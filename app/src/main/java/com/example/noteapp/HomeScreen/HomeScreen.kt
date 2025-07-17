@@ -2,10 +2,17 @@ package com.example.noteapp.HomeScreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.noteapp.ui.theme.NoteAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,22 +36,39 @@ fun HomeScreen() {
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Top app bar")
+                    Text(text = "Notes App")
                 }
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { },
+            ) {
+                Icon(Icons.Filled.Add, "Floating action button.")
+            }
+        }
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            val noteViewModel = MainViewModel()
+            val noteViewModel: MainViewModel = viewModel()
             val noteList by noteViewModel.notes.collectAsState(initial = emptyList())
-
-            LazyColumn() {
+            val dummyNotes = listOf(
+                Note(1, "First Note", "This is the first dummy note."),
+                Note(2, "Second Note", "This is the second dummy note."),
+                Note(3, "Third Note", "This is the third dummy note.")
+            )
+            LazyColumn {
                 items(noteList) { note ->
-                    Text(
-                        text = note.title,
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.titleLarge
-                    )
+                    Card(modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth()) {
+                        Text(
+                            text = note.title,
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                    }
+
                 }
             }
         }

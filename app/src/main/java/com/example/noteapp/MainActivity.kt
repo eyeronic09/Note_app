@@ -11,7 +11,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.noteapp.HomeScreen.HomeScreen
+import com.example.noteapp.HomeScreen.Screen
 import com.example.noteapp.ui.theme.NoteAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,17 +33,11 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    NoteAppTheme {
-        Greeting("Android")
+fun NoteApp() {
+    val NavHostController = rememberNavController()
+    NavHost(navController = NavHostController , startDestination = Screen.Home.route) {
+        composable(route = Screen.Home.route) {
+            HomeScreen()
+        }
     }
 }
