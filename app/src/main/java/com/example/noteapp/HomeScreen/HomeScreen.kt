@@ -1,5 +1,6 @@
 package com.example.noteapp.HomeScreen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,16 +23,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.noteapp.ui.theme.NoteAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -42,7 +45,9 @@ fun HomeScreen() {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { },
+                onClick = {
+
+                },
             ) {
                 Icon(Icons.Filled.Add, "Floating action button.")
             }
@@ -60,7 +65,9 @@ fun HomeScreen() {
                 items(noteList) { note ->
                     Card(modifier = Modifier
                         .padding(10.dp)
-                        .fillMaxWidth()) {
+                        .fillMaxWidth()
+                        .clickable(onClick = { navController.navigate("${Screen.EditorScreen.route}/${note.id}") })
+                    ) {
                         Text(
                             text = note.title,
                             modifier = Modifier.padding(16.dp),
@@ -79,6 +86,6 @@ fun HomeScreen() {
 @Composable
 fun HomeScreenPreview() {
     NoteAppTheme {
-        HomeScreen()
+        HomeScreen(navController = NavController(LocalContext.current))
     }
 }

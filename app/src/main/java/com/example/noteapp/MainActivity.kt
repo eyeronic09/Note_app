@@ -13,9 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.noteapp.HomeScreen.EditorScreen
 import com.example.noteapp.HomeScreen.HomeScreen
 import com.example.noteapp.HomeScreen.Screen
 import com.example.noteapp.ui.theme.NoteAppTheme
@@ -26,18 +29,25 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NoteAppTheme {
-                HomeScreen()
+                val navController = rememberNavController()
+                NoteApp(navController)
             }
         }
     }
 }
 
 @Composable
-fun NoteApp() {
-    val NavHostController = rememberNavController()
-    NavHost(navController = NavHostController , startDestination = Screen.Home.route) {
+fun NoteApp(navController : NavHostController) {
+    NavHost(navController = navController , startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
-            HomeScreen()
+            HomeScreen(navController)
         }
+        composable(
+                route = Screen.EditorScreen.route + "/{noteId}",
+        arguments = listOf(navArgument("noteId") { type = NavType.IntType })
+        ) { backStackEntry ->
+        val noteId = backStackEntry.arguments?.getInt("noteId") ?: 0
+        EditorScreen(navController = navController, noteId = noteId)
+    }
     }
 }
