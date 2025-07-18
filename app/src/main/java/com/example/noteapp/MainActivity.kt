@@ -31,16 +31,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             NoteAppTheme {
-                val navController = rememberNavController()
-                val mainViewModel : MainViewModel = viewModel()// <-- create at Activity level
-                NoteApp(navController, mainViewModel)
+                val mainViewModel: MainViewModel = viewModel()
+                NoteApp(mainViewModel)
             }
         }
     }
 }
 
 @Composable
-fun NoteApp(navController: NavHostController, mainViewModel: MainViewModel) {
+fun NoteApp( mainViewModel: MainViewModel) {
+    val navController = rememberNavController()
     NavHost(navController = navController, startDestination = Screen.Home.route) {
         composable(route = Screen.Home.route) {
             HomeScreen(navController , mainViewModel)

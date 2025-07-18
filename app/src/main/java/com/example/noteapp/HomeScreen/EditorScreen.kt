@@ -1,5 +1,8 @@
 package com.example.noteapp.HomeScreen
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,13 +20,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainViewModel) {
     val notes by mainViewModel.notes.collectAsState()
     val note = notes.find { it.id == noteId }
 
-    var title by remember { mutableStateOf(note?.title ?: "") }
+    var title by remember { mutableStateOf(note?.title ?:"") }
     var content by remember { mutableStateOf(note?.content ?: "") }
+    var date by remember { mutableStateOf(note?.date ?: "") }
+
 
     Column {
         TextField(
@@ -45,7 +51,7 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
         Button(
             onClick = {
                 if (noteId == 0) {
-                    mainViewModel.addNote(title = title, description = content)
+                    mainViewModel.addNote(title = title, description = content , date = date)
                 }
                 navController.popBackStack()
             },
@@ -53,5 +59,6 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
         ) {
             Text("Save")
         }
-    }
+     }
+    Log.d("NoteVar", "noteId: $note.id, title: $note.title, content: $note.content")
 }
