@@ -31,10 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun TasknoteCard(modifier: Modifier = Modifier, mainViewModel: MainViewModel, navController: NavController) {
-    Column(modifier = modifier) {
+    val context = LocalContext.current
+        Column(modifier = modifier) {
         val noteList by mainViewModel.notes.collectAsState()
         if (noteList.isEmpty()) {
             Column(
@@ -88,18 +90,15 @@ fun TasknoteCard(modifier: Modifier = Modifier, mainViewModel: MainViewModel, na
                                     IconButton(
                                         onClick = {
                                             val textToCopy = "Title: ${note.title}\nContent: ${note.content}"
-                                            val intent = Int
-
+                                            val clipboardIntent = Intent(Intent.ACTION_SEND).apply {
+                                                type = "text/plain"
+                                                putExtra(Intent.EXTRA_TEXT, textToCopy)
+                                            }
+                                            context.startActivity(Intent.createChooser(clipboardIntent, "Copy Note"))
                                         }
                                     ) {
                                         Icon(
                                             imageVector = Icons.Filled.CopyAll,
-                                            contentDescription = "Created On"
-                                        )
-                                    }
-                                    IconButton(onClick = {}) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Share,
                                             contentDescription = "Created On"
                                         )
                                     }
