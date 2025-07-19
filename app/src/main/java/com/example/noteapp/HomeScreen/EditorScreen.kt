@@ -60,5 +60,4 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
             Text("Save")
         }
      }
-    Log.d("NoteVar", "noteId: $note.id, title: $note.title, content: $note.content")
 }

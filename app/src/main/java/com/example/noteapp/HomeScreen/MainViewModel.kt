@@ -29,4 +29,5 @@ class MainViewModel() : ViewModel() {
     fun deleteNote(note: Note){
         _notes.value = _notes.value - note
     }
+    
 }
