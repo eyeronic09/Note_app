@@ -35,9 +35,9 @@ import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun TasknoteCard(modifier: Modifier = Modifier, mainViewModel: MainViewModel, navController: NavController) {
-    val context = LocalContext.current
+        val context = LocalContext.current
+       val  noteList by mainViewModel.notes.collectAsState()
         Column(modifier = modifier) {
-        val noteList by mainViewModel.notes.collectAsState()
         if (noteList.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -98,13 +98,13 @@ fun TasknoteCard(modifier: Modifier = Modifier, mainViewModel: MainViewModel, na
                                         }
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Filled.CopyAll,
+                                            imageVector = Icons.Filled.Share,
                                             contentDescription = "Created On"
                                         )
                                     }
                                     IconButton(onClick = {mainViewModel.deleteNote(note)}) {
                                         Icon(
-                                            imageVector = Icons.Filled.Delete,
+                                            imageVector = Icons.Filled.Share,
                                             contentDescription = "Created On"
                                         )
                                     }
