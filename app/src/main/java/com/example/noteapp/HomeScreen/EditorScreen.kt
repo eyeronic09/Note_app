@@ -3,24 +3,24 @@ package com.example.noteapp.HomeScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,22 +34,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
-
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainViewModel) {
     val notes by mainViewModel.notes.collectAsState()
     val note = notes.find { it.id == noteId }
-    var title by remember { mutableStateOf(note?.title ?:"") }
+    
+    var title by remember { mutableStateOf(note?.title ?: "") }
     var content by remember { mutableStateOf(note?.content ?: "") }
     var date by remember { mutableStateOf(note?.date ?: "") }
 
-
-
-    EditorScreenContent(
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(if (noteId == 0) "New Note" else "Edit Note") },
@@ -58,66 +54,51 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                         Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                actions = {
+                    IconButton(
+                        onClick = { if (noteId == 0) {
+                            mainViewModel.addNote(title = title, description = content , date = date)
+                        }
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Icon(Icons.Filled.Save, "Save the note")
+                    }
+                }
             )
         }
-    ) {
-        if (noteId == 0) {
-            mainViewModel.addNote(title = title, description = content , date = date)
-        }
-        navController.popBackStack()
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EditorScreenContent(
-    topBar: @Composable () -> Unit,
-    onSaveClick: () -> Unit
-) {
-    var title by remember { mutableStateOf("") }
-    var content by remember { mutableStateOf("") }
-
-    Scaffold(topBar = topBar) { innerPadding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(innerPadding)
+                .padding(16.dp)
         ) {
             TextField(
                 value = title,
                 onValueChange = { title = it },
-                label = { Text("Title") },
+                placeholder = {Text("Tittle")},
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = (Color.Transparent),
-                    unfocusedContainerColor = (Color.Transparent)
-                )
+                    .padding(bottom = 8.dp),
+                        colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent
+            )
             )
             TextField(
                 value = content,
+                placeholder = {Text("Content")},
                 onValueChange = { content = it },
-                label = { Text("Content") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = (Color.Transparent),
-                    unfocusedContainerColor = (Color.Transparent)
-                )
+                    .fillMaxHeight()
+                    .padding(bottom = 16.dp),
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent
+                    )
             )
-            Button(
-                onClick = onSaveClick,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text("Save")
-            }
+
         }
     }
 }
@@ -127,7 +108,7 @@ fun EditorScreenContent(
 @Composable
 fun EditorScreenNewNotePreview() {
     val navController = rememberNavController()
-    val viewModel: MainViewModel = viewModel() // Use a real or mock ViewModel
+    val viewModel: MainViewModel = viewModel()
     EditorScreen(navController = navController, noteId = 0, mainViewModel = viewModel)
 }
 
@@ -136,6 +117,6 @@ fun EditorScreenNewNotePreview() {
 @Composable
 fun EditorScreenEditNotePreview() {
     val navController = rememberNavController()
-    val viewModel: MainViewModel = viewModel() // Use a real or mock ViewModel
+    val viewModel: MainViewModel = viewModel()
     EditorScreen(navController = navController, noteId = 1, mainViewModel = viewModel)
 }

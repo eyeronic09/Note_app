@@ -104,7 +104,7 @@ fun TasknoteCard(modifier: Modifier = Modifier, mainViewModel: MainViewModel, na
                                     }
                                     IconButton(onClick = {mainViewModel.deleteNote(note)}) {
                                         Icon(
-                                            imageVector = Icons.Filled.Share,
+                                            imageVector = Icons.Filled.Delete,
                                             contentDescription = "Created On"
                                         )
                                     }
