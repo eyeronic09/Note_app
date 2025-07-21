@@ -1,6 +1,7 @@
 package com.example.noteapp.HomeScreen
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -60,6 +61,7 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                             mainViewModel.addNote(title = title, description = content , date = date)
                         }
                             navController.popBackStack()
+
                         }
                     ) {
                         Icon(Icons.Filled.Save, "Save the note")
@@ -97,9 +99,12 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                         unfocusedContainerColor = Color.Transparent,
                         focusedContainerColor = Color.Transparent
                     )
+
             )
 
         }
+
+
     }
 }
 

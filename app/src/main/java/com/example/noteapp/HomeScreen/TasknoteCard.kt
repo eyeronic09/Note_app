@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.CopyAll
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
@@ -27,16 +26,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.compose.ui.platform.LocalContext
+import kotlinx.serialization.builtins.CharArraySerializer
+import kotlin.random.Random
 
 @Composable
 fun TasknoteCard(modifier: Modifier = Modifier, mainViewModel: MainViewModel, navController: NavController) {
-        val context = LocalContext.current
+       val context = LocalContext.current
        val  noteList by mainViewModel.notes.collectAsState()
+    val cardColors = remember { mutableStateListOf<Color>() }
         Column(modifier = modifier) {
         if (noteList.isEmpty()) {
             Column(
@@ -60,7 +65,8 @@ fun TasknoteCard(modifier: Modifier = Modifier, mainViewModel: MainViewModel, na
                             .clickable(onClick = {
                                 navController.navigate("${Screen.EditorScreen.route}/${note.id}")
                             }),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        colors = CardDefaults.cardColors(containerColor = note.color)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
@@ -108,6 +114,7 @@ fun TasknoteCard(modifier: Modifier = Modifier, mainViewModel: MainViewModel, na
                                             contentDescription = "Created On"
                                         )
                                     }
+                                    Log.d("HomeScreen", ": id=${note.id}, title=${note.title}")
                                 }
                             }
                         }
