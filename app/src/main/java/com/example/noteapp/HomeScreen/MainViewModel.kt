@@ -35,12 +35,19 @@ class MainViewModel() : ViewModel() {
     fun deleteNote(note: Note) {
         _notes.value = _notes.value - note
     }
+    
+    fun updateNote(updatedNote: Note) {
+        _notes.value = _notes.value.map { note ->
+            if (note.id == updatedNote.id) updatedNote else note
+        }
+    }
 
     fun getPastelColor(): Color {
         val predefinedColors = listOf(
             Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Cyan, Color.Magenta
         )
         return predefinedColors.random()
+
 
     }
 

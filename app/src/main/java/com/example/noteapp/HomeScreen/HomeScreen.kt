@@ -36,7 +36,7 @@ fun HomeScreen(navController: NavController, mainViewModel: MainViewModel) {
             }
         }
     ) { innerPadding ->
-        TasknoteCard(modifier = Modifier.padding(innerPadding) , mainViewModel = mainViewModel , navController = navController)
+        noteDisplay(modifier = Modifier.padding(innerPadding) , mainViewModel = mainViewModel , navController = navController)
     }
 }
 

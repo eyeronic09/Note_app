@@ -34,11 +34,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import kotlinx.serialization.builtins.CharArraySerializer
-import kotlin.random.Random
 
 @Composable
-fun TasknoteCard(modifier: Modifier = Modifier, mainViewModel: MainViewModel, navController: NavController) {
+fun noteDisplay(modifier: Modifier = Modifier, mainViewModel: MainViewModel, navController: NavController) {
        val context = LocalContext.current
        val  noteList by mainViewModel.notes.collectAsState()
     val cardColors = remember { mutableStateListOf<Color>() }
