@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
@@ -70,11 +71,16 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                         Icon(Icons.Filled.Save, "Save the note")
                     }
                     IconButton(onClick = {
-                           if (makeReadonly == false){
-                               makeReadonly =  true
-                           }
+                        makeReadonly =  !makeReadonly
                     }) {
-                        Icon(imageVector = Icons.Default.RemoveRedEye , "reading mode")
+                        Icon(
+                            imageVector = if (makeReadonly){
+                                Icons.Default.Edit
+                            }else{
+                                Icons.Default.RemoveRedEye},
+                            contentDescription = "mode Switching"
+                        )
+
                     }
                 }
             )
@@ -95,7 +101,7 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                     .padding(bottom = 8.dp),
                         colors = TextFieldDefaults.colors(
                         unfocusedContainerColor = Color.Transparent,
-                focusedContainerColor = Color.Transparent
+                        focusedContainerColor = Color.Transparent
             )
             )
             TextField(
