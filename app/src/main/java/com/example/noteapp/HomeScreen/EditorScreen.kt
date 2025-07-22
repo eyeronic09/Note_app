@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,6 +47,8 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
     var content by remember { mutableStateOf(note?.content ?: "") }
     var date by remember { mutableStateOf(note?.date ?: "") }
 
+    var makeReadonly by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -66,6 +69,13 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                     ) {
                         Icon(Icons.Filled.Save, "Save the note")
                     }
+                    IconButton(onClick = {
+                           if (makeReadonly == false){
+                               makeReadonly =  true
+                           }
+                    }) {
+                        Icon(imageVector = Icons.Default.RemoveRedEye , "reading mode")
+                    }
                 }
             )
         }
@@ -79,6 +89,7 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                 value = title,
                 onValueChange = { title = it },
                 placeholder = {Text("Tittle")},
+                readOnly = makeReadonly,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 8.dp),
@@ -91,6 +102,7 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                 value = content,
                 placeholder = {Text("Content")},
                 onValueChange = { content = it },
+                readOnly = makeReadonly,
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()

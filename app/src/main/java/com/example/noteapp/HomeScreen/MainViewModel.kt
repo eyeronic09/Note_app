@@ -21,13 +21,13 @@ class MainViewModel() : ViewModel() {
     private val currentDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun addNote(title: String, description: String, date: String, color: Color = getPastelColor()) {
+    fun addNote(title: String, description: String, date: String, colors: Color = getPastelColor()) {
         val note = Note(
             id = noteId++, 
             title = title, 
             content = description, 
             date = currentDate,
-            color = color
+            color = colors
         )
         _notes.value = _notes.value + note
     }
@@ -43,4 +43,5 @@ class MainViewModel() : ViewModel() {
         return predefinedColors.random()
 
     }
+
 }
