@@ -56,12 +56,11 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
 
     var makeReadonly by remember { mutableStateOf(false) }
 
-    // Snackbar state and coroutine scope
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackBarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(if (noteId == 0) "New Note" else "Edit Note") },
@@ -76,9 +75,8 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                             if (noteId == 0) {
                                 mainViewModel.addNote(title = title, description = content , date = date)
                                 coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        message = "Note saved",
-                                        actionLabel = "OK"
+                                    snackBarHostState.showSnackbar(
+                                        message = "Note Saved"
                                     )
                                 }
                             } else {
@@ -91,11 +89,11 @@ fun EditorScreen(navController: NavController, noteId: Int, mainViewModel: MainV
                                         )
                                     )
                                     coroutineScope.launch {
-                                        snackbarHostState.showSnackbar(
-                                            message = "Note updated",
-                                            actionLabel = "OK"
+                                        snackBarHostState.showSnackbar(
+                                            message = "Note update"
                                         )
                                     }
+
                                 }
                             }
                             navController.popBackStack()
