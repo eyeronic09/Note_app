@@ -15,11 +15,11 @@ interface NotesDao {
     fun getAllNotes(): Flow<List<Note>>
 
     @Upsert
-    fun addNotes(note: Note)
+   suspend fun addNotes(note: Note)
 
     @Delete
-    fun deleteNotes(note: Note)
+    suspend fun deleteNotes(note: Note)
 
     @Update
-    fun updateNotes(note: Note)
+    suspend fun updateNotes(note: Note)
 }
