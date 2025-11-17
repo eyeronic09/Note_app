@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import com.example.noteapp.HomeScreen.data_layer.local.entity.Note
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,9 +24,9 @@ class MainViewModel() : ViewModel() {
     @RequiresApi(Build.VERSION_CODES.O)
     fun addNote(title: String, description: String, date: String, colors: Color = getPastelColor()) {
         val note = Note(
-            id = noteId++, 
-            title = title, 
-            content = description, 
+            id = noteId++,
+            title = title,
+            content = description,
             date = currentDate,
             color = colors
         )
