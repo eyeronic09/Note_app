@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.room.PrimaryKey
 
 data class Note(
-    val id: Int ,
+    val id: Int = 0 ,
     val title: String,
     val content: String,
     val date: String

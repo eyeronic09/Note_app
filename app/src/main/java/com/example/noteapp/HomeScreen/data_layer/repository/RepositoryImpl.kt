@@ -1,24 +1,30 @@
 package com.example.noteapp.HomeScreen.data_layer.repository
 
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
-import com.example.noteapp.HomeScreen.data_layer.local.entity.Note
-import com.example.noteapp.HomeScreen.domain_layer.repository.Repository
+import com.example.noteapp.HomeScreen.data_layer.local.mapper.toDomain
+import com.example.noteapp.HomeScreen.data_layer.local.mapper.toEntity
+import com.example.noteapp.HomeScreen.domain_layer.model.Note
+import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class RepositoryImpl (private val sources: NotesLocalDataSources) : Repository {
+class RepositoryImpl(private val sources: NotesLocalDataSources) : NoteRepository {
     override fun getAllNotes(): Flow<List<Note>> {
-        return sources.getAllNotes()
+        return sources.getAllNotes().map { noteEntities -> noteEntities.map {
+            it.toDomain()
+        } }
     }
 
     override suspend fun addNotes(note: Note) {
-        return sources.addNotes(note)
+        sources.addNotes(note.toEntity())
     }
 
-    override suspend fun deleteNotes(note: Note) {
-       return sources.deleteNotes(note)
+    override suspend fun deleteNotes(note : Note) {
+        sources.deleteNotes(note.toEntity())
     }
 
     override suspend fun updateNotes(note: Note) {
-        return sources.updateNotes(note)
+        sources.updateNotes(note.toEntity())
     }
+
 }
