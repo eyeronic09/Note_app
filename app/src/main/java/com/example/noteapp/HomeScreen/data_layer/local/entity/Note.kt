@@ -9,6 +9,5 @@ data class Note(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val content: String,
-    val date: String,
-    val color: Color
+    val date: String
 )

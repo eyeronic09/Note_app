@@ -54,13 +54,17 @@ dependencies {
 
     
     //Koin
-    implementation("org.koin:koin-core:3.2.0")
+    //Koin
+// 1. Define the version in a variable, just like you did for Room
+    val koin_version = "4.1.0"
 
-    // Koin for Android (if you are using it for Android context)
-    implementation("io.insert-koin:koin-android:3.5.3") // Or io.insert-koin:koin-android-compat if needed
+// 2. Import the Bill of Materials (BOM) using its full name
+// The platform() function ensures all Koin modules use the same version
+    implementation(platform("io.insert-koin:koin-bom:$koin_version"))
 
-    // Koin for Compose
-    implementation("io.insert-koin:koin-compose:3.5.3")
+// 3. Add the Koin modules you need without specifying a version
+    implementation("io.insert-koin:koin-core:$koin_version")
+    implementation("io.insert-koin:koin-androidx-compose:$koin_version")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
