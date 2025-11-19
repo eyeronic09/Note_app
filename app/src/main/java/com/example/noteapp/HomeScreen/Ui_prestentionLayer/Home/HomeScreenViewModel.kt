@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 
 data class HomeScreenUIState(
     val notes: List<Note> = emptyList(),
+    val title: String = "" ,
+    val content : String = "" ,
     val isLoading : Boolean = false,
     val error: String? = null
 )
@@ -42,6 +44,16 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel(){
     }
     init {
         loadNotes()
+    }
+    fun changeTitle(str : String){
+        _uiState.update {
+            it.copy(title = str)
+        }
+    }
+    fun changeContent(str : String){
+        _uiState.update {
+            it.copy(content = str)
+        }
     }
 
     private fun loadNotes(){
