@@ -2,6 +2,7 @@ package com.example.noteapp.HomeScreen.Di
 
 import android.app.Application
 import androidx.room.Room
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSourcesImpl
 import com.example.noteapp.HomeScreen.data_layer.local.database.NoteRoomDatabase
@@ -15,6 +16,8 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 
@@ -59,6 +62,9 @@ class AppModule () : Application() {
         factory { UpdateNotesUseCase(get()) }
         factory { DeleteNoteUseCase(get()) }
 
+        viewModel {
+            HomeScreenViewModel(get())
+        }
 
 
     }

@@ -8,7 +8,9 @@ import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class RepositoryImpl(private val sources: NotesLocalDataSources) : NoteRepository {
+class RepositoryImpl(
+    private val sources: NotesLocalDataSources
+) : NoteRepository {
     override fun getAllNotes(): Flow<List<Note>> {
         return sources.getAllNotes().map { noteEntities -> noteEntities.map {
             it.toDomain()
