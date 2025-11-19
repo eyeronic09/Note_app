@@ -3,7 +3,6 @@ package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
 
 data class HomeScreenUIState(
     val notes: List<Note> = emptyList(),
@@ -43,6 +43,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel(){
     init {
         loadNotes()
     }
+
     private fun loadNotes(){
         viewModelScope.launch {
             try {
