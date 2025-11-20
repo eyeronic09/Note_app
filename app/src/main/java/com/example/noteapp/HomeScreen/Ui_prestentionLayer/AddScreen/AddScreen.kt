@@ -9,13 +9,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -24,13 +22,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -41,7 +40,8 @@ fun AddScreen(
     navController: NavController,
     viewModel: HomeScreenViewModel = koinViewModel()
 ) {
-    val uiState = viewModel.uiState.collectAsState()
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    val onEvent = viewModel::onEvent
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -86,10 +86,13 @@ fun AddScreen(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.value.title,
-                onValueChange = { viewModel.changeTitle(it)},
+                onValueChange = { newText ->
+                    onEvent(HomeScreenEvent.UpdateTitle(title = newText))
+                },
                 label = { Text("Title") },
                 singleLine = true
             )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -98,17 +101,20 @@ fun AddScreen(
                     .weight(1f)
                     .fillMaxWidth(),
                 value = uiState.value.content,
-                onValueChange = { viewModel.changeContent(it) },
-                label = { Text("content") },
-                maxLines = Integer.MAX_VALUE,
+                onValueChange = { newText ->
+                    onEvent(HomeScreenEvent.UpdateContent(content = newText))
+                },
+                label = { Text("Content") },
+                maxLines = Int.MAX_VALUE
             )
+
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
                 onClick = {
                     scope.launch {
-                        TODO()
+                       onEvent(HomeScreenEvent.AddNote)
                     }
                 },
                 enabled = !uiState.value.isLoading &&
@@ -126,12 +132,3 @@ fun AddScreen(
     }
 }
 
-@androidx.compose.ui.tooling.preview.Preview(showSystemUi = true)
-@Composable
-fun AddScreenPreview() {
-    MaterialTheme {
-        // AddScreen(navController = rememberNavController())
-        // Note: Preview might not work properly with Hilt ViewModel
-        // You can create a preview version with a fake ViewModel if needed
-    }
-}

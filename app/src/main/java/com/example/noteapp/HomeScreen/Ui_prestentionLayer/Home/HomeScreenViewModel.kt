@@ -14,49 +14,65 @@ import kotlinx.coroutines.launch
 
 data class HomeScreenUIState(
     val notes: List<Note> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null,
     val title: String = "" ,
-    val content : String = "" ,
-    val isLoading : Boolean = false,
-    val error: String? = null
+    val content: String = ""
 )
 
 sealed interface  HomeScreenEvent {
-    data class AddNote(val title: String, val content: String) : HomeScreenEvent
+    data class UpdateTitle(val title: String) : HomeScreenEvent
+    data class UpdateContent(val content: String) : HomeScreenEvent
+
+    data object AddNote : HomeScreenEvent
     data class UpdateNote(val note: Note) : HomeScreenEvent
     data class DeleteNote(val note: Note) : HomeScreenEvent
     data class OpenToRead(val note: Note) : HomeScreenEvent
     object LoadNotes : HomeScreenEvent
 }
 
-class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel(){
+class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() {
 
-    private val _uiState = MutableStateFlow <HomeScreenUIState>(HomeScreenUIState())
-    val uiState : StateFlow<HomeScreenUIState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<HomeScreenUIState>(HomeScreenUIState())
+    val uiState: StateFlow<HomeScreenUIState> = _uiState.asStateFlow()
 
-    fun onEvent(onClick : HomeScreenEvent) {
-        when(onClick){
+    fun onEvent(event: HomeScreenEvent) {
+        when (event) {
             HomeScreenEvent.LoadNotes -> loadNotes()
-            is HomeScreenEvent.AddNote -> TODO()
             is HomeScreenEvent.DeleteNote -> TODO()
+            is HomeScreenEvent.AddNote -> insertNote()
             is HomeScreenEvent.OpenToRead -> TODO()
             is HomeScreenEvent.UpdateNote -> TODO()
-        }
-    }
-    init {
-        loadNotes()
-    }
-    fun changeTitle(str : String){
-        _uiState.update {
-            it.copy(title = str)
-        }
-    }
-    fun changeContent(str : String){
-        _uiState.update {
-            it.copy(content = str)
+            is HomeScreenEvent.UpdateContent -> {
+                _uiState.update { it.copy(content = event.content) }
+            }
+
+            is HomeScreenEvent.UpdateTitle -> {
+                _uiState.update {
+                    it.copy(title = event.title)
+                }
+            }
+
+            else -> {}
         }
     }
 
-    private fun loadNotes(){
+    fun insertNote() {
+        viewModelScope.launch {
+            val note = Note(
+                title = _uiState.value.title,
+                content = _uiState.value.content,
+                date = ""
+            )
+            repository.addNotes(note).also {
+                Log.d("Add_Note", note.toString())
+            }
+        }
+
+
+    }
+
+    fun loadNotes() {
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }
@@ -69,8 +85,8 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel(){
                         )
                     }
                 }
-            }catch (e: Exception){
-                Log.d("HomeScreen_error" , e.toString())
+            } catch (e: Exception) {
+                Log.d("HomeScreen_error", e.toString())
             }
         }
     }
