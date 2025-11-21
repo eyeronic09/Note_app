@@ -1,6 +1,7 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 
 import android.util.Log
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
@@ -18,15 +19,16 @@ data class HomeScreenUIState(
     val notes: List<Note> = emptyList(),
     val error: String? = null,
     val currentNoteId: Int? = null,
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val isWriting : Boolean = false
 )
 
 sealed interface  HomeScreenEvent {
+    data object SetToEdit : HomeScreenEvent
     data class UpdateTitle(val title: String) : HomeScreenEvent
     data class UpdateContent(val content: String) : HomeScreenEvent
     data object AddNote : HomeScreenEvent
     data class DeleteNote(val note: Note) : HomeScreenEvent
-
     data object UpdateNote : HomeScreenEvent
     data class OpenToReadAndUpdate(val noteId: Int) : HomeScreenEvent
     object LoadNotes : HomeScreenEvent
@@ -40,7 +42,13 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
     fun onEvent(event: HomeScreenEvent) {
         when (event) {
             is HomeScreenEvent.DeleteNote -> {
-                TODO()
+                viewModelScope.launch {
+                    deleteNote(event.note)
+                }
+
+            }
+            is HomeScreenEvent.SetToEdit -> {
+                setToEditMode()
             }
             is HomeScreenEvent.AddNote -> {
                 insertNote()
@@ -67,37 +75,56 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         loadNotes()
     }
 
+    private fun setToEditMode(){
+        _uiState.update {
+            it.copy(
+                isWriting = !_uiState.value.isWriting
+            ).also {
+                Log.d("Current Mode" , _uiState.value.isWriting.toString())
+            }
+
+
+        }
+    }
+
+    private suspend fun deleteNote(note: Note){
+        repository.deleteNotes(note)
+    }
+
     private fun updateNote(){
-        val noteId = _uiState.value.currentNoteId ?: return
+        if (_uiState.value.isWriting){
+            val noteId = _uiState.value.currentNoteId ?: return
 
-        viewModelScope.launch {
-            try {
-                _uiState.update { it.copy(isLoading = true) }
-                val updatedNote = Note(
-                    id = noteId, // Use the existing ID
-                    title = _uiState.value.title,
-                    content = _uiState.value.content,
-                    date = "" // Later
-                )
-
-
-                repository.updateNotes(updatedNote)
-
-                _uiState.update {
-                    it.copy(
-                        title = "",
-                        content = "",
-                        currentNoteId = null,
-                        isLoading = false
+            viewModelScope.launch {
+                try {
+                    _uiState.update { it.copy(isLoading = true) }
+                    val updatedNote = Note(
+                        id = noteId, // Use the existing ID
+                        title = _uiState.value.title,
+                        content = _uiState.value.content,
+                        date = "" // Later
                     )
+
+
+                    repository.updateNotes(updatedNote)
+
+                    _uiState.update {
+                        it.copy(
+                            title = "",
+                            content = "",
+                            currentNoteId = null,
+                            isLoading = false
+                        )
+                    }
+                } catch (e: Exception) {
+                    _uiState.update { it.copy(
+                        error = "Failed to update note",
+                        isLoading = false
+                    )}
                 }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(
-                    error = "Failed to update note",
-                    isLoading = false
-                )}
             }
         }
+
     }
 
     private fun loadNoteById(noteId: Int) {

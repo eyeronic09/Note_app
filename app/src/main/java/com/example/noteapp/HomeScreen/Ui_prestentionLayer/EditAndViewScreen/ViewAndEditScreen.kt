@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -41,7 +42,7 @@ fun ViewAndEditScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel::onEvent
 
-    // This will run when the noteId changes
+
     LaunchedEffect(noteId) {
         if (noteId != -1) {
             event(HomeScreenEvent.OpenToReadAndUpdate(noteId = noteId))
@@ -52,7 +53,11 @@ fun ViewAndEditScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Reading Mode")
+                    if (uiState.isWriting) {
+                        Text("writing Mode")
+                    } else {
+                        Text("Reading Mode")
+                    }
                 },
                 actions = {
                     IconButton(onClick = {
@@ -61,6 +66,16 @@ fun ViewAndEditScreen(
                         Icon(
                             imageVector = Icons.Default.Save,
                             contentDescription = "Save"
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            event(HomeScreenEvent.SetToEdit)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit"
                         )
                     }
                 },
@@ -91,6 +106,7 @@ fun ViewAndEditScreen(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = uiState.title,
+                enabled = uiState.isWriting,
                 onValueChange = { newText ->
                     event(HomeScreenEvent.UpdateTitle(title = newText))
                 },
@@ -106,6 +122,7 @@ fun ViewAndEditScreen(
                     .weight(1f)
                     .fillMaxWidth(),
                 value = uiState.content,
+                enabled = uiState.isWriting,
                 onValueChange = { newText ->
                     event(HomeScreenEvent.UpdateContent(content = newText))
                 },
