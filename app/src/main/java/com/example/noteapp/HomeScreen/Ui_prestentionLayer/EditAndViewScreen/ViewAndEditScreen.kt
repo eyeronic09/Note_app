@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.coreScreen.SealedScreen
@@ -35,13 +36,16 @@ import com.example.noteapp.HomeScreen.domain_layer.model.Note
 fun ViewAndEditScreen(
     navController: NavController,
     viewModel: HomeScreenViewModel,
-    onClickNavigate : (noteId : Int) -> Unit
+    noteId: Int,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel::onEvent
 
-    LaunchedEffect(onClickNavigate) {
-        event(HomeScreenEvent.OpenToReadAndUpdate(noteId = uiState.currentNoteId ?: -1))
+    // This will run when the noteId changes
+    LaunchedEffect(noteId) {
+        if (noteId != -1) {
+            event(HomeScreenEvent.OpenToReadAndUpdate(noteId = noteId))
+        }
     }
 
     Scaffold(
@@ -52,7 +56,7 @@ fun ViewAndEditScreen(
                 },
                 actions = {
                     IconButton(onClick = {
-
+                        event(HomeScreenEvent.UpdateNote)
                     }) {
                         Icon(
                             imageVector = Icons.Default.Save,

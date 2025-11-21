@@ -26,6 +26,8 @@ sealed interface  HomeScreenEvent {
     data class UpdateContent(val content: String) : HomeScreenEvent
     data object AddNote : HomeScreenEvent
     data class DeleteNote(val note: Note) : HomeScreenEvent
+
+    data object UpdateNote : HomeScreenEvent
     data class OpenToReadAndUpdate(val noteId: Int) : HomeScreenEvent
     object LoadNotes : HomeScreenEvent
 }
@@ -37,8 +39,12 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
 
     fun onEvent(event: HomeScreenEvent) {
         when (event) {
-            is HomeScreenEvent.DeleteNote -> TODO()
-            is HomeScreenEvent.AddNote -> insertNote()
+            is HomeScreenEvent.DeleteNote -> {
+                TODO()
+            }
+            is HomeScreenEvent.AddNote -> {
+                insertNote()
+            }
             is HomeScreenEvent.OpenToReadAndUpdate -> {
                 loadNoteById(event.noteId)
             }
@@ -51,13 +57,49 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                     it.copy(title = event.title)
                 }
             }
-
+            is HomeScreenEvent.UpdateNote -> {
+                updateNote()
+            }
             else -> {}
         }
     }
     init {
         loadNotes()
     }
+
+    private fun updateNote(){
+        val noteId = _uiState.value.currentNoteId ?: return
+
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+                val updatedNote = Note(
+                    id = noteId, // Use the existing ID
+                    title = _uiState.value.title,
+                    content = _uiState.value.content,
+                    date = "" // Later
+                )
+
+
+                repository.updateNotes(updatedNote)
+
+                _uiState.update {
+                    it.copy(
+                        title = "",
+                        content = "",
+                        currentNoteId = null,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(
+                    error = "Failed to update note",
+                    isLoading = false
+                )}
+            }
+        }
+    }
+
     private fun loadNoteById(noteId: Int) {
         viewModelScope.launch {
             try {
@@ -71,6 +113,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                         isLoading = false
                     )
                 }
+
             } catch (e: Exception) {
                 _uiState.update { it.copy(
                     error = "Failed to load note",
@@ -80,7 +123,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         }
     }
 
-    fun insertNote() {
+    private fun insertNote() {
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }

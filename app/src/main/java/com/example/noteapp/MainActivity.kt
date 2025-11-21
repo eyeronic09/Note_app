@@ -70,16 +70,13 @@ fun Appnav() {
         ) { backStackEntry ->
             val noteId = backStackEntry.arguments?.getInt("noteId") ?: -1
             val viewModel: HomeScreenViewModel = koinViewModel()
-            
-            // Load the note when the screen is first shown
-            LaunchedEffect(Unit) {
-                viewModel.onEvent(HomeScreenEvent.OpenToReadAndUpdate(noteId))
-            }
-            
+
+
             ViewAndEditScreen(
                 navController = navController,
                 viewModel = viewModel,
-                onClickNavigate = { navController.navigateUp() }
+                //pass the id 
+                noteId = noteId,
             )
         }
     }
