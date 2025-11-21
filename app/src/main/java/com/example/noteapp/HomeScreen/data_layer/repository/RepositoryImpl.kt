@@ -1,5 +1,6 @@
 package com.example.noteapp.HomeScreen.data_layer.repository
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
 import com.example.noteapp.HomeScreen.data_layer.local.mapper.toDomain
 import com.example.noteapp.HomeScreen.data_layer.local.mapper.toEntity
@@ -15,6 +16,10 @@ class RepositoryImpl(
         return sources.getAllNotes().map { noteEntities -> noteEntities.map {
             it.toDomain()
         } }
+    }
+
+    override suspend fun getNoteById(noteId: Int): Note {
+        return sources.getNoteById(noteId).toDomain()
     }
 
     override suspend fun addNotes(note: Note) {

@@ -1,5 +1,6 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,8 +16,14 @@ import androidx.compose.ui.unit.dp
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
 
 @Composable
-fun NoteCard(note: Note) {
-    OutlinedCard(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+fun NoteCard(
+    note: Note,
+    onNoteClick: () -> Unit
+) {
+    OutlinedCard(modifier = Modifier
+        .fillMaxWidth()
+        .padding(16.dp)
+        .clickable(onClick = onNoteClick)) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = note.title, style = MaterialTheme.typography.titleLarge)
             HorizontalDivider()
@@ -38,6 +45,7 @@ private fun NoteCardPreview() {
         date = "1-1-2025"
     )
     NoteCard(
-        note = note
+        note = note,
+        onNoteClick = {}
     )
 }

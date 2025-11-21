@@ -55,8 +55,15 @@ fun HomeScreen (viewModel: HomeScreenViewModel = koinViewModel() , navController
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.fillMaxSize() , contentPadding = innerPadding) {
-            items(uiState.notes){
-                NoteCard(it)
+            items(uiState.notes){ note ->
+                NoteCard(
+                    note = note,
+                    onNoteClick = {
+                        navController.navigate(
+                            SealedScreen.View_add_Edit.createRoute(noteId = note.id)
+                        )
+                    }
+                )
             }
         }
     }

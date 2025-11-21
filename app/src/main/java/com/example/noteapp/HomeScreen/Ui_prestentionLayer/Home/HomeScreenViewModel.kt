@@ -13,21 +13,20 @@ import kotlinx.coroutines.launch
 
 
 data class HomeScreenUIState(
+    val title: String = "",
+    val content: String = "",
     val notes: List<Note> = emptyList(),
-    val isLoading: Boolean = false,
     val error: String? = null,
-    val title: String = "" ,
-    val content: String = ""
+    val currentNoteId: Int? = null,
+    val isLoading: Boolean = false
 )
 
 sealed interface  HomeScreenEvent {
     data class UpdateTitle(val title: String) : HomeScreenEvent
     data class UpdateContent(val content: String) : HomeScreenEvent
-
     data object AddNote : HomeScreenEvent
-    data class UpdateNote(val note: Note) : HomeScreenEvent
     data class DeleteNote(val note: Note) : HomeScreenEvent
-    data class OpenToRead(val note: Note) : HomeScreenEvent
+    data class OpenToReadAndUpdate(val noteId: Int) : HomeScreenEvent
     object LoadNotes : HomeScreenEvent
 }
 
@@ -38,11 +37,11 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
 
     fun onEvent(event: HomeScreenEvent) {
         when (event) {
-            HomeScreenEvent.LoadNotes -> loadNotes()
             is HomeScreenEvent.DeleteNote -> TODO()
             is HomeScreenEvent.AddNote -> insertNote()
-            is HomeScreenEvent.OpenToRead -> TODO()
-            is HomeScreenEvent.UpdateNote -> TODO()
+            is HomeScreenEvent.OpenToReadAndUpdate -> {
+                loadNoteById(event.noteId)
+            }
             is HomeScreenEvent.UpdateContent -> {
                 _uiState.update { it.copy(content = event.content) }
             }
@@ -56,16 +55,49 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             else -> {}
         }
     }
+    init {
+        loadNotes()
+    }
+    private fun loadNoteById(noteId: Int) {
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+                val note = repository.getNoteById(noteId)
+                _uiState.update { currentState ->
+                    currentState.copy(
+                        title = note.title,
+                        content = note.content,
+                        currentNoteId = noteId,
+                        isLoading = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(
+                    error = "Failed to load note",
+                    isLoading = false
+                )}
+            }
+        }
+    }
 
     fun insertNote() {
         viewModelScope.launch {
-            val note = Note(
-                title = _uiState.value.title,
-                content = _uiState.value.content,
-                date = ""
-            )
-            repository.addNotes(note).also {
-                Log.d("Add_Note", note.toString())
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+                val note = Note(
+                    title = _uiState.value.title,
+                    content = _uiState.value.content,
+                    date = ""
+                )
+                repository.addNotes(note).also {
+                    Log.d("Add_Note", note.toString())
+                }
+                _uiState.update { HomeScreenUIState(isLoading = false) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(
+                    error = "Failed to save note",
+                    isLoading = false
+                )}
             }
         }
 

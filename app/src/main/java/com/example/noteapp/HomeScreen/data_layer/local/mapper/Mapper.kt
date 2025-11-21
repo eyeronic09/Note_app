@@ -12,6 +12,8 @@ fun NoteEntity.toDomain() : Note {
     )
 }
 
+
+
 fun Note.toEntity() : NoteEntity {
     return NoteEntity(
         id = this.id,

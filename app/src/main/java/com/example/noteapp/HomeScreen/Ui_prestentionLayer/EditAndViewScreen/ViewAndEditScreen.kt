@@ -1,5 +1,4 @@
-package com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen
-
+package com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,54 +8,50 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.coreScreen.SealedScreen
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import com.example.noteapp.HomeScreen.domain_layer.model.Note
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddScreen(
+fun ViewAndEditScreen(
     navController: NavController,
-    viewModel: HomeScreenViewModel = koinViewModel()
+    viewModel: HomeScreenViewModel,
+    onClickNavigate : (noteId : Int) -> Unit
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    val onEvent = viewModel::onEvent
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val event = viewModel::onEvent
 
+    LaunchedEffect(onClickNavigate) {
+        event(HomeScreenEvent.OpenToReadAndUpdate(noteId = uiState.currentNoteId ?: -1))
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Add Note")
-                }
-                ,
+                    Text("Reading Mode")
+                },
                 actions = {
                     IconButton(onClick = {
-                        onEvent(HomeScreenEvent.AddNote)
 
                     }) {
                         Icon(
@@ -79,20 +74,21 @@ fun AddScreen(
                 }
             )
         }
-    ) { paddingValues ->
+    )
+    { it ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(it)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = uiState.value.title,
+                value = uiState.title,
                 onValueChange = { newText ->
-                    onEvent(HomeScreenEvent.UpdateTitle(title = newText))
+                    event(HomeScreenEvent.UpdateTitle(title = newText))
                 },
                 label = { Text("Title") },
                 singleLine = true
@@ -105,9 +101,9 @@ fun AddScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                value = uiState.value.content,
+                value = uiState.content,
                 onValueChange = { newText ->
-                    onEvent(HomeScreenEvent.UpdateContent(content = newText))
+                    event(HomeScreenEvent.UpdateContent(content = newText))
                 },
                 label = { Text("Content") },
                 maxLines = Int.MAX_VALUE
@@ -115,4 +111,3 @@ fun AddScreen(
         }
     }
 }
-

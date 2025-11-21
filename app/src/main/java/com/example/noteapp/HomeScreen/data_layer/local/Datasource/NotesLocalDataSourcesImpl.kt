@@ -13,6 +13,10 @@ class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSourc
        return dao.addNotes(noteEntity)
     }
 
+    override suspend fun getNoteById(noteId: Int): NoteEntity {
+        return dao.getNoteById(noteId = noteId)
+    }
+
     override suspend fun deleteNotes(noteEntity: NoteEntity) {
         return dao.deleteNotes(noteEntity)
     }
