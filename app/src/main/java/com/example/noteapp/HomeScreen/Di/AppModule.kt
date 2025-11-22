@@ -35,10 +35,12 @@ class AppModule () : Application() {
         // Database
         single {
             Room.databaseBuilder(
-                androidApplication(),
-                NoteRoomDatabase::class.java,
-                "Notes_DB"
-            ).build()
+                        androidApplication(),
+                        NoteRoomDatabase::class.java,
+                        "Notes_DB"
+                    )
+                .fallbackToDestructiveMigration(true)
+                .build()
         }
         
         // DAO

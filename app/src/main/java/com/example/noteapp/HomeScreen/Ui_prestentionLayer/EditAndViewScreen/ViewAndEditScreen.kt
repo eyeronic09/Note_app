@@ -54,7 +54,7 @@ fun ViewAndEditScreen(
             TopAppBar(
                 title = {
                     if (uiState.isWriting) {
-                        Text("writing Mode")
+                        Text("Writing Mode")
                     } else {
                         Text("Reading Mode")
                     }

@@ -1,7 +1,12 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 
+import android.graphics.Color.GREEN
+import android.graphics.Color.RED
+import android.graphics.Color.WHITE
 import android.util.Log
 import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
@@ -20,7 +25,8 @@ data class HomeScreenUIState(
     val error: String? = null,
     val currentNoteId: Int? = null,
     val isLoading: Boolean = false,
-    val isWriting : Boolean = false
+    val isWriting : Boolean = false,
+    val color : Int? = null
 )
 
 sealed interface  HomeScreenEvent {
@@ -86,7 +92,9 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
 
         }
     }
-
+    private fun randomColor() : Int {
+       return listOf(WHITE, RED , GREEN ).random()
+    }
     private suspend fun deleteNote(note: Note){
         repository.deleteNotes(note)
     }
@@ -102,7 +110,9 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                         id = noteId, // Use the existing ID
                         title = _uiState.value.title,
                         content = _uiState.value.content,
-                        date = "" // Later
+                        date = "", // Later
+                        color = randomColor()
+
                     )
 
 
@@ -157,7 +167,8 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 val note = Note(
                     title = _uiState.value.title,
                     content = _uiState.value.content,
-                    date = ""
+                    date = "",
+                    color = randomColor()
                 )
                 repository.addNotes(note).also {
                     Log.d("Add_Note", note.toString())
