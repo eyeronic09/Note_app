@@ -12,8 +12,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -186,21 +190,21 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
     }
 
     fun loadNotes() {
-        viewModelScope.launch {
-            try {
-                _uiState.update { it.copy(isLoading = true) }
-                repository.getAllNotes().collect { notes ->
-                    _uiState.update { state ->
-                        state.copy(
-                            notes = notes,
-                            isLoading = false,
-                            error = null
-                        )
+            viewModelScope.launch {
+                try {
+                    _uiState.update { it.copy(isLoading = true) }
+                    repository.getAllNotes().collect { notes ->
+                        _uiState.update { state ->
+                            state.copy(
+                                notes = notes,
+                                isLoading = false,
+                                error = null
+                            )
+                        }
                     }
+                } catch (e: Exception) {
+                    Log.d("HomeScreen_error", e.toString())
                 }
-            } catch (e: Exception) {
-                Log.d("HomeScreen_error", e.toString())
             }
-        }
     }
 }
