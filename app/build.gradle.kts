@@ -64,6 +64,8 @@ dependencies {
     //Navigation
     implementation("androidx.navigation:navigation-compose:2.9.6")
 
+    // Removed: implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc13")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

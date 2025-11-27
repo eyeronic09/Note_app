@@ -2,6 +2,7 @@ package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,11 +29,15 @@ fun NoteCard(
         .fillMaxWidth()
         .padding(16.dp)
         .clickable(onClick = onNoteClick),
-        colors = CardDefaults.cardColors(containerColor = Color.Red)
+        colors = CardDefaults
+            .cardColors(
+                containerColor = Color(note.color),
+                contentColor = if(isSystemInDarkTheme()) Color.White else Color.Black
+            )
 
     )
     {
-        Column(modifier = Modifier.padding(16.dp).background(Color(note.color))) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(text = note.title, style = MaterialTheme.typography.titleLarge)
             HorizontalDivider()
             Spacer(modifier = Modifier.padding(4.dp))

@@ -3,6 +3,7 @@ package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 import android.graphics.Color.GREEN
 import android.graphics.Color.RED
 import android.graphics.Color.WHITE
+import android.graphics.Color.argb
 import android.util.Log
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
+
 data class HomeScreenUIState(
     val title: String = "",
     val content: String = "",
@@ -37,7 +39,7 @@ sealed interface  HomeScreenEvent {
     data object SetToEdit : HomeScreenEvent
     data class UpdateTitle(val title: String) : HomeScreenEvent
     data class UpdateContent(val content: String) : HomeScreenEvent
-    data object AddNote : HomeScreenEvent
+    data class AddNote(val content: String) : HomeScreenEvent // Modified here
     data class DeleteNote(val note: Note) : HomeScreenEvent
     data object UpdateNote : HomeScreenEvent
     data class OpenToReadAndUpdate(val noteId: Int) : HomeScreenEvent
@@ -61,7 +63,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 setToEditMode()
             }
             is HomeScreenEvent.AddNote -> {
-                insertNote()
+                insertNote(event.content) // Modified here
             }
             is HomeScreenEvent.OpenToReadAndUpdate -> {
                 loadNoteById(event.noteId)
@@ -78,9 +80,10 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             is HomeScreenEvent.UpdateNote -> {
                 updateNote()
             }
-            else -> {}
+            is HomeScreenEvent.LoadNotes -> { /* Handled in init block */ }
         }
     }
+
     init {
         loadNotes()
     }
@@ -96,8 +99,15 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
 
         }
     }
-    private fun randomColor() : Int {
-       return listOf(WHITE, RED , GREEN ).random()
+    private fun randomColor(): Int {
+        val colors = listOf(
+            argb(255,246, 114, 128),
+            argb(255,192, 108, 132),
+            argb(255, 108, 91, 123),
+            argb(255, 174, 222, 252)
+        )
+
+        return colors.random()
     }
     private suspend fun deleteNote(note: Note){
         repository.deleteNotes(note)
@@ -164,13 +174,13 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         }
     }
 
-    private fun insertNote() {
+    private fun insertNote(content: String) { // Modified here
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }
                 val note = Note(
-                    title = _uiState.value.title,
-                    content = _uiState.value.content,
+                    title = _uiState.value.title, // Title from UI state
+                    content = content, // Content from parameter
                     date = "",
                     color = randomColor()
                 )
