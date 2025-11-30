@@ -13,7 +13,9 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -95,6 +97,7 @@ fun ViewAndEditScreen(
         }
     )
     { it ->
+        val constColorMaterial = MaterialTheme.colorScheme.primary
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -104,7 +107,16 @@ fun ViewAndEditScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+
+                modifier = Modifier
+                    .fillMaxWidth()
+                ,
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = constColorMaterial,
+                    disabledBorderColor = constColorMaterial,
+                    disabledTextColor  = constColorMaterial,
+                    disabledLabelColor = constColorMaterial
+                ),
                 value = uiState.title,
                 enabled = uiState.isWriting,
                 onValueChange = { newText ->
@@ -121,6 +133,12 @@ fun ViewAndEditScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = constColorMaterial,
+                    disabledBorderColor = constColorMaterial,
+                    disabledTextColor  = constColorMaterial,
+                    disabledLabelColor = constColorMaterial
+                ),
                 value = uiState.content,
                 enabled = uiState.isWriting,
                 onValueChange = { newText ->
