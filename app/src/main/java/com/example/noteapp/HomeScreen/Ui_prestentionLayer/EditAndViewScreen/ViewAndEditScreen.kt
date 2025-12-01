@@ -1,4 +1,5 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,15 +25,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.coreScreen.SealedScreen
-import com.example.noteapp.HomeScreen.domain_layer.model.Note
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,12 +95,13 @@ fun ViewAndEditScreen(
             )
         }
     )
-    { it ->
-        val constColorMaterial = MaterialTheme.colorScheme.primary
+    { paddingValues ->
+        val themePrimaryColor = MaterialTheme.colorScheme.primary
+        val textContestColor = if (isSystemInDarkTheme()) Color.White else Color.Black
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
+                .padding(paddingValues)
                 .padding(16.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -112,37 +112,36 @@ fun ViewAndEditScreen(
                     .fillMaxWidth()
                 ,
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = constColorMaterial,
-                    disabledBorderColor = constColorMaterial,
-                    disabledTextColor  = constColorMaterial,
-                    disabledLabelColor = constColorMaterial
+                    unfocusedBorderColor = themePrimaryColor,
+                    disabledBorderColor = themePrimaryColor,
+                    disabledTextColor = textContestColor,
+                    focusedTextColor = textContestColor,
+                    disabledLabelColor = themePrimaryColor
                 ),
                 value = uiState.title,
                 enabled = uiState.isWriting,
-                onValueChange = { newText ->
-                    event(HomeScreenEvent.UpdateTitle(title = newText))
+                onValueChange = { updatedContent ->
+                    event(HomeScreenEvent.UpdateTitle(title = updatedContent))
                 },
                 label = { Text("Title") },
                 singleLine = true
             )
-
-
             Spacer(modifier = Modifier.height(16.dp))
-
             OutlinedTextField(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = constColorMaterial,
-                    disabledBorderColor = constColorMaterial,
-                    disabledTextColor  = constColorMaterial,
-                    disabledLabelColor = constColorMaterial
+                    unfocusedBorderColor = themePrimaryColor,
+                    disabledBorderColor = themePrimaryColor,
+                    disabledLabelColor = themePrimaryColor,
+                    disabledTextColor = textContestColor,
+                    focusedTextColor = textContestColor,
                 ),
                 value = uiState.content,
                 enabled = uiState.isWriting,
-                onValueChange = { newText ->
-                    event(HomeScreenEvent.UpdateContent(content = newText))
+                onValueChange = { updatedContent ->
+                    event(HomeScreenEvent.UpdateContent(content = updatedContent))
                 },
                 label = { Text("Content") },
                 maxLines = Int.MAX_VALUE

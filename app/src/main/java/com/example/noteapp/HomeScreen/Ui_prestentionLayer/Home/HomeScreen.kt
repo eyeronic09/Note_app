@@ -71,8 +71,12 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
                     note = note,
                     onNoteClick = {
                         navController.navigate(
-                            SealedScreen.View_add_Edit.createRoute(noteId = note.id)
+                            SealedScreen.View_add_Edit.createRoute(noteId = note.id),
+
                         )
+                    },
+                    onClickDelete = {
+                       event(HomeScreenEvent.DeleteNote(note))
                     }
                 )
             }
