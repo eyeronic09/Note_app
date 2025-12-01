@@ -90,7 +90,7 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
                         val sendIntent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
                             putExtra(Intent.EXTRA_TEXT,
-                                 "${note.title}  + {${note.content}}"
+                                 "Title : ${note.title}  Content: ${note.content}"
                                 )
                         }
                         val chooser = Intent.createChooser(sendIntent , "share using")

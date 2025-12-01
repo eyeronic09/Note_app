@@ -33,6 +33,10 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.coreScreen.SealedScreen
 import android.util.Log
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.runtime.Stable
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.toColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +47,7 @@ fun ViewAndEditScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel::onEvent
+
 
 
     LaunchedEffect(noteId) {
@@ -107,17 +112,17 @@ fun ViewAndEditScreen(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
             OutlinedTextField(
                 modifier = Modifier
-                    .fillMaxWidth()
-                ,
+                    .fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = themePrimaryColor,
                     disabledBorderColor = themePrimaryColor,
                     disabledTextColor = textContestColor,
                     focusedTextColor = textContestColor,
-                    disabledLabelColor = themePrimaryColor
-                ),
+                    disabledLabelColor = themePrimaryColor,
+                   ),
                 value = uiState.title,
                 enabled = uiState.isWriting,
                 onValueChange = { updatedContent ->
@@ -137,7 +142,7 @@ fun ViewAndEditScreen(
                     disabledLabelColor = themePrimaryColor,
                     disabledTextColor = textContestColor,
                     focusedTextColor = textContestColor,
-                ),
+                 ),
                 value = uiState.content,
                 enabled = uiState.isWriting,
                 onValueChange = { updatedTitle ->

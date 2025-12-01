@@ -82,7 +82,9 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             is HomeScreenEvent.UpdateNote -> {
                 updateNote()
             }
-            is HomeScreenEvent.LoadNotes -> { /* Handled in init block */ }
+            is HomeScreenEvent.LoadNotes -> {
+                loadNotes()
+            }
 
         }
     }
@@ -129,7 +131,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                         title = _uiState.value.title,
                         content = _uiState.value.content,
                         date = "", // Later
-                        color = randomColor()
+                        color = _uiState.value.color!!
 
                     )
 
