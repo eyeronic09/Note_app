@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.coreScreen.SealedScreen
+import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +108,6 @@ fun ViewAndEditScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
-
                 modifier = Modifier
                     .fillMaxWidth()
                 ,
@@ -140,8 +140,8 @@ fun ViewAndEditScreen(
                 ),
                 value = uiState.content,
                 enabled = uiState.isWriting,
-                onValueChange = { updatedContent ->
-                    event(HomeScreenEvent.UpdateContent(content = updatedContent))
+                onValueChange = { updatedTitle ->
+                    event(HomeScreenEvent.UpdateContent(content = updatedTitle))
                 },
                 label = { Text("Content") },
                 maxLines = Int.MAX_VALUE

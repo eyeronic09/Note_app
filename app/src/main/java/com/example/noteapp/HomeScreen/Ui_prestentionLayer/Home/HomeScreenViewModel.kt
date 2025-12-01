@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
@@ -37,6 +38,7 @@ data class HomeScreenUIState(
 
 sealed interface  HomeScreenEvent {
     data object SetToEdit : HomeScreenEvent
+
     data class UpdateTitle(val title: String) : HomeScreenEvent
     data class UpdateContent(val content: String) : HomeScreenEvent
     data class AddNote(val content: String) : HomeScreenEvent // Modified here
@@ -63,7 +65,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 setToEditMode()
             }
             is HomeScreenEvent.AddNote -> {
-                insertNote(event.content) // Modified here
+                insertNote()
             }
             is HomeScreenEvent.OpenToReadAndUpdate -> {
                 loadNoteById(event.noteId)
@@ -81,12 +83,14 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 updateNote()
             }
             is HomeScreenEvent.LoadNotes -> { /* Handled in init block */ }
+
         }
     }
 
     init {
         loadNotes()
     }
+
 
     private fun setToEditMode(){
         _uiState.update {
@@ -174,13 +178,13 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         }
     }
 
-    private fun insertNote(content: String) { // Modified here
+    private fun insertNote() { // Modified here
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }
                 val note = Note(
                     title = _uiState.value.title, // Title from UI state
-                    content = content, // Content from parameter
+                    content = _uiState.value.content, // Content from parameter
                     date = "",
                     color = randomColor()
                 )

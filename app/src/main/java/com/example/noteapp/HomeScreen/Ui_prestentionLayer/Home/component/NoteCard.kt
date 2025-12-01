@@ -3,8 +3,10 @@ package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,7 +37,8 @@ import com.example.noteapp.HomeScreen.domain_layer.model.Note
 fun NoteCard(
     note: Note,
     onNoteClick: () -> Unit,
-    onClickDelete: () -> Unit
+    onClickDelete: () -> Unit,
+    onShare:() -> Unit
 ) {
     OutlinedCard(modifier = Modifier
         .fillMaxWidth()
@@ -55,43 +58,16 @@ fun NoteCard(
             Spacer(modifier = Modifier.padding(4.dp))
             Text(text = note.content)
         }
-        BasicDropdownMenu(
-            onClickDelete
-        )
-    }
-
-}
-
-@Composable
-fun BasicDropdownMenu(
-    onClickDelete:() -> Unit
-) {
-    var isDropDownExpanded by remember {
-        mutableStateOf(false)
-    }
-    Box(){
-        IconButton(
-            onClick = {isDropDownExpanded = !isDropDownExpanded}
-        ) {
-            Icon(Icons.Default.MoreVert, contentDescription = "More options")
-        }
-        DropdownMenu(
-            expanded = isDropDownExpanded ,
-            onDismissRequest = { isDropDownExpanded = false}
-        ){
-            DropdownMenuItem(
-                text = {Text("Delete")},
-                onClick = {
-                    onClickDelete()
-                }
-            )
-            DropdownMenuItem(
-                text = {Text("share")},
-                onClick = {}
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            BasicDropdownMenu(
+                onClickDelete,
+                onShare
             )
         }
+
     }
 }
+
 
 
 @Preview(showBackground = true)
@@ -107,6 +83,7 @@ private fun NoteCardPreview() {
     NoteCard(
         note = note,
         onNoteClick = {},
-        onClickDelete = {}
+        onClickDelete = {},
+        onShare = {}
     )
 }

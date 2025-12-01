@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 
+import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,6 +19,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.intl.Locale
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
@@ -29,6 +35,8 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: NavController) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val event = viewModel::onEvent
+
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -77,6 +85,16 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
                     },
                     onClickDelete = {
                        event(HomeScreenEvent.DeleteNote(note))
+                    },
+                    onShare = {
+                        val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT,
+                                 "${note.title}  + {${note.content}}"
+                                )
+                        }
+                        val chooser = Intent.createChooser(sendIntent , "share using")
+                        context.startActivity(chooser)
                     }
                 )
             }
