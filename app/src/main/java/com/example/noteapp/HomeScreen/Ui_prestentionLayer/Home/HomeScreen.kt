@@ -8,24 +8,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.intl.Locale
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
-import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchBar
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNotes
 import com.example.noteapp.HomeScreen.coreScreen.SealedScreen
 import org.koin.androidx.compose.koinViewModel
@@ -35,18 +32,23 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: NavController) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val event = viewModel::onEvent
+    val onEvent = viewModel::onEvent
 
     val context = LocalContext.current
 
     Scaffold(
         topBar = {
-            SearchBar(
-                value = uiState.searchedText,
-                onValueChange = {
-                    event(HomeScreenEvent.OnSearchQueryChanged(it))
-                }
-            )
+            if (uiState.isSearching){
+                SearchAppBar(
+                    value = uiState.searchedText,
+                    onValueChange = {onEvent(HomeScreenEvent.OnSearchQueryChanged(query = it))},
+                    onCloseClick = {onEvent(HomeScreenEvent.CloseSearch)}
+                )
+            }else {
+                DefaultAppBar(
+                    onSearchClicked = { onEvent(HomeScreenEvent.TapToSearch) }
+                )
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -78,7 +80,7 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
                         )
                     },
                     onClickDelete = {
-                       event(HomeScreenEvent.DeleteNote(note))
+                       onEvent(HomeScreenEvent.DeleteNote(note))
                     },
                     onShare = {
                         val sendIntent = Intent(Intent.ACTION_SEND).apply {

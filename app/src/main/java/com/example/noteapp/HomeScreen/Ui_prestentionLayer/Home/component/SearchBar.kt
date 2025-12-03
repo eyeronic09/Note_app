@@ -2,23 +2,73 @@ package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(
+fun SearchAppBar(
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit ,
+    onCloseClick : () -> Unit
 ) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = { Text("Search notes…") },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+    TopAppBar(
+       navigationIcon = {},
+        title = {
+            TextField(
+                value = value,
+                onValueChange = {onValueChange(it)},
+                placeholder = {Text("Search Notes")},
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+            )
+        },
+        actions = {
+            IconButton(onClick = onCloseClick ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close Search"
+                )
+            }
+        }
+    )
+
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DefaultAppBar(onSearchClicked: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(text = "My Notes")
+        },
+        actions = {
+            IconButton(onClick = onSearchClicked) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search Notes"
+                )
+            }
+
+        }
     )
 }

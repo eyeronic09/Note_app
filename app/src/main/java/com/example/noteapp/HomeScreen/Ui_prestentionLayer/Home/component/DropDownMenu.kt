@@ -39,7 +39,7 @@ fun BasicDropdownMenu(
                 }
             )
             DropdownMenuItem(
-                text = {Text("share")},
+                text = {Text("Share")},
                 onClick = {
                     onShare()
                 }
