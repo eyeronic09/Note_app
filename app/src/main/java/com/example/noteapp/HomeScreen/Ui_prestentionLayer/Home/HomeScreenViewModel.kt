@@ -31,7 +31,7 @@ data class HomeScreenUIState(
     val color : Int? = null,
     var searchedText : String  = "",
     val isSearching : Boolean = false,
-    val searchResult: List<Note> = emptyList()
+
 
 )
 
@@ -47,6 +47,11 @@ sealed interface  HomeScreenEvent {
     object LoadNotes : HomeScreenEvent
     data class OnSearchQueryChanged(val query: String) : HomeScreenEvent
     data object ShowResult : HomeScreenEvent
+
+    data object TapToSearch : HomeScreenEvent
+
+    data object CloseSearch : HomeScreenEvent
+
 }
 
 @OptIn(FlowPreview::class)
@@ -92,6 +97,12 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             }
 
             is HomeScreenEvent.ShowResult -> search()
+            HomeScreenEvent.TapToSearch -> {
+                _uiState.update { it.copy(isSearching = true) }
+            }
+            is HomeScreenEvent.CloseSearch -> {
+                _uiState.update { it.copy(isSearching = false , searchedText = "") }
+            }
         }
     }
 
@@ -123,13 +134,12 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                     // The `debounce(300L)` operator on the text flow is crucial: it waits for 300 milliseconds of inactivity before emitting the latest text.
                     // This prevents the app from searching on every single keystroke, improving performance.
                     .combine(searchedTextFlow.debounce(300L)) { notes, text ->
-                        Log.d("Query", uiState.value.searchedText.toString())
+                        Log.d("Query", uiState.value.searchedText)
                         if (text.isBlank()) {
                             notes
                         } else {
                             notes.filter { note ->
-                                note.title.contains(text, ignoreCase = true) ||
-                                        note.content.contains(text, ignoreCase = true)
+                                note.title.contains(text, ignoreCase = true) ||  note.content.contains(text, ignoreCase = true)
                             }
                         }
                     }
