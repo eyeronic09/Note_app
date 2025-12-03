@@ -10,4 +10,6 @@ interface NoteRepository {
     suspend fun addNotes(note: Note)
     suspend fun deleteNotes(note: Note)
     suspend fun updateNotes(note: Note)
+
+    suspend fun searchNotes(query: String) : List<NoteEntity>
 }

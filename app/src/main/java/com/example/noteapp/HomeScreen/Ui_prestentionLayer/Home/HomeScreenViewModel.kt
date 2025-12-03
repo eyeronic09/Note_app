@@ -1,25 +1,20 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 
-import android.graphics.Color.GREEN
-import android.graphics.Color.RED
-import android.graphics.Color.WHITE
 import android.graphics.Color.argb
 import android.util.Log
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -33,7 +28,11 @@ data class HomeScreenUIState(
     val currentNoteId: Int? = null,
     val isLoading: Boolean = false,
     val isWriting : Boolean = false,
-    val color : Int? = null
+    val color : Int? = null,
+    var searchedText : String  = "",
+    val isSearching : Boolean = false,
+    val searchResult: List<Note> = emptyList()
+
 )
 
 sealed interface  HomeScreenEvent {
@@ -41,16 +40,19 @@ sealed interface  HomeScreenEvent {
 
     data class UpdateTitle(val title: String) : HomeScreenEvent
     data class UpdateContent(val content: String) : HomeScreenEvent
-    data class AddNote(val content: String) : HomeScreenEvent // Modified here
+    data class AddNote(val content: String) : HomeScreenEvent
     data class DeleteNote(val note: Note) : HomeScreenEvent
     data object UpdateNote : HomeScreenEvent
     data class OpenToReadAndUpdate(val noteId: Int) : HomeScreenEvent
     object LoadNotes : HomeScreenEvent
+    data class OnSearchQueryChanged(val query: String) : HomeScreenEvent
+    data object ShowResult : HomeScreenEvent
 }
 
+@OptIn(FlowPreview::class)
 class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<HomeScreenUIState>(HomeScreenUIState())
+    private val _uiState = MutableStateFlow(HomeScreenUIState())
     val uiState: StateFlow<HomeScreenUIState> = _uiState.asStateFlow()
 
     fun onEvent(event: HomeScreenEvent) {
@@ -82,17 +84,78 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             is HomeScreenEvent.UpdateNote -> {
                 updateNote()
             }
+            is HomeScreenEvent.OnSearchQueryChanged -> {
+                onSearchQueryChange(event.query)
+            }
             is HomeScreenEvent.LoadNotes -> {
-                loadNotes()
+                print("loaded")
             }
 
+            is HomeScreenEvent.ShowResult -> search()
         }
     }
 
     init {
-        loadNotes()
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+                repository.getAllNotes().collect { notes ->
+                    _uiState.update { state ->
+                        state.copy(
+                            notes = notes,
+                            isLoading = false,
+                            error = null
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d("HomeScreen_error", e.toString())
+            }
+        }
     }
 
+    fun search() {
+        if(_uiState.value.isSearching) {
+            viewModelScope.launch {
+                val allNotesFlow = repository.getAllNotes()
+                val searchedTextFlow = _uiState.map { it.searchedText }.distinctUntilChanged()
+                allNotesFlow
+                    // The `debounce(300L)` operator on the text flow is crucial: it waits for 300 milliseconds of inactivity before emitting the latest text.
+                    // This prevents the app from searching on every single keystroke, improving performance.
+                    .combine(searchedTextFlow.debounce(300L)) { notes, text ->
+                        Log.d("Query", uiState.value.searchedText.toString())
+                        if (text.isBlank()) {
+                            notes
+                        } else {
+                            notes.filter { note ->
+                                note.title.contains(text, ignoreCase = true) ||
+                                        note.content.contains(text, ignoreCase = true)
+                            }
+                        }
+                    }
+                    .collectLatest { filteredNotes ->
+                        _uiState.update {
+                            it.copy(
+                                notes = filteredNotes,
+                                isLoading = false
+                            )
+                        }
+                    }
+            }
+        }
+    }
+
+
+    fun onSearchQueryChange(query: String) {
+        _uiState.update {
+            it.copy(
+                searchedText =  query,
+                isSearching = true
+            )
+        }
+        search()
+
+    }
 
     private fun setToEditMode(){
         _uiState.update {
@@ -101,8 +164,6 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             ).also {
                 Log.d("Current Mode" , _uiState.value.isWriting.toString())
             }
-
-
         }
     }
     private fun randomColor(): Int {
@@ -115,6 +176,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
 
         return colors.random()
     }
+
     private suspend fun deleteNote(note: Note){
         repository.deleteNotes(note)
     }
@@ -127,14 +189,12 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 try {
                     _uiState.update { it.copy(isLoading = true) }
                     val updatedNote = Note(
-                        id = noteId, // Use the existing ID
+                        id = noteId,
                         title = _uiState.value.title,
                         content = _uiState.value.content,
-                        date = "", // Later
-                        color = _uiState.value.color!!
-
+                        date = "",
+                        color = _uiState.value.color ?: randomColor()
                     )
-
 
                     repository.updateNotes(updatedNote)
 
@@ -154,7 +214,6 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 }
             }
         }
-
     }
 
     private fun loadNoteById(noteId: Int) {
@@ -167,7 +226,8 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                         title = note.title,
                         content = note.content,
                         currentNoteId = noteId,
-                        isLoading = false
+                        isLoading = false,
+                        color = note.color
                     )
                 }
 
@@ -180,20 +240,25 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         }
     }
 
-    private fun insertNote() { // Modified here
+    private fun insertNote() {
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }
                 val note = Note(
-                    title = _uiState.value.title, // Title from UI state
-                    content = _uiState.value.content, // Content from parameter
+                    title = _uiState.value.title,
+                    content = _uiState.value.content, // Use content from parameter
                     date = "",
                     color = randomColor()
                 )
                 repository.addNotes(note).also {
                     Log.d("Add_Note", note.toString())
                 }
-                _uiState.update { HomeScreenUIState(isLoading = false) }
+                // Reset state after adding
+                 _uiState.update { it.copy(
+                    title = "",
+                    content = "",
+                    isLoading = false
+                ) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(
                     error = "Failed to save note",
@@ -201,26 +266,5 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 )}
             }
         }
-
-
-    }
-
-    fun loadNotes() {
-            viewModelScope.launch {
-                try {
-                    _uiState.update { it.copy(isLoading = true) }
-                    repository.getAllNotes().collect { notes ->
-                        _uiState.update { state ->
-                            state.copy(
-                                notes = notes,
-                                isLoading = false,
-                                error = null
-                            )
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.d("HomeScreen_error", e.toString())
-                }
-            }
     }
 }

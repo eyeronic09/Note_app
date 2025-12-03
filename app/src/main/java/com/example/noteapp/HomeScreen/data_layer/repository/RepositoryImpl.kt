@@ -2,6 +2,7 @@ package com.example.noteapp.HomeScreen.data_layer.repository
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
+import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
 import com.example.noteapp.HomeScreen.data_layer.local.mapper.toDomain
 import com.example.noteapp.HomeScreen.data_layer.local.mapper.toEntity
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
@@ -32,6 +33,10 @@ class RepositoryImpl(
 
     override suspend fun updateNotes(note: Note) {
         sources.updateNotes(note.toEntity())
+    }
+
+    override suspend fun searchNotes(query: String): List<NoteEntity> {
+       return sources.searchNotes(query)
     }
 
 }

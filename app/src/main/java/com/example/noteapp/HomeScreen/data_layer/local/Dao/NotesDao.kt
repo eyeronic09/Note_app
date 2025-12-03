@@ -17,6 +17,9 @@ interface NotesDao {
     @Query("SELECT * FROM notes WHERE id = :noteId")
     suspend fun getNoteById(noteId: Int): NoteEntity
 
+    @Query("SELECT * FROM notes WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
+    suspend fun searchNotes(query: String): List<NoteEntity>
+
     @Upsert
    suspend fun addNotes(noteEntity: NoteEntity)
 

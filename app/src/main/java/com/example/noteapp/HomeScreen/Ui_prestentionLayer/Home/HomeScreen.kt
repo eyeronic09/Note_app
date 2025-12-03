@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNotes
 import com.example.noteapp.HomeScreen.coreScreen.SealedScreen
 import org.koin.androidx.compose.koinViewModel
@@ -40,17 +41,10 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Notes App") },
-                actions = {
-                    IconButton(
-                        onClick = { event(HomeScreenEvent.LoadNotes) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = null
-                        )
-                    }
+            SearchBar(
+                value = uiState.searchedText,
+                onValueChange = {
+                    event(HomeScreenEvent.OnSearchQueryChanged(it))
                 }
             )
         },
