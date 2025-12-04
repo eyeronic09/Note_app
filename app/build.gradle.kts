@@ -46,6 +46,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation(libs.androidx.compose.foundation)
 
     //Room
     val room_version = "2.8.3"
@@ -63,7 +64,6 @@ dependencies {
 
     //Navigation
     implementation("androidx.navigation:navigation-compose:2.9.6")
-    implementation("jp.wasabeef:richeditor-android:2.0.0") // Added this line
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 

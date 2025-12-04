@@ -33,7 +33,10 @@ fun BasicDropdownMenu(
             onDismissRequest = { isDropDownExpanded = false}
         ){
             DropdownMenuItem(
-                text = {Text("Delete")},
+                text = {
+
+                    Text("Delete")
+                 },
                 onClick = {
                     onClickDelete()
                 }

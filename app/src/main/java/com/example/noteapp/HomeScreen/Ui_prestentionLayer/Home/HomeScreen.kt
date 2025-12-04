@@ -3,6 +3,8 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,7 +15,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -21,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.MenuRows
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNotes
@@ -28,6 +30,7 @@ import com.example.noteapp.HomeScreen.coreScreen.SealedScreen
 import org.koin.androidx.compose.koinViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: NavController) {
@@ -56,7 +59,6 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
                     navController.navigate(SealedScreen.AddScreen.route)
                 }
             ) {
-                Text("+")
                 IconButton(
                     onClick = {
                         navController.navigate(SealedScreen.AddScreen.route)
@@ -69,6 +71,14 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
     ) { innerPadding ->
         if (uiState.notes.isEmpty()) emptyNotes()
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = innerPadding) {
+            item {
+                MenuRows(
+
+                    onOldestClick = {
+                        onEvent(HomeScreenEvent.Oldest)
+                    }
+                )
+            }
 
             items(uiState.notes) { note ->
                 NoteCard(
@@ -76,7 +86,6 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
                     onNoteClick = {
                         navController.navigate(
                             SealedScreen.View_add_Edit.createRoute(noteId = note.id),
-
                         )
                     },
                     onClickDelete = {
@@ -96,7 +105,5 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
             }
         }
     }
-
 }
-
 

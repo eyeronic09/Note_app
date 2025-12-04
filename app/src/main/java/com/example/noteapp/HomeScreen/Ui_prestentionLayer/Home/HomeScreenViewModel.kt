@@ -1,7 +1,12 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 
+import android.annotation.SuppressLint
 import android.graphics.Color.argb
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.DatePickerFormatter
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
@@ -14,10 +19,15 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.isActive
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Date
 
 
 data class HomeScreenUIState(
@@ -31,8 +41,7 @@ data class HomeScreenUIState(
     val color : Int? = null,
     var searchedText : String  = "",
     val isSearching : Boolean = false,
-
-
+    val isOldest : Boolean  = false
 )
 
 sealed interface  HomeScreenEvent {
@@ -52,6 +61,9 @@ sealed interface  HomeScreenEvent {
 
     data object CloseSearch : HomeScreenEvent
 
+
+    data object Oldest: HomeScreenEvent
+
 }
 
 @OptIn(FlowPreview::class)
@@ -60,6 +72,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
     private val _uiState = MutableStateFlow(HomeScreenUIState())
     val uiState: StateFlow<HomeScreenUIState> = _uiState.asStateFlow()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: HomeScreenEvent) {
         when (event) {
             is HomeScreenEvent.DeleteNote -> {
@@ -103,6 +116,13 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             is HomeScreenEvent.CloseSearch -> {
                 _uiState.update { it.copy(isSearching = false , searchedText = "") }
             }
+
+
+            HomeScreenEvent.Oldest ->{
+                _uiState.update { it.copy(isOldest = true) }
+                oldestNote()
+
+            }
         }
     }
 
@@ -125,17 +145,42 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         }
     }
 
+
+
+    fun oldestNote(){
+        if (_uiState.value.isOldest){
+            val sortedNote: List<Note>
+
+            try {
+                val note = _uiState.value.notes
+                _uiState.update { it
+                    it.copy(isOldest = true)
+                }
+                sortedNote = note.sortedByDescending {
+                    it.date
+                }
+                    _uiState.update { it.copy(
+                        notes = sortedNote
+                    ) }
+
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = e.toString()  , isOldest = false) }
+            }
+
+            Log.d("OldestNote" , _uiState.value.notes.toString())
+        }
+
+    }
     fun search() {
         if(_uiState.value.isSearching) {
             viewModelScope.launch {
                 val allNotesFlow = repository.getAllNotes()
                 val searchedTextFlow = _uiState.map { it.searchedText }.distinctUntilChanged()
                 allNotesFlow
-                    // The `debounce(300L)` operator on the text flow is crucial: it waits for 300 milliseconds of inactivity before emitting the latest text.
-                    // This prevents the app from searching on every single keystroke, improving performance.
+                     // This prevents the app from searching on every single keystroke, improving performance.
                     .combine(searchedTextFlow.debounce(300L)) { notes, text ->
-                        Log.d("Query", uiState.value.searchedText)
-                        if (text.isBlank()) {
+
+                        if (text.isBlank())   {
                             notes
                         } else {
                             notes.filter { note ->
@@ -143,7 +188,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                             }
                         }
                     }
-                    .collectLatest { filteredNotes ->
+                    .collect { filteredNotes ->
                         _uiState.update {
                             it.copy(
                                 notes = filteredNotes,
@@ -154,7 +199,6 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             }
         }
     }
-
 
     fun onSearchQueryChange(query: String) {
         _uiState.update {
@@ -250,14 +294,22 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         }
     }
 
+    @SuppressLint("SimpleDateFormat")
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun insertNote() {
         viewModelScope.launch {
             try {
+
+                val sdf = SimpleDateFormat("dd/M/yyyy")
+                val currentDate = sdf.format(Date())
+
+
+
                 _uiState.update { it.copy(isLoading = true) }
                 val note = Note(
                     title = _uiState.value.title,
-                    content = _uiState.value.content, // Use content from parameter
-                    date = "",
+                    content = _uiState.value.content,
+                    date = currentDate,
                     color = randomColor()
                 )
                 repository.addNotes(note).also {

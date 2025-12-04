@@ -57,6 +57,7 @@ fun NoteCard(
             HorizontalDivider()
             Spacer(modifier = Modifier.padding(4.dp))
             Text(text = note.content)
+            Text(text = note.date)
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             BasicDropdownMenu(
