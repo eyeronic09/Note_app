@@ -21,7 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MenuRows(onClickToggle:() -> Unit ,  onSelected: Boolean) {
+fun MenuRows(onClickToggle:() -> Unit ,  onSelected: Boolean , onUnSelect:() -> Unit ) {
     FilterChip(
         selected = onSelected,
         onClick = onClickToggle,
@@ -30,7 +30,7 @@ fun MenuRows(onClickToggle:() -> Unit ,  onSelected: Boolean) {
                 Icon(
                     imageVector = Icons.Filled.Done,
                     contentDescription = "Done icon",
-                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    modifier = Modifier.size(FilterChipDefaults.IconSize).clickable(enabled = true, onClick = onUnSelect)
                 )
             }
         } else {
@@ -43,5 +43,5 @@ fun MenuRows(onClickToggle:() -> Unit ,  onSelected: Boolean) {
 @Preview(showBackground = true)
 @Composable
 private fun menuRow() {
-    MenuRows({}, false)
+    MenuRows({}, false , {})
 }

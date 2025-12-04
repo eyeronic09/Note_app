@@ -44,6 +44,7 @@ data class HomeScreenUIState(
     var searchedText : String  = "",
     val isSearching : Boolean = false,
     val isOldest : Boolean  = false
+
 )
 
 
@@ -66,6 +67,8 @@ sealed interface  HomeScreenEvent {
 
 
     data object Oldest: HomeScreenEvent
+
+    data object onUnSelectOldest : HomeScreenEvent
 
 }
 
@@ -119,10 +122,27 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             is HomeScreenEvent.CloseSearch -> {
                 _uiState.update { it.copy(isSearching = false , searchedText = "") }
             }
-
-
-            HomeScreenEvent.Oldest ->{
+            is HomeScreenEvent.Oldest ->{
                 oldestNote()
+            }
+
+            is HomeScreenEvent.onUnSelectOldest -> {
+                viewModelScope.launch {
+                    try {
+                        _uiState.update { it.copy(isLoading = true , isOldest = false) }
+                        repository.getNotesNewestFirst().collect { notes ->
+                            _uiState.update { state ->
+                                state.copy(
+                                    notes = notes,
+                                    isLoading = false,
+                                    error = null
+                                )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.d("HomeScreen_error", e.toString())
+                    }
+                }
             }
         }
     }
@@ -156,7 +176,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             } else {
                 repository.getNotesNewestFirst()
             }
-            notesFlow.collect { notes ->
+            notesFlow.collectLatest { notes ->
                 _uiState.update {
                     it.copy(notes = notes)
                 }

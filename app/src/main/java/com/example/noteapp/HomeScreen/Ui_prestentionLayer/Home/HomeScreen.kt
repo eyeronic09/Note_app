@@ -74,7 +74,8 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
             item {
                 MenuRows(
                     onClickToggle = {onEvent(HomeScreenEvent.Oldest)},
-                    onSelected = uiState.isOldest
+                    onSelected = uiState.isOldest,
+                    onUnSelect = {onEvent(HomeScreenEvent.onUnSelectOldest)}
                 )
             }
 
