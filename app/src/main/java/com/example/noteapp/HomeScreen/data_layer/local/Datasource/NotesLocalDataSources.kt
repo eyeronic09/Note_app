@@ -5,7 +5,11 @@ import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
 import kotlinx.coroutines.flow.Flow
 
 interface NotesLocalDataSources {
-    fun getAllNotes(): Flow<List<NoteEntity>>
+    fun getNotesNewestFirst(): Flow<List<NoteEntity>>
+
+    fun getNotesOldestFirst(): Flow<List<NoteEntity>>
+
+
     suspend fun addNotes(noteEntity: NoteEntity)
      suspend fun getNoteById(noteId: Int): NoteEntity
 

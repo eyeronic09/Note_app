@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.map
 
 class GetAllNoteUseCase(private val repository: NoteRepository) {
      operator fun invoke() : Flow<List<Note>> {
-        return repository.getAllNotes()
+        return repository.getNotesNewestFirst()
     }
 }

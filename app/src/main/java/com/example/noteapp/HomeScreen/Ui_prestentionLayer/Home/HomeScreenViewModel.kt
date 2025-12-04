@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.DatePickerFormatter
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.ui.util.normalizedAngleCos
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
@@ -43,6 +45,7 @@ data class HomeScreenUIState(
     val isSearching : Boolean = false,
     val isOldest : Boolean  = false
 )
+
 
 sealed interface  HomeScreenEvent {
     data object SetToEdit : HomeScreenEvent
@@ -119,9 +122,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
 
 
             HomeScreenEvent.Oldest ->{
-                _uiState.update { it.copy(isOldest = true) }
                 oldestNote()
-
             }
         }
     }
@@ -130,7 +131,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         viewModelScope.launch {
             try {
                 _uiState.update { it.copy(isLoading = true) }
-                repository.getAllNotes().collect { notes ->
+                repository.getNotesNewestFirst().collect { notes ->
                     _uiState.update { state ->
                         state.copy(
                             notes = notes,
@@ -148,33 +149,25 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
 
 
     fun oldestNote(){
-        if (_uiState.value.isOldest){
-            val sortedNote: List<Note>
-
-            try {
-                val note = _uiState.value.notes
-                _uiState.update { it
-                    it.copy(isOldest = true)
-                }
-                sortedNote = note.sortedByDescending {
-                    it.date
-                }
-                    _uiState.update { it.copy(
-                        notes = sortedNote
-                    ) }
-
-            } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.toString()  , isOldest = false) }
+        _uiState.update { it.copy(isOldest = true) }
+        viewModelScope.launch {
+            val notesFlow =
+                if (_uiState.value.isOldest) {repository.getNotesOldestFirst()
+            } else {
+                repository.getNotesNewestFirst()
             }
-
-            Log.d("OldestNote" , _uiState.value.notes.toString())
+            notesFlow.collect { notes ->
+                _uiState.update {
+                    it.copy(notes = notes)
+                }
+            }
         }
-
     }
+
     fun search() {
         if(_uiState.value.isSearching) {
             viewModelScope.launch {
-                val allNotesFlow = repository.getAllNotes()
+                val allNotesFlow = repository.getNotesNewestFirst()
                 val searchedTextFlow = _uiState.map { it.searchedText }.distinctUntilChanged()
                 allNotesFlow
                      // This prevents the app from searching on every single keystroke, improving performance.

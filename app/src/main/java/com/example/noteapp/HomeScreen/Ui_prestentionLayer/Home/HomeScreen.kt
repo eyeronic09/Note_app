@@ -73,10 +73,8 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = innerPadding) {
             item {
                 MenuRows(
-
-                    onOldestClick = {
-                        onEvent(HomeScreenEvent.Oldest)
-                    }
+                    onClickToggle = {onEvent(HomeScreenEvent.Oldest)},
+                    onSelected = uiState.isOldest
                 )
             }
 

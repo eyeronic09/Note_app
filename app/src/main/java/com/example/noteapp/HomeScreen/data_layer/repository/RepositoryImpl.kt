@@ -13,10 +13,14 @@ import kotlinx.coroutines.flow.map
 class RepositoryImpl(
     private val sources: NotesLocalDataSources
 ) : NoteRepository {
-    override fun getAllNotes(): Flow<List<Note>> {
-        return sources.getAllNotes().map { noteEntities -> noteEntities.map {
+    override fun getNotesNewestFirst(): Flow<List<Note>> {
+        return sources.getNotesNewestFirst().map { noteEntities -> noteEntities.map {
             it.toDomain()
         } }
+    }
+
+    override fun getNotesOldestFirst(): Flow<List<Note>> {
+        return sources.getNotesOldestFirst().map { noteEntities -> noteEntities.map { it.toDomain() } }
     }
 
     override suspend fun getNoteById(noteId: Int): Note {

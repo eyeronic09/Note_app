@@ -47,6 +47,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material3)
 
     //Room
     val room_version = "2.8.3"
