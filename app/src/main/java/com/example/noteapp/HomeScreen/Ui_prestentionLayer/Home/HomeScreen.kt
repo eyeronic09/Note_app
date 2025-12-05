@@ -5,7 +5,9 @@ package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -22,7 +24,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
-import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.MenuRows
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NewestChip
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OldestChip
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNotes
@@ -72,11 +75,21 @@ fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: 
         if (uiState.notes.isEmpty()) emptyNotes()
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = innerPadding) {
             item {
-                MenuRows(
-                    onClickToggle = {onEvent(HomeScreenEvent.Oldest)},
-                    onSelected = uiState.isOldest,
-                    onUnSelect = {onEvent(HomeScreenEvent.onUnSelectOldest)}
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OldestChip(
+                        onClickToggle = {onEvent(HomeScreenEvent.Oldest)},
+                        onSelected = uiState.isOldest,
+                        onUnSelect = {onEvent(HomeScreenEvent.OnUnSelectOldest)}
+                    )
+                    NewestChip(
+                        onClickToggle = {onEvent(HomeScreenEvent.Newest)},
+                        onSelected = uiState.isNewest,
+                        onUnSelect = {onEvent(HomeScreenEvent.OnUnSelectNewest)}
+                    )
+                }
+
             }
 
             items(uiState.notes) { note ->

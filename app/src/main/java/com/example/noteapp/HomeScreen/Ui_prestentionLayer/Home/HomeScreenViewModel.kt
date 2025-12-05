@@ -5,10 +5,6 @@ import android.graphics.Color.argb
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.DatePickerFormatter
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.ui.util.normalizedAngleCos
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
@@ -21,14 +17,10 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.isActive
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Date
 
 
@@ -43,8 +35,8 @@ data class HomeScreenUIState(
     val color : Int? = null,
     var searchedText : String  = "",
     val isSearching : Boolean = false,
-    val isOldest : Boolean  = false
-
+    val isOldest : Boolean  = false,
+    val isNewest : Boolean = true, // <-- default newest selected
 )
 
 
@@ -68,7 +60,11 @@ sealed interface  HomeScreenEvent {
 
     data object Oldest: HomeScreenEvent
 
-    data object onUnSelectOldest : HomeScreenEvent
+    data object OnUnSelectOldest : HomeScreenEvent
+
+    data object Newest: HomeScreenEvent
+
+    data object OnUnSelectNewest : HomeScreenEvent
 
 }
 
@@ -122,67 +118,31 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             is HomeScreenEvent.CloseSearch -> {
                 _uiState.update { it.copy(isSearching = false , searchedText = "") }
             }
-            is HomeScreenEvent.Oldest ->{
-                oldestNote()
+            is HomeScreenEvent.Oldest -> {
+                selectOldest()
             }
 
-            is HomeScreenEvent.onUnSelectOldest -> {
-                viewModelScope.launch {
-                    try {
-                        _uiState.update { it.copy(isLoading = true , isOldest = false) }
-                        repository.getNotesNewestFirst().collect { notes ->
-                            _uiState.update { state ->
-                                state.copy(
-                                    notes = notes,
-                                    isLoading = false,
-                                    error = null
-                                )
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.d("HomeScreen_error", e.toString())
-                    }
-                }
+            is HomeScreenEvent.OnUnSelectOldest -> {
+
+                selectNewest()
+            }
+
+            is HomeScreenEvent.Newest -> {
+                selectNewest()
+            }
+            is HomeScreenEvent.OnUnSelectNewest -> {
+
+                selectNewest()
             }
         }
     }
 
     init {
-        viewModelScope.launch {
-            try {
-                _uiState.update { it.copy(isLoading = true) }
-                repository.getNotesNewestFirst().collect { notes ->
-                    _uiState.update { state ->
-                        state.copy(
-                            notes = notes,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Log.d("HomeScreen_error", e.toString())
-            }
-        }
+        // load newest by default
+        selectNewest()
     }
 
 
-
-    fun oldestNote(){
-        _uiState.update { it.copy(isOldest = true) }
-        viewModelScope.launch {
-            val notesFlow =
-                if (_uiState.value.isOldest) {repository.getNotesOldestFirst()
-            } else {
-                repository.getNotesNewestFirst()
-            }
-            notesFlow.collectLatest { notes ->
-                _uiState.update {
-                    it.copy(notes = notes)
-                }
-            }
-        }
-    }
 
     fun search() {
         if(_uiState.value.isSearching) {
@@ -339,6 +299,36 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                     error = "Failed to save note",
                     isLoading = false
                 )}
+            }
+        }
+    }
+
+    private fun selectOldest() {
+        _uiState.update { it.copy(isOldest = true, isNewest = false, isLoading = true) }
+        viewModelScope.launch {
+            try {
+                repository.getNotesOldestFirst().collectLatest { notes ->
+                    _uiState.update {
+                        it.copy(notes = notes, isLoading = false, error = null)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d("HomeScreen_error", e.toString())
+            }
+        }
+    }
+
+    private fun selectNewest() {
+        _uiState.update { it.copy(isOldest = false, isNewest = true, isLoading = true) }
+        viewModelScope.launch {
+            try {
+                repository.getNotesNewestFirst().collectLatest { notes ->
+                    _uiState.update {
+                        it.copy(notes = notes, isLoading = false, error = null)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d("HomeScreen_error", e.toString())
             }
         }
     }
