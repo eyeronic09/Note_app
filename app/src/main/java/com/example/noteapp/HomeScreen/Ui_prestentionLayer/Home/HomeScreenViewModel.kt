@@ -40,7 +40,7 @@ data class HomeScreenUIState(
 )
 
 
-sealed interface  HomeScreenEvent {
+sealed interface HomeScreenEvent {
     data object SetToEdit : HomeScreenEvent
 
     data class UpdateTitle(val title: String) : HomeScreenEvent
@@ -52,17 +52,13 @@ sealed interface  HomeScreenEvent {
     object LoadNotes : HomeScreenEvent
     data class OnSearchQueryChanged(val query: String) : HomeScreenEvent
     data object ShowResult : HomeScreenEvent
-
     data object TapToSearch : HomeScreenEvent
-
     data object CloseSearch : HomeScreenEvent
-
-
-    data object Oldest: HomeScreenEvent
+    data object Oldest : HomeScreenEvent
 
     data object OnUnSelectOldest : HomeScreenEvent
 
-    data object Newest: HomeScreenEvent
+    data object Newest : HomeScreenEvent
 
     data object OnUnSelectNewest : HomeScreenEvent
 
@@ -131,7 +127,6 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 selectNewest()
             }
             is HomeScreenEvent.OnUnSelectNewest -> {
-
                 selectNewest()
             }
         }

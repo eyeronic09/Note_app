@@ -48,6 +48,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui.graphics)
 
     //Room
     val room_version = "2.8.3"
@@ -64,9 +65,11 @@ dependencies {
     implementation("io.insert-koin:koin-androidx-compose:$koin_version")
 
     //Navigation
+    val voyagerVersion = "1.1.0-beta02"
     implementation("androidx.navigation:navigation-compose:2.9.6")
-
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    implementation("cafe.adriel.voyager:voyager-navigator:${voyagerVersion}")
+    implementation("cafe.adriel.voyager:voyager-koin:${voyagerVersion}")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
