@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen._AddScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
@@ -30,97 +31,14 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNo
 import org.koin.androidx.compose.koinViewModel
 
 
-@RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
-//fun HomeScreen(viewModel: HomeScreenViewModel = koinViewModel(), navController: NavController) {
-//    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-//    val onEvent = viewModel::onEvent
-//
-//    val context = LocalContext.current
-//
-//    Scaffold(
-//        topBar = {
-//            if (uiState.isSearching){
-//                SearchAppBar(
-//                    value = uiState.searchedText,
-//                    onValueChange = {onEvent(HomeScreenEvent.OnSearchQueryChanged(query = it))},
-//                    onCloseClick = {onEvent(HomeScreenEvent.CloseSearch)}
-//                )
-//            }else {
-//                DefaultAppBar(
-//                    onSearchClicked = { onEvent(HomeScreenEvent.TapToSearch) }
-//                )
-//            }
-//        },
-//        floatingActionButton = {
-//            FloatingActionButton(
-//                onClick = {
-//                    navController.navigate(SealedScreen.AddScreen.route)
-//                }
-//            ) {
-//                IconButton(
-//                    onClick = {
-//                        navController.navigate(SealedScreen.AddScreen.route)
-//                    }
-//                ) {
-//                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
-//                }
-//            }
-//        }
-//    ) { innerPadding ->
-//        if (uiState.notes.isEmpty()) emptyNotes()
-//        LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = innerPadding) {
-//            item {
-//                Row(
-//                    modifier = Modifier.fillMaxWidth()
-//                ) {
-//                    OldestChip(
-//                        onClickToggle = {onEvent(HomeScreenEvent.Oldest)},
-//                        onSelected = uiState.isOldest,
-//                        onUnSelect = {onEvent(HomeScreenEvent.OnUnSelectOldest)}
-//                    )
-//                    NewestChip(
-//                        onClickToggle = {onEvent(HomeScreenEvent.Newest)},
-//                        onSelected = uiState.isNewest,
-//                        onUnSelect = {onEvent(HomeScreenEvent.OnUnSelectNewest)}
-//                    )
-//                }
-//
-//            }
-//
-//            items(uiState.notes) { note ->
-//                NoteCard(
-//                    note = note,
-//                    onNoteClick = {
-//                        navController.navigate(
-//                            SealedScreen.View_add_Edit.createRoute(noteId = note.id),
-//                        )
-//                    },
-//                    onClickDelete = {
-//                       onEvent(HomeScreenEvent.DeleteNote(note))
-//                    },
-//                    onShare = {
-//                        val sendIntent = Intent(Intent.ACTION_SEND).apply {
-//                            type = "text/plain"
-//                            putExtra(Intent.EXTRA_TEXT,
-//                                 "Title : ${note.title}  Content: ${note.content}"
-//                                )
-//                        }
-//                        val chooser = Intent.createChooser(sendIntent , "share using")
-//                        context.startActivity(chooser)
-//                    }
-//                )
-//            }
-//        }
-//    }
-//}
-//
 
 class _HomeScreen () : Screen {
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     override fun Content() {
         HomeScreenRoute()
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun HomeScreenRoute(viewModel: HomeScreenViewModel = koinViewModel()){
         val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -155,14 +73,13 @@ class _HomeScreen () : Screen {
             floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-
+                        navigator?.push(_AddScreen())
                     }
                 ) {
-                    IconButton(
-                        onClick = {}
-                    ) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
-                    }
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "add note"
+                    )
                 }
             }
         ) { innerPadding ->

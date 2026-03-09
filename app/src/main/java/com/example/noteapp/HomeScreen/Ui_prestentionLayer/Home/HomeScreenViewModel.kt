@@ -45,7 +45,7 @@ sealed interface HomeScreenEvent {
 
     data class UpdateTitle(val title: String) : HomeScreenEvent
     data class UpdateContent(val content: String) : HomeScreenEvent
-    data class AddNote(val content: String) : HomeScreenEvent
+    object AddNote : HomeScreenEvent
     data class DeleteNote(val note: Note) : HomeScreenEvent
     data object UpdateNote : HomeScreenEvent
     data class OpenToReadAndUpdate(val noteId: Int) : HomeScreenEvent
@@ -270,8 +270,6 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
 
                 val sdf = SimpleDateFormat("dd/M/yyyy")
                 val currentDate = sdf.format(Date())
-
-
 
                 _uiState.update { it.copy(isLoading = true) }
                 val note = Note(
