@@ -83,7 +83,7 @@ class _AddScreen() : Screen {
                         }
                     },
                     title = {
-                        Text("Add New note")
+                        Text("Compose Note")
                     },
                     actions = {
                         IconButton(

@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen._AddScreen
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen._ViewAndEditScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
@@ -97,6 +98,7 @@ class _HomeScreen () : Screen {
         onAction: (HomeScreenEvent) -> Unit
     ) {
         val local = LocalContext.current
+        val navigator = LocalNavigator.current
         when {
             state.notes.isEmpty() -> {
                 emptyNotes()
@@ -110,6 +112,8 @@ class _HomeScreen () : Screen {
                             note = notes,
                             onNoteClick = {
                                 onAction(HomeScreenEvent.OpenToReadAndUpdate(notes.id))
+                                navigator?.push(_ViewAndEditScreen(notes.id))
+
                             },
                             onClickDelete = {
                                 onAction(HomeScreenEvent.DeleteNote(notes))

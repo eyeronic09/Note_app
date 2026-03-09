@@ -267,11 +267,11 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
     private fun insertNote() {
         viewModelScope.launch {
             try {
-
                 val sdf = SimpleDateFormat("dd/M/yyyy")
                 val currentDate = sdf.format(Date())
 
                 _uiState.update { it.copy(isLoading = true) }
+
                 val note = Note(
                     title = _uiState.value.title,
                     content = _uiState.value.content,
