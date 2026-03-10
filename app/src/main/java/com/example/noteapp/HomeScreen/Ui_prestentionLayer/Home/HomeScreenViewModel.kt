@@ -147,7 +147,6 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 allNotesFlow
                      // This prevents the app from searching on every single keystroke, improving performance.
                     .combine(searchedTextFlow.debounce(300L)) { notes, text ->
-
                         if (text.isBlank())   {
                             notes
                         } else {
@@ -239,7 +238,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
     }
 
     private fun loadNoteById(noteId: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch{
             try {
                 _uiState.update { it.copy(isLoading = true) }
                 val note = repository.getNoteById(noteId)
@@ -249,8 +248,11 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                         content = note.content,
                         currentNoteId = noteId,
                         isLoading = false,
+                        isWriting = true,
                         color = note.color
                     )
+                }.also {
+                    Log.d("LoadedNote" , _uiState.value.toString())
                 }
 
             } catch (e: Exception) {

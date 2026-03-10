@@ -4,6 +4,7 @@ package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen._AddScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen._ViewAndEditScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
@@ -97,6 +99,7 @@ class _HomeScreen () : Screen {
         modifier: Modifier,
         onAction: (HomeScreenEvent) -> Unit
     ) {
+        val state = state
         val local = LocalContext.current
         val navigator = LocalNavigator.current
         when {
@@ -111,8 +114,10 @@ class _HomeScreen () : Screen {
                         NoteCard(
                             note = notes,
                             onNoteClick = {
-                                onAction(HomeScreenEvent.OpenToReadAndUpdate(notes.id))
-                                navigator?.push(_ViewAndEditScreen(notes.id))
+                             //   onAction(HomeScreenEvent.OpenToReadAndUpdate(notes.id))
+                                Log.d("Navigation", "Pushing Screen. Current stack size: ${navigator?.items?.size} and ${notes.id}")
+                                navigator?.push(item = _ViewAndEditScreen(notes.id))
+                                Log.d("Navigation", "Push successful. New last item: ${navigator?.lastItem}")
 
                             },
                             onClickDelete = {

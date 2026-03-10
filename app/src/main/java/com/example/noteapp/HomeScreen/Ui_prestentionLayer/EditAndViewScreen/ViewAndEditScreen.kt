@@ -1,6 +1,8 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,17 +11,32 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.NavigateBefore
+import androidx.compose.material.icons.automirrored.filled.ReadMore
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MarkChatRead
+import androidx.compose.material.icons.filled.NavigateBefore
+import androidx.compose.material.icons.filled.ReadMore
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
@@ -46,7 +63,7 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
     ) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val event = viewModel::onEvent
-        LaunchedEffect(noteId) {
+        LaunchedEffect(noteId != -1) {
             event(
                 HomeScreenEvent.OpenToReadAndUpdate(
                     noteId = noteId
@@ -62,6 +79,7 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
 
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun NoteScreen(
         modifier: Modifier,
@@ -69,7 +87,60 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
         onAction: (HomeScreenEvent) -> Unit
     ) {
         val navigator = LocalNavigator.current
-        Scaffold() { innerPadding ->
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        when {
+                            state.isWriting -> {
+                                Text(text = "Writing Mode")
+                            }
+                            else -> {
+                                Text("Reading Mode")
+                            }
+                        }
+                    },
+                    actions = {
+                        when {
+                            state.isWriting -> {
+                                IconButton(
+                                    onClick = {
+                                        onAction(HomeScreenEvent.SetToEdit)
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        contentDescription = "editing Mode"
+                                    )
+                                }
+                            }
+                            else -> {
+
+                                IconButton(
+                                    onClick = {
+                                        onAction(HomeScreenEvent.SetToEdit)
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ReadMore,
+                                        contentDescription = "editing Mode"
+                                    )
+                                }
+                            }
+                        }
+
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navigator?.popAll() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.NavigateBefore,
+                                contentDescription = "Back"
+                            )
+                        }
+                    }
+                )
+            }
+        ) { innerPadding ->
             NoteScreenContent(
                 state = state,
                 modifier = modifier.padding(innerPadding),
@@ -84,10 +155,10 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
         modifier: Modifier,
         onAction: (HomeScreenEvent) -> Unit
     ) {
-        when {
-            state.currentNoteId != -1 -> {
+
                 val themePrimaryColor = MaterialTheme.colorScheme.primary
                 val textContestColor = if (isSystemInDarkTheme()) Color.White else Color.Black
+
                 Column(
                     modifier = modifier
                         .fillMaxSize()
@@ -137,6 +208,4 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
                     )
                 }
             }
-        }
     }
-}
