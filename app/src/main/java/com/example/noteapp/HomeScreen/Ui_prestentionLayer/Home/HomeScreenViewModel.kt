@@ -236,7 +236,6 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             }
         }
     }
-
     private fun loadNoteById(noteId: Int) {
         viewModelScope.launch{
             try {

@@ -2,6 +2,7 @@ package com.example.noteapp.HomeScreen.Di
 
 import android.app.Application
 import androidx.room.Room
+import androidx.room.Room.databaseBuilder
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSourcesImpl
@@ -12,12 +13,13 @@ import com.example.noteapp.HomeScreen.domain_layer.Use_Case.DeleteNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.UpdateNotesUseCase
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
+import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSources
+import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSourcesImpl
+import com.example.noteapp.TodoFeature.HomeScreen.data.local.Database.TodoDataBase
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
@@ -28,18 +30,18 @@ class AppModule () : Application() {
         startKoin {
             androidLogger()
             androidContext(this@AppModule)
-            modules(appModule)
+            modules(noteModule)
         }
     }
 
-    private val appModule = module {
+    private val noteModule = module {
         // Database
         single {
-            Room.databaseBuilder(
-                        androidApplication(),
-                        NoteRoomDatabase::class.java,
-                        "Notes_DB"
-                    )
+            databaseBuilder(
+                androidApplication(),
+                NoteRoomDatabase::class.java,
+                "Notes_DB"
+            )
                 .fallbackToDestructiveMigration(true)
                 .build()
         }
@@ -73,5 +75,20 @@ class AppModule () : Application() {
 
     }
 
+    private val todoModule = module {
+        single {
+            databaseBuilder(
+                context = androidApplication(),
+                klass = TodoDataBase::class.java,
+                name = "Todo_DB"
+            ).fallbackToDestructiveMigration(true).build()
+        }
+        single {
+            get<TodoDataBase>().TodoDao()
+        }
+        single<LocalDataSources> {
+            LocalDataSourcesImpl(get())
+        }
+    }
 
 }
