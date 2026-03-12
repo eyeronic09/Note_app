@@ -70,6 +70,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
     implementation("cafe.adriel.voyager:voyager-navigator:${voyagerVersion}")
     implementation("cafe.adriel.voyager:voyager-koin:${voyagerVersion}")
+    implementation("cafe.adriel.voyager:voyager-tab-navigator:${voyagerVersion}")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
