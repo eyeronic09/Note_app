@@ -3,16 +3,28 @@ package com.example.noteapp.TodoFeature.HomeScreen.data.local.Mapper
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Enity.TodoEntity
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 
-object Mapper {
-    fun TodoToDomain(entity: TodoEntity) : Todo {
-        return Todo(
-            id = entity.id,
-            title = entity.title,
-            content = entity.content.toString(),
-            date = entity.date,
-            deadlineTimestamp = entity.deadlineTimestamp.toString(),
-            priority = entity.priority,
-            isCompleted = entity.isCompleted
-        )
-    }
+
+fun TodoEntity.toDomain(): Todo {
+    return Todo(
+        id = this.id,
+        title = this.title,
+        content = this.content,
+        date = this.date,
+        deadlineTimestamp = this.deadlineTimestamp,
+        priority = this.priority,
+        isCompleted = this.isCompleted
+    )
 }
+
+fun Todo.toEntity(): TodoEntity {
+    return TodoEntity(
+        id = this.id,
+        title = this.title,
+        content = this.content,
+        date = this.date,
+        deadlineTimestamp = this.deadlineTimestamp,
+        priority = this.priority,
+        isCompleted = this.isCompleted
+    )
+}
+

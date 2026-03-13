@@ -5,15 +5,15 @@ import com.example.noteapp.TodoFeature.HomeScreen.data.local.Enity.TodoEntity
 import kotlinx.coroutines.flow.Flow
 
 class LocalDataSourcesImpl(private val dao: TodoDao) : LocalDataSources {
-    override suspend fun getTodos(): Flow<List<TodoEntity>> {
+    override fun getTodos(): Flow<List<TodoEntity>> {
         return dao.getTodos()
     }
 
-    override fun insertAndUpdateTodo(todoEntity: TodoEntity) {
+    override suspend fun insertAndUpdateTodo(todoEntity: TodoEntity) {
         return dao.insertAndUpdateTodo(todoEntity)
     }
 
-    override fun deleteTodo(todoEntity: TodoEntity) {
+    override suspend fun deleteTodo(todoEntity: TodoEntity) {
         return dao.deleteTodo(todoEntity)
     }
 }
