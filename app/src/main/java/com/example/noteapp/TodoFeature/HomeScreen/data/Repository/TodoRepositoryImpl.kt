@@ -12,7 +12,11 @@ class TodoRepositoryImpl(
     private val localDataSources: LocalDataSources
 ) : TodoRepository {
     override fun getTodos(): Flow<List<Todo>> {
-        return localDataSources.getTodos().map { it -> it.map { it.toDomain() } }
+        return localDataSources.getTodos().map {
+            it.map { todoEntity ->
+                todoEntity.toDomain()
+            }
+        }
     }
 
     override suspend fun insertAndUpdateTodo(todo: Todo) {

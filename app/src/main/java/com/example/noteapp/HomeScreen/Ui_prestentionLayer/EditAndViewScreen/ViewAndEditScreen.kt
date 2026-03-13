@@ -1,12 +1,16 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen
+
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -71,9 +75,7 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
             )
         }
         NoteScreen(
-            modifier = Modifier.padding(),
-            state = state,
-            onAction = event
+            modifier = Modifier, state = state, onAction = event
         )
 
 
@@ -82,130 +84,117 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun NoteScreen(
-        modifier: Modifier,
-        state: HomeScreenUIState,
-        onAction: (HomeScreenEvent) -> Unit
+        modifier: Modifier, state: HomeScreenUIState, onAction: (HomeScreenEvent) -> Unit
     ) {
         val navigator = LocalNavigator.current
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = {
-                        when {
-                            state.isWriting -> {
-                                Text(text = "Writing Mode")
-                            }
-                            else -> {
-                                Text("Reading Mode")
-                            }
-                        }
-                    },
-                    actions = {
-                        when {
-                            state.isWriting -> {
-                                IconButton(
-                                    onClick = {
-                                        onAction(HomeScreenEvent.SetToEdit)
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Edit,
-                                        contentDescription = "editing Mode"
-                                    )
-                                }
-                            }
-                            else -> {
-
-                                IconButton(
-                                    onClick = {
-                                        onAction(HomeScreenEvent.SetToEdit)
-                                    }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ReadMore,
-                                        contentDescription = "editing Mode"
-                                    )
-                                }
-                            }
+                TopAppBar(title = {
+                    when {
+                        state.isWriting -> {
+                            Text(text = "Writing Mode")
                         }
 
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { navigator?.popAll() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.NavigateBefore,
-                                contentDescription = "Back"
-                            )
+                        else -> {
+                            Text("Reading Mode")
                         }
                     }
-                )
-            }
-        ) { innerPadding ->
+                }, actions = {
+                    when {
+                        state.isWriting -> {
+                            IconButton(
+                                onClick = {
+                                    onAction(HomeScreenEvent.SetToEdit)
+                                }) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "editing Mode"
+                                )
+                            }
+                        }
+
+                        else -> {
+
+                            IconButton(
+                                onClick = {
+                                    onAction(HomeScreenEvent.SetToEdit)
+                                }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ReadMore,
+                                    contentDescription = "editing Mode"
+                                )
+                            }
+                        }
+                    }
+
+                }, navigationIcon = {
+                    IconButton(onClick = { navigator?.popAll() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.NavigateBefore,
+                            contentDescription = "Back"
+                        )
+                    }
+                })
+            }) { innerPadding ->
             NoteScreenContent(
-                state = state,
-                modifier = modifier.padding(innerPadding),
-                onAction = onAction
+                state = state, modifier = modifier, onAction = onAction
             )
         }
+
     }
 
     @Composable
     fun NoteScreenContent(
-        state: HomeScreenUIState,
-        modifier: Modifier,
-        onAction: (HomeScreenEvent) -> Unit
+        state: HomeScreenUIState, modifier: Modifier, onAction: (HomeScreenEvent) -> Unit
     ) {
 
-                val themePrimaryColor = MaterialTheme.colorScheme.primary
-                val textContestColor = if (isSystemInDarkTheme()) Color.White else Color.Black
+        val themePrimaryColor = MaterialTheme.colorScheme.primary
+        val textContestColor = if (isSystemInDarkTheme()) Color.White else Color.Black
 
-                Column(
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
 
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = themePrimaryColor,
-                            disabledBorderColor = themePrimaryColor,
-                            disabledTextColor = textContestColor,
-                            focusedTextColor = textContestColor,
-                            disabledLabelColor = themePrimaryColor,
-                        ),
-                        value = state.title,
-                        enabled = state.isWriting,
-                        onValueChange = { updatedContent ->
-                            onAction(HomeScreenEvent.UpdateTitle(title = updatedContent))
-                        },
-                        label = { Text("Title") },
-                        singleLine = true
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = themePrimaryColor,
-                            disabledBorderColor = themePrimaryColor,
-                            disabledLabelColor = themePrimaryColor,
-                            disabledTextColor = textContestColor,
-                            focusedTextColor = textContestColor,
-                        ),
-                        value = state.content,
-                        enabled = state.isWriting,
-                        onValueChange = { updatedTitle ->
-                            onAction(HomeScreenEvent.UpdateContent(content = updatedTitle))
-                        },
-                        label = { Text("Content") },
-                        maxLines = Int.MAX_VALUE
-                    )
-                }
-            }
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = themePrimaryColor,
+                    disabledBorderColor = themePrimaryColor,
+                    disabledTextColor = textContestColor,
+                    focusedTextColor = textContestColor,
+                    disabledLabelColor = themePrimaryColor,
+                ),
+                value = state.title,
+                enabled = state.isWriting,
+                onValueChange = { updatedContent ->
+                    onAction(HomeScreenEvent.UpdateTitle(title = updatedContent))
+                },
+                label = { Text("Title") },
+                singleLine = true
+            )
+            OutlinedTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = themePrimaryColor,
+                    disabledBorderColor = themePrimaryColor,
+                    disabledLabelColor = themePrimaryColor,
+                    disabledTextColor = textContestColor,
+                    focusedTextColor = textContestColor,
+                ),
+                value = state.content,
+                enabled = state.isWriting,
+                onValueChange = { updatedTitle ->
+                    onAction(HomeScreenEvent.UpdateContent(content = updatedTitle))
+                },
+                label = { Text("Content") },
+                maxLines = Int.MAX_VALUE
+            )
+        }
     }
+}

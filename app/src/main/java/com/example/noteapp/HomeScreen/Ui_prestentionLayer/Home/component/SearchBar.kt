@@ -1,5 +1,6 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,7 +27,8 @@ fun SearchAppBar(
     onCloseClick : () -> Unit
 ) {
     TopAppBar(
-       navigationIcon = {},
+        windowInsets = WindowInsets(0, 0, 0, 0),
+        navigationIcon = {},
         title = {
             TextField(
                 value = value,
@@ -58,6 +60,7 @@ fun SearchAppBar(
 @Composable
 fun DefaultAppBar(onSearchClicked: () -> Unit) {
     TopAppBar(
+        windowInsets = WindowInsets(0, 0, 0, 0),
         title = {
             Text(text = "My Notes")
         },

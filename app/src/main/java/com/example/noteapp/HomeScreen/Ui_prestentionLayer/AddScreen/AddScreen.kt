@@ -4,8 +4,12 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -66,7 +70,8 @@ class _AddScreen() : Screen {
         onAction: (HomeScreenEvent) -> Unit,
         modifier: Modifier
     ) {
-        Scaffold (
+        Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
                 TopAppBar(
                     navigationIcon = {
@@ -97,14 +102,15 @@ class _AddScreen() : Screen {
                     }
                 )
             }
-        ){ innerPadding ->
+        ) { it: PaddingValues ->
             AddScreenContent(
                 state = state,
                 onAction = onAction,
-                modifier = modifier.padding(innerPadding)
+                modifier = modifier.padding(it)
             )
         }
     }
+
 
     @Composable
     fun AddScreenContent(
@@ -115,9 +121,9 @@ class _AddScreen() : Screen {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+                ,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.Start
         ) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
@@ -129,8 +135,6 @@ class _AddScreen() : Screen {
                 singleLine = true
             )
 
-
-            Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 modifier = Modifier
                     .weight(1f)
