@@ -13,9 +13,12 @@ import com.example.noteapp.HomeScreen.domain_layer.Use_Case.DeleteNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.UpdateNotesUseCase
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
+import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.HomeScreenVM
+import com.example.noteapp.TodoFeature.HomeScreen.data.Repository.TodoRepositoryImpl
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSources
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSourcesImpl
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Database.TodoDataBase
+import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -30,7 +33,7 @@ class AppModule () : Application() {
         startKoin {
             androidLogger()
             androidContext(this@AppModule)
-            modules(noteModule)
+            modules(noteModule , todoModule)
         }
     }
 
@@ -88,6 +91,14 @@ class AppModule () : Application() {
         }
         single<LocalDataSources> {
             LocalDataSourcesImpl(get())
+        }
+
+        // Repository
+        single<TodoRepository> {
+            TodoRepositoryImpl(get())
+        }
+        viewModel {
+            HomeScreenVM(get())
         }
     }
 

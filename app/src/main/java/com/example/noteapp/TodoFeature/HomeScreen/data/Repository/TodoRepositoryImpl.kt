@@ -8,7 +8,7 @@ import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoReposito
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class RepositoryImpl(
+class TodoRepositoryImpl(
     private val localDataSources: LocalDataSources
 ) : TodoRepository {
     override fun getTodos(): Flow<List<Todo>> {
