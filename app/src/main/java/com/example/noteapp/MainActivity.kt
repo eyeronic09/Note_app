@@ -1,5 +1,6 @@
 package com.example.noteapp
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +12,9 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -19,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -28,10 +32,11 @@ import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoTab
 import com.example.noteapp.ui.theme.NoteAppTheme
 
 class MainActivity : ComponentActivity() {
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
             NoteAppTheme {
                 TabNavigator(NoteTab) { _ ->
@@ -43,13 +48,18 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         content = { padding ->
-                            Box(modifier = Modifier.padding(padding)){
-                                CurrentTab()
-                            }
-                        },
+                            CurrentTabContent(padding)
+                        }
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun CurrentTabContent(padding: PaddingValues) {
+        Box(Modifier.padding(padding)) {
+            CurrentTab()
         }
     }
 

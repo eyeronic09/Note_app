@@ -1,7 +1,6 @@
 package com.example.noteapp.HomeScreen.Di
 
 import android.app.Application
-import androidx.room.Room
 import androidx.room.Room.databaseBuilder
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
@@ -13,7 +12,7 @@ import com.example.noteapp.HomeScreen.domain_layer.Use_Case.DeleteNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.UpdateNotesUseCase
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
-import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.HomeScreenVM
+import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreenVM
 import com.example.noteapp.TodoFeature.HomeScreen.data.Repository.TodoRepositoryImpl
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSources
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSourcesImpl
@@ -98,7 +97,7 @@ class AppModule () : Application() {
             TodoRepositoryImpl(get())
         }
         viewModel {
-            HomeScreenVM(get())
+            TodoHomeScreenVM(get())
         }
     }
 

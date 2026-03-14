@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -101,6 +102,7 @@ fun HomeScreen(
             },
             floatingActionButton = {
                 FloatingActionButton(
+                    modifier = Modifier.navigationBarsPadding(),
                     onClick = { navigator?.push(_AddScreen()) }
                 ) {
                     Icon(Icons.Default.Add, "add note")

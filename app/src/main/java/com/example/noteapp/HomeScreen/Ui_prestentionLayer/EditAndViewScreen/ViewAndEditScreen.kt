@@ -1,30 +1,17 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.ReadMore
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MarkChatRead
-import androidx.compose.material.icons.filled.NavigateBefore
-import androidx.compose.material.icons.filled.ReadMore
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,14 +27,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
-import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenUIState
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import org.koin.androidx.compose.koinViewModel
 
 class _ViewAndEditScreen(val noteId: Int) : Screen {
@@ -94,7 +80,6 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
                         state.isWriting -> {
                             Text(text = "Writing Mode")
                         }
-
                         else -> {
                             Text("Reading Mode")
                         }
@@ -137,7 +122,7 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
                 })
             }) { innerPadding ->
             NoteScreenContent(
-                state = state, modifier = modifier, onAction = onAction
+                state = state, modifier = modifier.padding(innerPadding), onAction = onAction
             )
         }
 
@@ -154,7 +139,7 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                ,
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start
         ) {
