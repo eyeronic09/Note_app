@@ -13,6 +13,7 @@ import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.UpdateNotesUseCase
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreenVM
+import com.example.noteapp.TodoFeature.AddScreen.TodoAddScreenVM
 import com.example.noteapp.TodoFeature.HomeScreen.data.Repository.TodoRepositoryImpl
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSources
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSourcesImpl
@@ -98,6 +99,9 @@ class AppModule () : Application() {
         }
         viewModel {
             TodoHomeScreenVM(get())
+        }
+        viewModel {
+            TodoAddScreenVM(get())
         }
     }
 

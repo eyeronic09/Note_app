@@ -8,7 +8,7 @@ fun TodoEntity.toDomain(): Todo {
     return Todo(
         id = this.id,
         title = this.title,
-        content = this.content,
+        description = this.description,
         date = this.date,
         deadlineTimestamp = this.deadlineTimestamp,
         priority = this.priority,
@@ -20,7 +20,7 @@ fun Todo.toEntity(): TodoEntity {
     return TodoEntity(
         id = this.id,
         title = this.title,
-        content = this.content,
+        description = this.description,
         date = this.date,
         deadlineTimestamp = this.deadlineTimestamp,
         priority = this.priority,

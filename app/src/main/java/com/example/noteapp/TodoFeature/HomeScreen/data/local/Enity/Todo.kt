@@ -8,7 +8,7 @@ data class TodoEntity (
     @PrimaryKey(autoGenerate = true)
     val id : Int = 0 ,
     val title : String,
-    val content : String ?= null,
+    val description : String ?= null,
     val date : String,
     val deadlineTimestamp: String ? = null ,
     val priority : String = "Low",
