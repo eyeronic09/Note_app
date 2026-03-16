@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,21 +26,42 @@ import androidx.compose.ui.Alignment.Companion.Bottom
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.Navigator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoAddScreen(
     state: TodoAddScreenUiState,
     onAction: (onEventTodoAdd) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigator : Navigator
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Add Task") }
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navigator.popUntilRoot() }
+                    ) { Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Arrow Back")}
+
+                },
+                title = { Text("Add Task") },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            onAction(onEventTodoAdd.AddTodo)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Save,
+                            contentDescription = "Save Todo"
+                        )
+                    }
+                }
             )
-        }
+        },
+
     ) { paddingValues ->
         Column(
             modifier = modifier
@@ -86,6 +109,7 @@ fun TodoAddScreenPreview(){
     TodoAddScreen(
         state = TodoAddScreenUiState(),
         onAction = {},
-        modifier = Modifier
+        modifier = Modifier,
+        navigator = TODO(),
     )
 }

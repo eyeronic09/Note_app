@@ -1,5 +1,7 @@
 package com.example.noteapp.TodoFeature.AddScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,11 +18,13 @@ import cafe.adriel.voyager.navigator.Navigator
 import org.koin.androidx.compose.koinViewModel
 
 class _TodoAddScreen(): Screen {
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     override fun Content() {
         AddTodoScreenMain()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun AddTodoScreenMain(viewModel : TodoAddScreenVM = koinViewModel()) {
         val state by viewModel.UiState.collectAsState()
@@ -60,11 +64,14 @@ fun TodoAddScreenContent(
             Text("error")
         }
         else ->{
-            TodoAddScreen(
-                state = state,
-                onAction = onAction,
-                modifier = modifier
-            )
+            navigator?.let {
+                TodoAddScreen(
+                    state = state,
+                    onAction = onAction,
+                    modifier = modifier,
+                    navigator = it
+                )
+            }
         }
     }
 }

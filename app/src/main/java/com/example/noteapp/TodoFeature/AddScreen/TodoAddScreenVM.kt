@@ -1,5 +1,7 @@
 package com.example.noteapp.TodoFeature.AddScreen
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
@@ -10,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.Date
 
 enum class Prioritise{
@@ -37,6 +40,7 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
     private val _UiState = MutableStateFlow(TodoAddScreenUiState())
     val UiState: StateFlow<TodoAddScreenUiState> = _UiState.asStateFlow()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(onEvent: onEventTodoAdd) {
         when(onEvent){
             is onEventTodoAdd.AddTodo -> {
@@ -64,14 +68,14 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun insertTodo() {
         viewModelScope.launch {
-            val sdf = SimpleDateFormat("dd/M/yyyy")
-            val currentDate = sdf.format(Date())
+            val currentDateAndTime = LocalDateTime.now()
             val todo = Todo(
                 title = _UiState.value.title,
                 description = _UiState.value.description,
-                date = currentDate,
+                date = currentDateAndTime,
                 deadlineTimestamp = _UiState.value.deadlineTimestamp,
                 priority = _UiState.value.priority.name,
                 isCompleted = false

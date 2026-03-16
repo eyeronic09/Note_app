@@ -1,10 +1,12 @@
 package com.example.noteapp.TodoFeature.HomeScreen.domain.model
 
+import java.time.LocalDateTime
+
 data class Todo(
     val id : Int = 0 ,
     val title : String,
     val description : String ? = null,
-    val date : String,
+    val date : LocalDateTime,
     val deadlineTimestamp: String ? = null ,
     val priority : String = "Low",
     val isCompleted : Boolean = false
