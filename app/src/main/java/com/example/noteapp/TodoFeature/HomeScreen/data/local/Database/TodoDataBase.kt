@@ -7,7 +7,7 @@ import com.example.noteapp.TodoFeature.HomeScreen.data.local.Converter.Converter
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Dao.TodoDao
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Enity.TodoEntity
 @TypeConverters(Converter::class)
-@Database(entities = [TodoEntity::class], version = 2)
+@Database(entities = [TodoEntity::class], version = 3)
 abstract class TodoDataBase : RoomDatabase() {
     abstract fun TodoDao(): TodoDao
 

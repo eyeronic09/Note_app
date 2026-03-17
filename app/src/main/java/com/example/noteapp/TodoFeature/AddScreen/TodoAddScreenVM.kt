@@ -12,18 +12,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDate.now
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.Date
 
 enum class Prioritise{
     Low , Medium , High
 }
-data class TodoAddScreenUiState(
+data class TodoAddScreenUiState (
     val title: String = "",
     val description: String = "",
-    val date: String = "",
+    val date: LocalDateTime? = null,
     val priority: Prioritise = Prioritise.Low,
-    val deadlineTimestamp: String? = "",
+    val time: LocalDateTime? = null,
     val error : Boolean = false
 )
 
@@ -31,7 +35,7 @@ sealed interface onEventTodoAdd {
     data class Title(val title: String) : onEventTodoAdd
     data class Description(val description: String) : onEventTodoAdd
     data class SetPriority(val priority: Prioritise) : onEventTodoAdd
-    data class SetDeadline(val deadline: String) : onEventTodoAdd
+    data class SetDate(val date: Long?) : onEventTodoAdd
 
 
     object AddTodo : onEventTodoAdd
@@ -44,7 +48,9 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
     fun onEvent(onEvent: onEventTodoAdd) {
         when(onEvent){
             is onEventTodoAdd.AddTodo -> {
-                insertTodo()
+                if (_UiState.value.title.isNotEmpty()){
+                    insertTodo()
+                }
             }
 
             is onEventTodoAdd.Description -> {
@@ -52,9 +58,16 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                     it.copy(description = onEvent.description)
                 }
             }
-            is onEventTodoAdd.SetDeadline -> {
+            is onEventTodoAdd.SetDate -> {
                 _UiState.update {
-                    it.copy(deadlineTimestamp = onEvent.deadline)
+                    it.copy(
+                        date = onEvent.date?.let { millis ->
+                            LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(millis),
+                                ZoneId.systemDefault()
+                            )
+                        }
+                    )
                 }
             }
             is onEventTodoAdd.SetPriority -> {
@@ -70,17 +83,17 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun insertTodo() {
+
         viewModelScope.launch {
-            val currentDateAndTime = LocalDateTime.now()
+            val today = LocalDate.now()
             val todo = Todo(
                 title = _UiState.value.title,
                 description = _UiState.value.description,
-                date = currentDateAndTime,
-                deadlineTimestamp = _UiState.value.deadlineTimestamp,
+                date = (_UiState.value.date?.toLocalDate() ?: today),
+                time = _UiState.value.time,
                 priority = _UiState.value.priority.name,
                 isCompleted = false
             )
-
             repository.insertAndUpdateTodo(todo)
 
         }
