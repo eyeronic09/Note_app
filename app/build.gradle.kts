@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.places)
+    implementation(libs.androidx.compose.ui.text)
 
     //Room
     val room_version = "2.8.3"

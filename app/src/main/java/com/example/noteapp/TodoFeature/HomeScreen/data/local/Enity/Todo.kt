@@ -3,7 +3,7 @@ package com.example.noteapp.TodoFeature.HomeScreen.data.local.Enity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Entity("todo")
 data class TodoEntity (
@@ -12,7 +12,7 @@ data class TodoEntity (
     val title : String,
     val description : String ?= null,
     val date : LocalDate,
-    val time: LocalDateTime ? = null ,
+    val time: LocalTime ? = null ,
     val priority : String = "Low",
     val isCompleted : Boolean = false
 )

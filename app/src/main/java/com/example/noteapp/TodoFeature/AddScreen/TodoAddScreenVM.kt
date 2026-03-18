@@ -1,6 +1,7 @@
 package com.example.noteapp.TodoFeature.AddScreen
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,13 +12,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDate.now
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
-import java.util.Date
 
 enum class Prioritise{
     Low , Medium , High
@@ -25,71 +25,80 @@ enum class Prioritise{
 data class TodoAddScreenUiState (
     val title: String = "",
     val description: String = "",
-    val date: LocalDateTime? = null,
+    val date: LocalDate? = null,
     val priority: Prioritise = Prioritise.Low,
-    val time: LocalDateTime? = null,
+    val time: LocalTime? = null,
     val error : Boolean = false
 )
 
-sealed interface onEventTodoAdd {
-    data class Title(val title: String) : onEventTodoAdd
-    data class Description(val description: String) : onEventTodoAdd
-    data class SetPriority(val priority: Prioritise) : onEventTodoAdd
-    data class SetDate(val date: Long?) : onEventTodoAdd
+sealed interface todoCreationEvent {
+    data class Title(val title: String) : todoCreationEvent
+    data class Description(val description: String) : todoCreationEvent
+    data class SetPriority(val priority: Prioritise) : todoCreationEvent
+    data class SetDate(val date: Long?) : todoCreationEvent
+    data class SetTime(val time: LocalTime): todoCreationEvent
 
 
-    object AddTodo : onEventTodoAdd
+    object AddTodo : todoCreationEvent
 }
 class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
     private val _UiState = MutableStateFlow(TodoAddScreenUiState())
     val UiState: StateFlow<TodoAddScreenUiState> = _UiState.asStateFlow()
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun onEvent(onEvent: onEventTodoAdd) {
+    fun onEvent(onEvent: todoCreationEvent) {
         when(onEvent){
-            is onEventTodoAdd.AddTodo -> {
+            is todoCreationEvent.AddTodo -> {
                 if (_UiState.value.title.isNotEmpty()){
                     insertTodo()
                 }
             }
 
-            is onEventTodoAdd.Description -> {
+            is todoCreationEvent.Description -> {
                 _UiState.update {
                     it.copy(description = onEvent.description)
                 }
             }
-            is onEventTodoAdd.SetDate -> {
+            is todoCreationEvent.SetDate -> {
                 _UiState.update {
                     it.copy(
                         date = onEvent.date?.let { millis ->
                             LocalDateTime.ofInstant(
                                 Instant.ofEpochMilli(millis),
                                 ZoneId.systemDefault()
-                            )
+                            ).toLocalDate()
                         }
                     )
                 }
             }
-            is onEventTodoAdd.SetPriority -> {
+            is todoCreationEvent.SetPriority -> {
                 _UiState.update {
                     it.copy(priority = onEvent.priority)
+
                 }
             }
-            is onEventTodoAdd.Title -> _UiState.update {
+            is todoCreationEvent.Title -> _UiState.update {
                 it.copy(title = onEvent.title)
+            }
+            is todoCreationEvent.SetTime -> {
+                _UiState.update { it ->
+                    it.copy(
+                        time = onEvent.time
+                    )
+
+                }
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun insertTodo() {
-
         viewModelScope.launch {
-            val today = LocalDate.now()
+            val today = now()
             val todo = Todo(
                 title = _UiState.value.title,
                 description = _UiState.value.description,
-                date = (_UiState.value.date?.toLocalDate() ?: today),
+                date = (_UiState.value.date ?: today),
                 time = _UiState.value.time,
                 priority = _UiState.value.priority.name,
                 isCompleted = false

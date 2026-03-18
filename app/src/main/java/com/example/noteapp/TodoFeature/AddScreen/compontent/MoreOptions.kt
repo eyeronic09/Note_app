@@ -3,6 +3,7 @@ package com.example.noteapp.TodoFeature.AddScreen.compontent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,13 +21,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.noteapp.TodoFeature.AddScreen.TodoAddScreenUiState
-import com.example.noteapp.TodoFeature.AddScreen.onEventTodoAdd
+import com.example.noteapp.TodoFeature.AddScreen.todoCreationEvent
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MoreOptionMenu(state: TodoAddScreenUiState, onAction:(onEventTodoAdd) -> Unit ){
+fun MoreOptionMenu(state: TodoAddScreenUiState, onAction:(todoCreationEvent) -> Unit ){
     var selectDate by remember {mutableStateOf(value = false)  }
+    var selectTime by remember {mutableStateOf(value = false)  }
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(16.dp)
@@ -46,21 +49,57 @@ fun MoreOptionMenu(state: TodoAddScreenUiState, onAction:(onEventTodoAdd) -> Uni
                     Text(text = date.format(formatter))
                 }
             }
-            if (selectDate) {
-                DatePickerPopup(
-                    onDateSelected = { it ->
-                        onAction(onEventTodoAdd.SetDate(it))
-                        Log.d("date", it.toString())
-                        selectDate = false
-                    },
-                    onDismiss = {
-                        selectDate = false
-                    }
-                )
+        }
+        Row(modifier = Modifier
+            .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            TextButton(onClick = {
+                selectTime = true
+            }) {
+                Text("Select Time")
+            }
+            if (state.time == null) {
+                Text("Not Selected")
+            }else {
+                state.time.let { time ->
+                    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+                    Text(text = time.format(formatter))
+                }
             }
         }
+
+    }
+    if (selectDate) {
+        DatePickerPopup(
+            onDateSelected = { it ->
+                onAction(todoCreationEvent.SetDate(it))
+                Log.d("date", it.toString())
+                selectDate = false
+            },
+            onDismiss = {
+                selectDate = false
+            }
+        )
+    }
+    if (selectTime) {
+        TimePickerPopup(
+            onTimeSelected = { it ->
+                onAction(
+                    todoCreationEvent.SetTime(
+                        it
+                    )
+                )
+                Log.d("time" , it.toString())
+            },
+            onDismiss = {
+                selectTime = false
+            },
+        )
     }
 }
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)

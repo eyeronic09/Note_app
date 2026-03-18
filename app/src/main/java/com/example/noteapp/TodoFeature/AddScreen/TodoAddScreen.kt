@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.noteapp.TodoFeature.AddScreen.compontent.MoreOptionMenu
@@ -30,7 +29,7 @@ import com.example.noteapp.TodoFeature.AddScreen.compontent.MoreOptionMenu
 @Composable
 fun TodoAddScreen(
     state: TodoAddScreenUiState,
-    onAction: (onEventTodoAdd) -> Unit,
+    onAction: (todoCreationEvent) -> Unit,
     modifier: Modifier = Modifier,
     navigator : Navigator
 ) {
@@ -48,7 +47,7 @@ fun TodoAddScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            onAction(onEventTodoAdd.AddTodo)
+                            onAction(todoCreationEvent.AddTodo)
                         }
                     ) {
                         Icon(
@@ -76,7 +75,7 @@ fun TodoAddScreen(
                     label = { Text("Title") },
                     modifier = Modifier.fillMaxWidth(),
                     value = state.title,
-                    onValueChange = { onAction(onEventTodoAdd.Title(it)) }
+                    onValueChange = { onAction(todoCreationEvent.Title(it)) }
                 )
 
                 OutlinedTextField(
@@ -85,7 +84,7 @@ fun TodoAddScreen(
                         .fillMaxWidth()
                         .height(250.dp),
                     value = state.description,
-                    onValueChange = { onAction(onEventTodoAdd.Description(it)) }
+                    onValueChange = { onAction(todoCreationEvent.Description(it)) }
                 )
                 MoreOptionMenu(state , onAction)
 
@@ -93,15 +92,4 @@ fun TodoAddScreen(
 
         }
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun TodoAddScreenPreview(){
-    TodoAddScreen(
-        state = TodoAddScreenUiState(),
-        onAction = {},
-        modifier = Modifier,
-        navigator = TODO(),
-    )
 }

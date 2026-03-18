@@ -3,7 +3,6 @@ package com.example.noteapp.TodoFeature.AddScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -35,8 +34,9 @@ class _TodoAddScreen(): Screen {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @Composable
-    fun TodoAddScreen(state : TodoAddScreenUiState , onAction:(onEventTodoAdd) -> Unit){
+    fun TodoAddScreen(state : TodoAddScreenUiState , onAction:(todoCreationEvent) -> Unit){
         val navigator = LocalNavigator.current
         Box(modifier = Modifier.fillMaxSize()){
             Scaffold() {  it ->
@@ -52,11 +52,12 @@ class _TodoAddScreen(): Screen {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TodoAddScreenContent(
     state : TodoAddScreenUiState,
     modifier: Modifier,
-    onAction: (onEventTodoAdd) -> Unit,
+    onAction: (todoCreationEvent) -> Unit,
     navigator: Navigator?,
 ){
     when {
