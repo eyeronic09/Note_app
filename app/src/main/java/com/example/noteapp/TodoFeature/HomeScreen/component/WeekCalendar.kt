@@ -2,6 +2,7 @@ package com.example.noteapp.TodoFeature.HomeScreen.component
 
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.HomeScreenUiState
+import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreen
+import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreenEvent
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
@@ -59,12 +62,13 @@ private fun previewWeekCalendarHomeScreen() {
                     priority = "Low"
                 )
             )
-        )
+        ),
+        onAction = {} // Empty lambda for preview
     )
 }
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState) {
+fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState , onAction: (TodoHomeScreenEvent) -> Unit) {
     val currentDate = Uistate.todayDate
     val startDate = remember { currentDate.minusDays(500) }
     val endDate = remember { currentDate.plusDays(500) }
@@ -79,16 +83,18 @@ fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState) {
         WeekCalendar(
             state = state,
             dayContent = { day ->
+                Log.d("todayDay" , day.date.toString())
                 val textColor = if (day.date == currentDate) {
                     Color.Green
                 } else {
                     Color.Gray
                 }
-
                 Box(
                     modifier = Modifier
                         .aspectRatio(1f) // Makes the day cell a square
-                        .clickable { /* Handle click */ },
+                        .clickable {
+                            onAction(TodoHomeScreenEvent.OnSpecificDate(day))
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -98,7 +104,9 @@ fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState) {
 
                 }
             },
+
         )
+
         LazyColumn() {
             items(Uistate.todo){ it ->
                 Text(it.title.toString())

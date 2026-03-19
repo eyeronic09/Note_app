@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Upsert
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Enity.TodoEntity
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
 
 @Dao
 interface TodoDao {
@@ -17,4 +18,7 @@ interface TodoDao {
 
     @Delete
     suspend fun deleteTodo(todo: TodoEntity)
+
+    @Query("SELECT * FROM todo WHERE date = :date")
+    fun getSpecificTodoFromDate(date: LocalDate): Flow<List<TodoEntity>>
 }

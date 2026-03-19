@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
+import com.kizitonwose.calendar.core.WeekDay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,15 +15,18 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 data class HomeScreenUiState(
     val todo: List<Todo> = emptyList(),
     val todayDate : LocalDate,
-    val isLoading : Boolean = false
+    val selectedDate : String = "",
+    val isLoading : Boolean = false,
+
 )
 
 sealed interface TodoHomeScreenEvent {
+    data class OnSpecificDate(val date : WeekDay): TodoHomeScreenEvent
     data class OnToggleCompleted(val todo: Todo) : TodoHomeScreenEvent
     data class UpdateTodoHomeScreen(val todo: Todo) : TodoHomeScreenEvent
     data class DeleteTodoHomeScreen(val todo: Todo) : TodoHomeScreenEvent
@@ -34,7 +38,7 @@ class TodoHomeScreenVM(
 ) : ViewModel() {
     @RequiresApi(Build.VERSION_CODES.O)
     private val _uiState = MutableStateFlow(HomeScreenUiState(
-        todayDate = LocalDate.now() ,
+        todayDate = LocalDate.now()
     ))
     @RequiresApi(Build.VERSION_CODES.O)
     val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
@@ -43,14 +47,17 @@ class TodoHomeScreenVM(
         when (event) {
             is TodoHomeScreenEvent.DeleteTodoHomeScreen -> {}
             is TodoHomeScreenEvent.OnToggleCompleted -> {}
-            is TodoHomeScreenEvent.UpdateTodoHomeScreen -> {}
+            is TodoHomeScreenEvent.UpdateTodoHomeScreen -> {
+
+            }
+            is TodoHomeScreenEvent.OnSpecificDate -> {
+                _uiState.update {
+                    it.copy(selectedDate = _uiState.value.selectedDate )
+                }
+                getSpecificTodoFromDate(event)
+            }
         }
     }
-
-    init {
-        getAllTodos()
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getAllTodos() {
         viewModelScope.launch {
@@ -68,6 +75,26 @@ class TodoHomeScreenVM(
                 Log.d("todos", "getAllTodos: ${e.message}")
             }
 
+
+        }
+    }
+
+    private fun getSpecificTodoFromDate(event: TodoHomeScreenEvent.OnSpecificDate) {
+        viewModelScope.launch {
+            _uiState.update { state ->
+                state.copy(isLoading = false, todo = emptyList())
+            }
+            try {
+                val selectedDate = event.date.date // this date is iso formated
+                val todo = repository.getSpecificTodoFromDate(selectedDate).collectLatest { todo ->
+                    _uiState.update { state ->
+                        state.copy(todo = todo)
+                    }
+                }
+                Log.d("LocalDate" , "get Specific {$todo}")
+            } catch (e: Exception) {
+                Log.d("todos", "getAllTodos: ${e.message}")
+            }
 
         }
     }

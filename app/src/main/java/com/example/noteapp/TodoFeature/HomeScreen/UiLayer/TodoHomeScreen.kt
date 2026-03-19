@@ -33,10 +33,10 @@ fun _TodoAddScreen(
         },
     ){ paddingValues ->
         Column(modifier = modifier.padding(paddingValues)) {
-            // WeekCalendar as separate component outside LazyColumn
-            WeekCalendarHomeScreen(Uistate = state)
 
-            // LazyColumn for todo items only
+            WeekCalendarHomeScreen(Uistate = state, onAction)
+
+
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(state.todo) { todo ->
                     Text(todo.title)
