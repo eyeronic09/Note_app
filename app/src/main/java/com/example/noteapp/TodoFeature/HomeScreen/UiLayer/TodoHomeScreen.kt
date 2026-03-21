@@ -14,33 +14,30 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
+import com.example.noteapp.TodoFeature.HomeScreen.component.TodoCard
 import com.example.noteapp.TodoFeature.HomeScreen.component.WeekCalendarHomeScreen
+
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun _TodoAddScreen(
-    state : HomeScreenUiState,
-    onAction:(TodoHomeScreenEvent) -> Unit,
+    state: HomeScreenUiState,
+    onAction: (TodoHomeScreenEvent) -> Unit,
     modifier: Modifier = Modifier,
     navigator: Navigator
 ) {
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {Text("Todo")}
-            )
-        },
-    ){ paddingValues ->
-        Column(modifier = modifier.padding(paddingValues)) {
+    Column(modifier = modifier.padding()) {
 
-            WeekCalendarHomeScreen(Uistate = state, onAction)
+        WeekCalendarHomeScreen(Uistate = state, onAction)
 
 
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(state.todo) { todo ->
-                    Text(todo.title)
-                }
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(state.todo) { it ->
+                TodoCard(
+                    it,
+                    onAction = onAction,
+                    modifier = modifier
+                )
             }
         }
     }

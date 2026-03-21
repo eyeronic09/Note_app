@@ -108,8 +108,11 @@ fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState , onAction: (TodoHomeScre
         )
 
         LazyColumn() {
-            items(Uistate.todo){ it ->
-                Text(it.title.toString())
+            items(Uistate.todo){ it
+                TodoCard(
+                    todo = it,
+                    onAction = onAction,
+                )
             }
         }
     }

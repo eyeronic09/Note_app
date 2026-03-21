@@ -15,17 +15,18 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 data class HomeScreenUiState(
     val todo: List<Todo> = emptyList(),
+    val completedTodos: List<Todo> = emptyList(),
     val todayDate : LocalDate,
     val selectedDate : String = "",
     val isLoading : Boolean = false,
 
-)
+    )
 
 sealed interface TodoHomeScreenEvent {
+
     data class OnSpecificDate(val date : WeekDay): TodoHomeScreenEvent
     data class OnToggleCompleted(val todo: Todo) : TodoHomeScreenEvent
     data class UpdateTodoHomeScreen(val todo: Todo) : TodoHomeScreenEvent
@@ -46,7 +47,9 @@ class TodoHomeScreenVM(
     fun onTodoEvent(event: TodoHomeScreenEvent) {
         when (event) {
             is TodoHomeScreenEvent.DeleteTodoHomeScreen -> {}
-            is TodoHomeScreenEvent.OnToggleCompleted -> {}
+            is TodoHomeScreenEvent.OnToggleCompleted -> {
+                markCompleted(event.todo)
+            }
             is TodoHomeScreenEvent.UpdateTodoHomeScreen -> {
 
             }
@@ -55,6 +58,21 @@ class TodoHomeScreenVM(
                     it.copy(selectedDate = _uiState.value.selectedDate )
                 }
                 getSpecificTodoFromDate(event)
+            }
+
+        }
+    }
+    private fun markCompleted(todo: Todo) {
+        viewModelScope.launch {
+            try {
+                // Toggle the completion status
+                val updatedTodo = todo.copy(isCompleted = !todo.isCompleted)
+
+                // Update in repository (this should update the database)
+                repository.insertAndUpdateTodo(updatedTodo)
+
+            } catch (e: Exception) {
+                Log.d("todos", "Error marking todo as completed: ${e.message}")
             }
         }
     }
@@ -91,8 +109,12 @@ class TodoHomeScreenVM(
                         state.copy(todo = todo)
                     }
                 }
-                Log.d("LocalDate" , "get Specific {$todo}")
+                val completedTodos = _uiState.value.todo.filter { it ->
+                    it.isCompleted
+                }
+                Log.d("completedTodos" , "get Specific {$completedTodos}")
             } catch (e: Exception) {
+
                 Log.d("todos", "getAllTodos: ${e.message}")
             }
 
