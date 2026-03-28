@@ -54,21 +54,18 @@ class TodoHomeScreenVM(
 
             }
             is TodoHomeScreenEvent.OnSpecificDate -> {
-                _uiState.update {
-                    it.copy(selectedDate = _uiState.value.selectedDate )
-                }
-                getSpecificTodoFromDate(event)
-            }
+                    _uiState.update {
+                        it.copy(selectedDate = _uiState.value.selectedDate )
+                    }
+                    getSpecificTodoFromDate(event)
 
+            }
         }
     }
     private fun markCompleted(todo: Todo) {
         viewModelScope.launch {
             try {
-                // Toggle the completion status
                 val updatedTodo = todo.copy(isCompleted = !todo.isCompleted)
-
-                // Update in repository (this should update the database)
                 repository.insertAndUpdateTodo(updatedTodo)
 
             } catch (e: Exception) {
@@ -104,15 +101,19 @@ class TodoHomeScreenVM(
             }
             try {
                 val selectedDate = event.date.date // this date is iso formated
-                val todo = repository.getSpecificTodoFromDate(selectedDate).collectLatest { todo ->
-                    _uiState.update { state ->
-                        state.copy(todo = todo)
-                    }
-                }
                 val completedTodos = _uiState.value.todo.filter { it ->
                     it.isCompleted
                 }
-                Log.d("completedTodos" , "get Specific {$completedTodos}")
+                val todo = repository.getSpecificTodoFromDate(selectedDate).collectLatest { todo ->
+                    _uiState.update { state ->
+                        state.copy(
+                            todo = todo,
+                            completedTodos = completedTodos
+                        )
+                    }
+                }
+
+
             } catch (e: Exception) {
 
                 Log.d("todos", "getAllTodos: ${e.message}")
