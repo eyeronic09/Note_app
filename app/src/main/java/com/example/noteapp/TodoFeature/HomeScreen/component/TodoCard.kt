@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreenEvent
 import com.google.android.material.chip.Chip
@@ -61,7 +62,9 @@ fun TodoCard(
             // Left side: an icon
             Checkbox(
                 checked = todo.isCompleted,
-                onCheckedChange = {}
+                onCheckedChange = {
+                    onAction(TodoHomeScreenEvent.OnToggleCompleted(todo))
+                }
             )
 
             // Space between icon and text
@@ -83,7 +86,9 @@ fun TodoCard(
                 Row(modifier = Modifier.fillMaxWidth().padding( 8.dp),
                     horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                     PriorityChip(todo)
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        onAction(TodoHomeScreenEvent.DeleteTodoHomeScreen(todo))
+                    }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete"

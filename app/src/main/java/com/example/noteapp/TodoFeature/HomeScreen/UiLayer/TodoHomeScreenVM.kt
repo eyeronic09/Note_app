@@ -47,7 +47,7 @@ class TodoHomeScreenVM(
     fun onTodoEvent(event: TodoHomeScreenEvent) {
         when (event) {
             is TodoHomeScreenEvent.DeleteTodoHomeScreen -> {
-
+                deleteTodo(event)
             }
             is TodoHomeScreenEvent.OnToggleCompleted -> {
                 markCompleted(event.todo)
@@ -100,7 +100,11 @@ class TodoHomeScreenVM(
 
         }
     }
-
+    fun deleteTodo(event: TodoHomeScreenEvent.DeleteTodoHomeScreen) {
+        viewModelScope.launch {
+            repository.deleteTodo(event.todo)
+        }
+    }
     private fun getSpecificTodoFromDate(event: TodoHomeScreenEvent.OnSpecificDate) {
         viewModelScope.launch {
             _uiState.update { state ->
