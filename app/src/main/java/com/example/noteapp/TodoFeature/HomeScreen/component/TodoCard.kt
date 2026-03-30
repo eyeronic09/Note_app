@@ -74,13 +74,21 @@ fun TodoCard(
                     style = MaterialTheme.typography.headlineSmall
                 )
                 Text(
-                    text = "This is a description within the card's column layout.",
+                    text = todo.description.toString(),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                // You can nest further rows or columns within this column as needed
+                Text(
+                    text = todo.date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                )
                 Row(modifier = Modifier.fillMaxWidth().padding( 8.dp),
-                    horizontalArrangement = Arrangement.End) {
+                    horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                     PriorityChip(todo)
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete"
+                        )
+                    }
                 }
             }
         }

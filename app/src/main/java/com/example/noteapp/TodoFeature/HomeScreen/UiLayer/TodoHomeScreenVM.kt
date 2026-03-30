@@ -46,7 +46,9 @@ class TodoHomeScreenVM(
 
     fun onTodoEvent(event: TodoHomeScreenEvent) {
         when (event) {
-            is TodoHomeScreenEvent.DeleteTodoHomeScreen -> {}
+            is TodoHomeScreenEvent.DeleteTodoHomeScreen -> {
+
+            }
             is TodoHomeScreenEvent.OnToggleCompleted -> {
                 markCompleted(event.todo)
             }
@@ -54,14 +56,19 @@ class TodoHomeScreenVM(
 
             }
             is TodoHomeScreenEvent.OnSpecificDate -> {
-                    _uiState.update {
-                        it.copy(selectedDate = _uiState.value.selectedDate )
-                    }
-                    getSpecificTodoFromDate(event)
-
+                _uiState.update {
+                    it.copy(selectedDate = _uiState.value.selectedDate )
+                }
+                getSpecificTodoFromDate(event)
             }
         }
     }
+
+    init {
+        getAllTodos()
+    }
+
+
     private fun markCompleted(todo: Todo) {
         viewModelScope.launch {
             try {
@@ -80,7 +87,7 @@ class TodoHomeScreenVM(
                 state.copy(isLoading = false)
             }
             try {
-                val todo = repository.getTodos().collectLatest {
+                val todo = repository.getSpecificTodoFromDate(LocalDate.now()).collectLatest {
                     _uiState.update { state ->
                         state.copy(todo = it)
                     }
@@ -101,6 +108,7 @@ class TodoHomeScreenVM(
             }
             try {
                 val selectedDate = event.date.date // this date is iso formated
+                Log.d("selectedDate" , event.toString())
                 val completedTodos = _uiState.value.todo.filter { it ->
                     it.isCompleted
                 }

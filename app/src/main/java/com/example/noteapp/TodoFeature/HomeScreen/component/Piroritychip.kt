@@ -2,6 +2,7 @@ package com.example.noteapp.TodoFeature.HomeScreen.component
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -15,21 +16,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.example.noteapp.TodoFeature.Utilty.chipColor
+import com.example.noteapp.TodoFeature.Utilty.chipColorBackGround
 import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
 fun PriorityChip(todo: Todo) {
-    val color = chipColor(todo.priority)
+    //val color = chipColor(todo.priority)
+    val backgroundChip = chipColorBackGround(todo.priority)
     Box(
         modifier = Modifier
-            .border(width = 1.dp, color = color, shape = CircleShape)
+            .background(color = backgroundChip, shape = CircleShape)
+            .border(
+                width = 1.dp, shape = CircleShape,
+                color = backgroundChip
+            )
             .padding(horizontal = 12.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = todo.priority,
-            color = color,
             style = MaterialTheme.typography.labelMedium
         )
     }
