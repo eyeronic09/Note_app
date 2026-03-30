@@ -3,6 +3,7 @@ package com.example.noteapp.TodoFeature.AddScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import cafe.adriel.voyager.core.screen.Screen
@@ -27,9 +28,14 @@ class _EditScreen(val id : Int): Screen {
         val event = viewModel::onEvent
         val navigator = LocalNavigator.currentOrThrow
 
+        LaunchedEffect(id) {
+            event(todoCreationEvent.TakeTodoId(id))
+            viewModel.editView()
+        }
+
+
         navigator?.let {
             TodoAddScreen(
-
                 state = state,
                 onAction = event,
                 navigator = it,

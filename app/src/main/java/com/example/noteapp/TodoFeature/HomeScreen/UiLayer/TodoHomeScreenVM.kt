@@ -29,7 +29,7 @@ sealed interface TodoHomeScreenEvent {
 
     data class OnSpecificDate(val date : WeekDay): TodoHomeScreenEvent
     data class OnToggleCompleted(val todo: Todo) : TodoHomeScreenEvent
-    data class UpdateTodoHomeScreen(val todo: Todo) : TodoHomeScreenEvent
+    object UpdateTodoHomeScreen : TodoHomeScreenEvent
     data class DeleteTodoHomeScreen(val todo: Todo) : TodoHomeScreenEvent
 }
 

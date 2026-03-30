@@ -29,46 +29,48 @@ import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import cafe.adriel.voyager.navigator.Navigator
 import java.time.LocalDate
 
-
+//
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview(showBackground = true)
+//@Composable
+//private fun previewWeekCalendarHomeScreen() {
+//    WeekCalendarHomeScreen(
+//        Uistate = HomeScreenUiState(
+//            todayDate = LocalDate.now(),
+//            todo = listOf(
+//                Todo(
+//                    id = 1,
+//                    title = "Gym",
+//                    description = "Leg day",
+//                    date = LocalDate.now(),
+//                    priority = "High"
+//                ),
+//                Todo(
+//                    id = 2,
+//                    title = "Code",
+//                    description = "Project Note App",
+//                    date = LocalDate.now(),
+//                    priority = "Medium"
+//                ),
+//                Todo(
+//                    id = 3,
+//                    title = "Read",
+//                    description = "Atomic Habits",
+//                    date = LocalDate.now().plusDays(1),
+//                    priority = "Low"
+//                )
+//            )
+//        ),
+//        onAction = {},
+//
+//    )
+//}
 @RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
 @Composable
-private fun previewWeekCalendarHomeScreen() {
-    WeekCalendarHomeScreen(
-        Uistate = HomeScreenUiState(
-            todayDate = LocalDate.now(),
-            todo = listOf(
-                Todo(
-                    id = 1,
-                    title = "Gym",
-                    description = "Leg day",
-                    date = LocalDate.now(),
-                    priority = "High"
-                ),
-                Todo(
-                    id = 2,
-                    title = "Code",
-                    description = "Project Note App",
-                    date = LocalDate.now(),
-                    priority = "Medium"
-                ),
-                Todo(
-                    id = 3,
-                    title = "Read",
-                    description = "Atomic Habits",
-                    date = LocalDate.now().plusDays(1),
-                    priority = "Low"
-                )
-            )
-        ),
-        onAction = {} // Empty lambda for preview
-    )
-}
-@RequiresApi(Build.VERSION_CODES.O)
-@Composable
-fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState , onAction: (TodoHomeScreenEvent) -> Unit) {
+fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState , onAction: (TodoHomeScreenEvent) -> Unit , navigator: Navigator) {
     val currentDate = Uistate.todayDate
     val startDate = remember { currentDate.minusDays(500) }
     val endDate = remember { currentDate.plusDays(500) }
@@ -112,6 +114,9 @@ fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState , onAction: (TodoHomeScre
                 TodoCard(
                     todo = it,
                     onAction = onAction,
+                    navigator = navigator,
+                    modifier = Modifier,
+                    onEdit = {},
                 )
             }
         }

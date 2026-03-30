@@ -28,7 +28,7 @@ fun _TodoAddScreen(
 ) {
     Column(modifier = modifier.padding()) {
 
-        WeekCalendarHomeScreen(Uistate = state, onAction)
+        WeekCalendarHomeScreen(Uistate = state, onAction = onAction, navigator = navigator)
 
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -36,7 +36,11 @@ fun _TodoAddScreen(
                 TodoCard(
                     it,
                     onAction = onAction,
-                    modifier = modifier
+                    modifier = modifier,
+                    navigator = navigator,
+                    onEdit = {
+
+                    },
                 )
             }
         }

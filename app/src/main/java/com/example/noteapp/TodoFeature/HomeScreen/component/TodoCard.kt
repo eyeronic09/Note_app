@@ -28,7 +28,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
+import com.example.noteapp.TodoFeature.AddScreen._EditScreen
+import com.example.noteapp.TodoFeature.AddScreen.todoCreationEvent
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreenEvent
 import com.google.android.material.chip.Chip
@@ -43,6 +48,8 @@ import java.time.format.DateTimeFormatter
 fun TodoCard(
     todo: Todo,
     onAction: (TodoHomeScreenEvent) -> Unit,
+    onEdit:(todoCreationEvent) ->  Unit,
+    navigator: Navigator,
     modifier: Modifier = Modifier
 ) {
     Card(onClick = {} ,
@@ -52,7 +59,7 @@ fun TodoCard(
             .fillMaxWidth(),
 
     ) {
-        // Main layout inside the card is a Row
+
         Row(
             modifier = Modifier
                 .padding(16.dp)
@@ -94,28 +101,41 @@ fun TodoCard(
                             contentDescription = "Delete"
                         )
                     }
+                    IconButton(onClick = {
+                        onEdit(todoCreationEvent.TakeTodoId(todo.id))
+
+                        navigator.push(_EditScreen(todo.id))
+
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "edit"
+                        )
+                    }
                 }
             }
         }
     }
 
 }
-
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview
-@Composable
-fun TodoCardPreview() {
-    TodoCard(
-        todo = Todo(
-            title = "Title",
-            description = "Description",
-            id = 2,
-            date = LocalDate.now(),
-            time = LocalTime.now(),
-            priority = "Low",
-            isCompleted = true
-        ),
-        onAction = {}
-    )
-}
+//
+//
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview
+//@Composable
+//fun TodoCardPreview() {
+//    TodoCard(
+//        todo = Todo(
+//            title = "Title",
+//            description = "Description",
+//            id = 2,
+//            date = LocalDate.now(),
+//            time = LocalTime.now(),
+//            priority = "Low",
+//            isCompleted = true
+//        ),
+//        onAction = {},
+//        navigator = ,
+//        modifier = TODO()
+//    )
+//}

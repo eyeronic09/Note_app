@@ -33,6 +33,7 @@ data class TodoAddScreenUiState (
 )
 
 sealed interface todoCreationEvent {
+    data class  TakeTodoId(val id: Int) : todoCreationEvent
     data class Title(val title: String) : todoCreationEvent
     data class Description(val description: String) : todoCreationEvent
     data class SetPriority(val priority: Prioritise) : todoCreationEvent
@@ -88,13 +89,23 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
 
                 }
             }
+
+            is todoCreationEvent.TakeTodoId -> {
+                _UiState.update {
+                    it.copy(
+                        id = onEvent.id,
+                    )
+                }
+            }
         }
     }
     fun editView(){
         viewModelScope.launch {
             val todoId = _UiState.value.id
+            Log.d("todoUpdate" , todoId.toString())
             if (todoId != null){
                 val todo = repository.getSpecificTodo(todoId)
+                Log.d("todoUpdate" , todo.toString())
                 _UiState.update {
                     it.copy(
                         id = todo.id,
