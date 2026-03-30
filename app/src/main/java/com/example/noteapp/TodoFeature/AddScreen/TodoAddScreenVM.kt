@@ -23,6 +23,7 @@ enum class Prioritise{
     Low , Medium , High
 }
 data class TodoAddScreenUiState (
+    val id : Int? = null ,
     val title: String = "",
     val description: String = "",
     val date: LocalDate? = null,
@@ -37,7 +38,6 @@ sealed interface todoCreationEvent {
     data class SetPriority(val priority: Prioritise) : todoCreationEvent
     data class SetDate(val date: Long?) : todoCreationEvent
     data class SetTime(val time: LocalTime): todoCreationEvent
-
 
     object AddTodo : todoCreationEvent
 }
@@ -86,6 +86,28 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                         time = onEvent.time
                     )
 
+                }
+            }
+        }
+    }
+    fun editView(){
+        viewModelScope.launch {
+            val todoId = _UiState.value.id
+            if (todoId != null){
+                val todo = repository.getSpecificTodo(todoId)
+                _UiState.update {
+                    it.copy(
+                        id = todo.id,
+                        title = todo.title,
+                        description = todo.description ?: "",
+                        date = todo.date,
+                        priority = when(todo.priority){
+                            "High" -> Prioritise.High
+                            "Medium" -> Prioritise.Medium
+                            else -> Prioritise.Low
+                        } ,
+                        time = todo.time,
+                    )
                 }
             }
         }

@@ -16,6 +16,9 @@ interface TodoDao {
     @Upsert
     suspend fun insertAndUpdateTodo(todo: TodoEntity)
 
+    @Query("SELECT * FROM todo WHERE id = :id")
+    suspend fun getTodoById(id: Int): TodoEntity?
+
     @Delete
     suspend fun deleteTodo(todo: TodoEntity)
 

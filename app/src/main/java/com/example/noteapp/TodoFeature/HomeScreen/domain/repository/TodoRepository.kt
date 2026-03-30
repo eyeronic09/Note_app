@@ -9,4 +9,5 @@ interface TodoRepository {
     suspend fun insertAndUpdateTodo(todo: Todo)
     suspend fun deleteTodo(todo: Todo)
     suspend fun getSpecificTodoFromDate(todo: LocalDate) : Flow<List<Todo>>
+    suspend fun getSpecificTodo(id: Int) : Todo
 }

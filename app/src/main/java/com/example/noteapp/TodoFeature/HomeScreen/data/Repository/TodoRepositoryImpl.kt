@@ -2,6 +2,7 @@ package com.example.noteapp.TodoFeature.HomeScreen.data.Repository
 
 import android.util.Log
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSources
+import com.example.noteapp.TodoFeature.HomeScreen.data.local.Enity.TodoEntity
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Mapper.toDomain
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Mapper.toEntity
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
@@ -38,7 +39,11 @@ class TodoRepositoryImpl(
         }.also {
             Log.d("getDate", "$it")
         }
+    }
 
+    override suspend fun getSpecificTodo(id: Int): Todo {
+        return localDataSources.getTodoById(id)?.toDomain()
+            ?: throw IllegalArgumentException("Todo with id $id not found")
     }
 
 

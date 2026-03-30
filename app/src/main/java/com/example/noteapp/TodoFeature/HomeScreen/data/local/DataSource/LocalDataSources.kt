@@ -10,4 +10,6 @@ interface LocalDataSources {
     suspend fun insertAndUpdateTodo (todoEntity: TodoEntity)
     suspend fun deleteTodo (todoEntity: TodoEntity)
     suspend fun getSpecificTodoFromDate(date : LocalDate) : Flow<List<TodoEntity>>
+
+    suspend fun getTodoById(id: Int) : TodoEntity?
 }
