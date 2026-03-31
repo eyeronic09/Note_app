@@ -23,6 +23,7 @@ enum class Prioritise{
     Low , Medium , High
 }
 data class TodoAddScreenUiState (
+    val isEditing : Boolean = false,
     val id : Int? = null ,
     val title: String = "",
     val description: String = "",
@@ -41,6 +42,7 @@ sealed interface todoCreationEvent {
     data class SetTime(val time: LocalTime): todoCreationEvent
 
     object AddTodo : todoCreationEvent
+    object UpdateTodo : todoCreationEvent
 }
 class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
     private val _UiState = MutableStateFlow(TodoAddScreenUiState())
@@ -97,29 +99,38 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                     )
                 }
             }
+            todoCreationEvent.UpdateTodo -> {
+                _UiState.update { it ->
+                    it.copy(
+                        isEditing = true,
+                    )
+                }
+            }
         }
     }
-    fun editView(){
+    fun editView() {
         viewModelScope.launch {
             val todoId = _UiState.value.id
-            Log.d("todoUpdate" , todoId.toString())
-            if (todoId != null){
+            _UiState.update { it -> it.copy(isEditing = true) }
+            Log.d("todoUpdate", todoId.toString())
+            if (todoId != null && _UiState.value.isEditing) {
                 val todo = repository.getSpecificTodo(todoId)
-                Log.d("todoUpdate" , todo.toString())
+                Log.d("todoUpdate", todo.toString())
                 _UiState.update {
                     it.copy(
                         id = todo.id,
                         title = todo.title,
                         description = todo.description ?: "",
                         date = todo.date,
-                        priority = when(todo.priority){
+                        priority = when (todo.priority) {
                             "High" -> Prioritise.High
                             "Medium" -> Prioritise.Medium
                             else -> Prioritise.Low
-                        } ,
+                        },
                         time = todo.time,
                     )
                 }
+                repository.updateTodo(todo)
             }
         }
     }
@@ -136,7 +147,7 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                 priority = _UiState.value.priority.name,
                 isCompleted = false
             )
-            repository.insertAndUpdateTodo(todo)
+            repository.insertTodo(todo)
 
         }
 

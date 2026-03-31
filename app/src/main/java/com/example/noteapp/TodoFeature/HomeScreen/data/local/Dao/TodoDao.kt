@@ -2,8 +2,9 @@ package com.example.noteapp.TodoFeature.HomeScreen.data.local.Dao
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Upsert
+import androidx.room.Update
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Enity.TodoEntity
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -13,8 +14,11 @@ interface TodoDao {
     @Query("Select * From todo")
     fun getTodos(): Flow<List<TodoEntity>>
 
-    @Upsert
-    suspend fun insertAndUpdateTodo(todo: TodoEntity)
+    @Insert
+    suspend fun insertTodo(todo: TodoEntity)
+
+    @Update
+    suspend fun updateTodo(todo: TodoEntity)
 
     @Query("SELECT * FROM todo WHERE id = :id")
     suspend fun getTodoById(id: Int): TodoEntity?

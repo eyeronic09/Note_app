@@ -2,7 +2,6 @@ package com.example.noteapp.TodoFeature.HomeScreen.data.Repository
 
 import android.util.Log
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSources
-import com.example.noteapp.TodoFeature.HomeScreen.data.local.Enity.TodoEntity
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Mapper.toDomain
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Mapper.toEntity
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
@@ -22,8 +21,12 @@ class TodoRepositoryImpl(
         }
     }
 
-    override suspend fun insertAndUpdateTodo(todo: Todo) {
-        return localDataSources.insertAndUpdateTodo(todo.toEntity())
+    override suspend fun insertTodo(todo: Todo) {
+        return localDataSources.insertTodo(todo.toEntity())
+    }
+
+    override suspend fun updateTodo(todo: Todo) {
+        return localDataSources.updateTodo(todo.toEntity())
     }
 
     override suspend fun deleteTodo(todo: Todo) {

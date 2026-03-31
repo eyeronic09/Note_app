@@ -73,7 +73,7 @@ class TodoHomeScreenVM(
         viewModelScope.launch {
             try {
                 val updatedTodo = todo.copy(isCompleted = !todo.isCompleted)
-                repository.insertAndUpdateTodo(updatedTodo)
+                repository.insertTodo(updatedTodo)
 
             } catch (e: Exception) {
                 Log.d("todos", "Error marking todo as completed: ${e.message}")
