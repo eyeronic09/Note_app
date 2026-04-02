@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
@@ -28,7 +25,7 @@ fun _TodoAddScreen(
 ) {
     Column(modifier = modifier.padding()) {
 
-        WeekCalendarHomeScreen(Uistate = state, onAction = onAction, navigator = navigator)
+        WeekCalendarHomeScreen(uiState = state, onAction = onAction, navigator = navigator)
 
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -39,7 +36,7 @@ fun _TodoAddScreen(
                     modifier = modifier,
                     navigator = navigator,
                     onEdit = {
-
+                        println(it)
                     },
                 )
             }

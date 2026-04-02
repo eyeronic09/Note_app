@@ -4,33 +4,28 @@ package com.example.noteapp.TodoFeature.HomeScreen.component
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.HomeScreenUiState
-import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreen
 import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreenEvent
-import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
-import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import cafe.adriel.voyager.navigator.Navigator
-import java.time.LocalDate
 
 //
 //@RequiresApi(Build.VERSION_CODES.O)
@@ -70,11 +65,13 @@ import java.time.LocalDate
 //}
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState , onAction: (TodoHomeScreenEvent) -> Unit , navigator: Navigator) {
-    val currentDate = Uistate.todayDate
+fun WeekCalendarHomeScreen(uiState : HomeScreenUiState, onAction: (TodoHomeScreenEvent) -> Unit, navigator: Navigator) {
+    val currentDate = uiState.todayDate
     val startDate = remember { currentDate.minusDays(500) }
     val endDate = remember { currentDate.plusDays(500) }
     val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
+    val selectedDate = uiState.selectedDate
+    Log.d("selectedDate" , selectedDate.toString())
     val state = rememberWeekCalendarState(
         startDate = startDate,
         endDate = endDate ,
@@ -86,14 +83,22 @@ fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState , onAction: (TodoHomeScre
             state = state,
             dayContent = { day ->
                 Log.d("todayDay" , day.date.toString())
-                val textColor = if (day.date == currentDate) {
+                val textColor = if (selectedDate != null && day.date == selectedDate) {
                     Color.Green
                 } else {
                     Color.Gray
                 }
                 Box(
                     modifier = Modifier
-                        .aspectRatio(1f) // Makes the day cell a square
+                        .aspectRatio(1f)
+                        .background(
+                            if (selectedDate != null && day.date == selectedDate) {
+                                MaterialTheme.colorScheme.onSecondary
+                            } else {
+                                Color.Transparent
+                            },
+                            shape = CircleShape
+                        )
                         .clickable {
                             onAction(TodoHomeScreenEvent.OnSpecificDate(day))
                         },
@@ -110,7 +115,7 @@ fun WeekCalendarHomeScreen(Uistate : HomeScreenUiState , onAction: (TodoHomeScre
         )
 
         LazyColumn() {
-            items(Uistate.todo){ it
+            items(uiState.todo){ it
                 TodoCard(
                     todo = it,
                     onAction = onAction,

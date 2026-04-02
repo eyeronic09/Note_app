@@ -20,7 +20,7 @@ data class HomeScreenUiState(
     val todo: List<Todo> = emptyList(),
     val completedTodos: List<Todo> = emptyList(),
     val todayDate : LocalDate,
-    val selectedDate : String = "",
+    val selectedDate : LocalDate? = null,
     val isLoading : Boolean = false,
 
     )
@@ -29,7 +29,7 @@ sealed interface TodoHomeScreenEvent {
 
     data class OnSpecificDate(val date : WeekDay): TodoHomeScreenEvent
     data class OnToggleCompleted(val todo: Todo) : TodoHomeScreenEvent
-    object UpdateTodoHomeScreen : TodoHomeScreenEvent
+
     data class DeleteTodoHomeScreen(val todo: Todo) : TodoHomeScreenEvent
 }
 
@@ -52,12 +52,9 @@ class TodoHomeScreenVM(
             is TodoHomeScreenEvent.OnToggleCompleted -> {
                 markCompleted(event.todo)
             }
-            is TodoHomeScreenEvent.UpdateTodoHomeScreen -> {
-
-            }
             is TodoHomeScreenEvent.OnSpecificDate -> {
                 _uiState.update {
-                    it.copy(selectedDate = _uiState.value.selectedDate )
+                    it.copy(selectedDate = event.date.date )
                 }
                 getSpecificTodoFromDate(event)
             }
@@ -73,7 +70,7 @@ class TodoHomeScreenVM(
         viewModelScope.launch {
             try {
                 val updatedTodo = todo.copy(isCompleted = !todo.isCompleted)
-                repository.insertTodo(updatedTodo)
+                repository.updateTodo(updatedTodo)
 
             } catch (e: Exception) {
                 Log.d("todos", "Error marking todo as completed: ${e.message}")

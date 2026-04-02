@@ -103,7 +103,6 @@ fun TodoCard(
                     }
                     IconButton(onClick = {
                         onEdit(todoCreationEvent.TakeTodoId(todo.id))
-
                         navigator.push(_EditScreen(todo.id))
 
                     }) {

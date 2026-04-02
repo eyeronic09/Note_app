@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,20 +41,22 @@ fun TodoAddScreen(
                 navigationIcon = {
                     IconButton(
                         onClick = { navigator.popUntilRoot() }
-                    ) { Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Arrow Back")}
+                    ) { Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back")}
 
                 },
-                title = { Text("Add Task") },
+                title = { Text(if (state.isEditing) "Edit Task" else "Add Task") },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            onAction(todoCreationEvent.AddTodo)
+                    if (!state.isEditing) {
+                        IconButton(
+                            onClick = {
+                                onAction(todoCreationEvent.AddTodo)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Save,
+                                contentDescription = "Save Todo"
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Save,
-                            contentDescription = "Save Todo"
-                        )
                     }
                 }
             )

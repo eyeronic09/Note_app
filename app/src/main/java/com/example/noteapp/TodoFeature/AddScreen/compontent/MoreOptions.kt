@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -30,6 +31,7 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MoreOptionMenu(state: TodoAddScreenUiState, onAction:(todoCreationEvent) -> Unit ){
+    val isEditing = state.isEditing
     var selectDate by remember {mutableStateOf(value = false)  }
     var selectTime by remember {mutableStateOf(value = false)  }
     Column(modifier = Modifier
@@ -71,9 +73,14 @@ fun MoreOptionMenu(state: TodoAddScreenUiState, onAction:(todoCreationEvent) -> 
                 }
             }
         }
+    }
+    if(isEditing){
+        Button(
+            onClick = {onAction(todoCreationEvent.OnupdateTodo)},
 
-
-
+        ) {
+            Text("save")
+        }
     }
     if (selectDate) {
         DatePickerPopup(

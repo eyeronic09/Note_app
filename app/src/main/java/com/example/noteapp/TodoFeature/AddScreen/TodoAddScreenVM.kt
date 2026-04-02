@@ -34,7 +34,7 @@ data class TodoAddScreenUiState (
 )
 
 sealed interface todoCreationEvent {
-    data class  TakeTodoId(val id: Int) : todoCreationEvent
+    data class TakeTodoId(val id: Int) : todoCreationEvent
     data class Title(val title: String) : todoCreationEvent
     data class Description(val description: String) : todoCreationEvent
     data class SetPriority(val priority: Prioritise) : todoCreationEvent
@@ -43,6 +43,10 @@ sealed interface todoCreationEvent {
 
     object AddTodo : todoCreationEvent
     object UpdateTodo : todoCreationEvent
+
+    object OnupdateTodo : todoCreationEvent
+
+
 }
 class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
     private val _UiState = MutableStateFlow(TodoAddScreenUiState())
@@ -106,19 +110,24 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                     )
                 }
             }
+
+            todoCreationEvent.OnupdateTodo -> {
+                Log.d("updateTodo", "OnupdateTodo event received")
+                updateTodo()
+            }
         }
     }
+    @RequiresApi(Build.VERSION_CODES.O)
     fun editView() {
         viewModelScope.launch {
             val todoId = _UiState.value.id
-            _UiState.update { it -> it.copy(isEditing = true) }
             Log.d("todoUpdate", todoId.toString())
-            if (todoId != null && _UiState.value.isEditing) {
+            if (todoId != null) {
                 val todo = repository.getSpecificTodo(todoId)
                 Log.d("todoUpdate", todo.toString())
-                _UiState.update {
-                    it.copy(
-                        id = todo.id,
+                _UiState.update { state ->
+                    state.copy(
+                        id = todoId,
                         title = todo.title,
                         description = todo.description ?: "",
                         date = todo.date,
@@ -128,9 +137,36 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                             else -> Prioritise.Low
                         },
                         time = todo.time,
+                        isEditing = true
                     )
+                }.also {
+                    Log.d("todoUpdate", "State updated with id: $todoId")
                 }
-                repository.updateTodo(todo)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateTodo() {
+        viewModelScope.launch {
+            val todoId = _UiState.value.id
+            Log.d("updateTodo", "updateTodo called with todoId: $todoId")
+            if (todoId != null) {
+                val updatedTodo = Todo(
+                    id = todoId,
+                    title = _UiState.value.title,
+                    description = _UiState.value.description,
+                    date = _UiState.value.date ?: LocalDate.now(),
+                    time = _UiState.value.time,
+                    priority = _UiState.value.priority.name,
+                    isCompleted = false
+                )
+                Log.d("updateTodo", "Updating todo: $updatedTodo")
+                repository.updateTodo(updatedTodo).also { 
+                    Log.d("updateTodo", "Successfully updated todo with id: $todoId")
+                }
+            } else {
+                Log.d("updateTodo", "todoId is null, cannot update")
             }
         }
     }
@@ -148,9 +184,7 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                 isCompleted = false
             )
             repository.insertTodo(todo)
-
         }
-
     }
 
 }
