@@ -1,12 +1,17 @@
 package com.example.noteapp.TodoFeature.AddScreen
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
+import com.example.noteapp.TodoFeature.Todo_Notification.NotificationHelper
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,15 +47,19 @@ sealed interface todoCreationEvent {
     data class SetTime(val time: LocalTime): todoCreationEvent
 
     object AddTodo : todoCreationEvent
-    object UpdateTodo : todoCreationEvent
+    object ChangeToEditMode : todoCreationEvent
 
     object OnupdateTodo : todoCreationEvent
 
 
 }
-class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
+class TodoAddScreenVM (val repository: TodoRepository, private val notificationHelper: NotificationHelper) : ViewModel() {
     private val _UiState = MutableStateFlow(TodoAddScreenUiState())
     val UiState: StateFlow<TodoAddScreenUiState> = _UiState.asStateFlow()
+
+    private val _requestNotification = MutableSharedFlow<Unit>()
+    val requestNotification = _requestNotification
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(onEvent: todoCreationEvent) {
@@ -103,7 +112,7 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                     )
                 }
             }
-            todoCreationEvent.UpdateTodo -> {
+            todoCreationEvent.ChangeToEditMode -> {
                 _UiState.update { it ->
                     it.copy(
                         isEditing = true,
@@ -156,7 +165,7 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                     id = todoId,
                     title = _UiState.value.title,
                     description = _UiState.value.description,
-                    date = _UiState.value.date ?: LocalDate.now(),
+                    date = _UiState.value.date ?: now(),
                     time = _UiState.value.time,
                     priority = _UiState.value.priority.name,
                     isCompleted = false
@@ -183,7 +192,14 @@ class TodoAddScreenVM (val repository: TodoRepository) : ViewModel() {
                 priority = _UiState.value.priority.name,
                 isCompleted = false
             )
+            notificationHelper.showNotification(
+                title = todo.title,
+                deadline = todo.time.toString(),
+                taskId = todo.id
+            )
             repository.insertTodo(todo)
+
+
         }
     }
 

@@ -50,6 +50,7 @@ fun TodoAddScreen(
                         IconButton(
                             onClick = {
                                 onAction(todoCreationEvent.AddTodo)
+
                             }
                         ) {
                             Icon(
@@ -59,6 +60,7 @@ fun TodoAddScreen(
                         }
                     }
                 }
+
             )
         },
 

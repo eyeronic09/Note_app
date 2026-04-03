@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
+import com.example.noteapp.TodoFeature.Todo_Notification.NotificationHelper
 import com.kizitonwose.calendar.core.WeekDay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,8 +23,7 @@ data class HomeScreenUiState(
     val todayDate : LocalDate,
     val selectedDate : LocalDate? = null,
     val isLoading : Boolean = false,
-
-    )
+)
 
 sealed interface TodoHomeScreenEvent {
 
@@ -35,7 +35,8 @@ sealed interface TodoHomeScreenEvent {
 
 @RequiresApi(Build.VERSION_CODES.O)
 class TodoHomeScreenVM(
-    private val repository: TodoRepository
+    private val repository: TodoRepository,
+    private val notificationHelper: NotificationHelper
 ) : ViewModel() {
     @RequiresApi(Build.VERSION_CODES.O)
     private val _uiState = MutableStateFlow(HomeScreenUiState(
@@ -71,6 +72,7 @@ class TodoHomeScreenVM(
             try {
                 val updatedTodo = todo.copy(isCompleted = !todo.isCompleted)
                 repository.updateTodo(updatedTodo)
+
 
             } catch (e: Exception) {
                 Log.d("todos", "Error marking todo as completed: ${e.message}")

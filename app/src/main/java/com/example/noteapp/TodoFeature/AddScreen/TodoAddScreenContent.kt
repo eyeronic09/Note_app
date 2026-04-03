@@ -39,10 +39,10 @@ class _TodoAddScreen(): Screen {
     fun TodoAddScreen(state : TodoAddScreenUiState , onAction:(todoCreationEvent) -> Unit){
         val navigator = LocalNavigator.current
         Box(modifier = Modifier.fillMaxSize()){
-            Scaffold() {  it ->
+
                 TodoAddScreenContent(
                     state = state,
-                    modifier = Modifier.padding(it),
+                    modifier = Modifier,
                     onAction = onAction,
                     navigator = navigator
                 )
@@ -50,7 +50,7 @@ class _TodoAddScreen(): Screen {
         }
 
     }
-}
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

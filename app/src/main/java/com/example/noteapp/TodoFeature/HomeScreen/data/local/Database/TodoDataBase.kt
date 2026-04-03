@@ -1,14 +1,26 @@
 package com.example.noteapp.TodoFeature.HomeScreen.data.local.Database
 
+import android.content.Context
 import androidx.room.Database
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Converter.Converter
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Dao.TodoDao
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Enity.TodoEntity
+
 @TypeConverters(Converter::class)
 @Database(entities = [TodoEntity::class], version = 3)
 abstract class TodoDataBase : RoomDatabase() {
     abstract fun TodoDao(): TodoDao
 
+    companion object {
+        fun getDatabase(context: Context): TodoDataBase {
+            return Room.databaseBuilder(
+                context,
+                TodoDataBase::class.java,
+                "todo_database"
+            ).build()
+        }
+    }
 }

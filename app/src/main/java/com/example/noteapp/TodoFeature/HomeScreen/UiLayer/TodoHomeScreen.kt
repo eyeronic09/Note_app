@@ -17,7 +17,7 @@ import com.example.noteapp.TodoFeature.HomeScreen.component.WeekCalendarHomeScre
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun _TodoAddScreen(
+fun TodoHomeScreen(
     state: HomeScreenUiState,
     onAction: (TodoHomeScreenEvent) -> Unit,
     modifier: Modifier = Modifier,
