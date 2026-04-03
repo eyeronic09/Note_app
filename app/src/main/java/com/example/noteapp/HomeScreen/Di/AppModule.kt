@@ -37,6 +37,7 @@ import org.koin.dsl.module
 class AppModule () : Application() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
+
         super.onCreate()
         createNotificationChannel()
         startKoin {
