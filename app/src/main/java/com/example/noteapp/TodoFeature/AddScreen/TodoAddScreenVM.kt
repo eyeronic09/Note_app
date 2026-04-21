@@ -1,16 +1,15 @@
 package com.example.noteapp.TodoFeature.AddScreen
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.app.Application
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
-import com.example.noteapp.TodoFeature.Todo_Notification.NotificationHelper
+import com.example.noteapp.TodoFeature.Todo_Notification.scheduleTodoNotification
+import com.example.noteapp.TodoFeature.HomeScreen.data.local.Mapper.toTimestamp
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +22,7 @@ import java.time.LocalDate.now
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import kotlin.random.Random
 
 enum class Prioritise{
     Low , Medium , High
@@ -53,7 +53,7 @@ sealed interface todoCreationEvent {
 
 
 }
-class TodoAddScreenVM (val repository: TodoRepository, private val notificationHelper: NotificationHelper) : ViewModel() {
+class TodoAddScreenVM (val repository: TodoRepository, application: Application) : AndroidViewModel(application) {
     private val _UiState = MutableStateFlow(TodoAddScreenUiState())
     val UiState: StateFlow<TodoAddScreenUiState> = _UiState.asStateFlow()
 
@@ -192,14 +192,16 @@ class TodoAddScreenVM (val repository: TodoRepository, private val notificationH
                 priority = _UiState.value.priority.name,
                 isCompleted = false
             )
-            notificationHelper.showNotification(
-                title = todo.title,
-                deadline = todo.time.toString(),
-                taskId = todo.id
-            )
             repository.insertTodo(todo)
 
-
+            val pseudoId = (todo.title + todo.time.toString()).hashCode()
+            scheduleTodoNotification(
+                context = getApplication(),
+                taskId =  pseudoId,
+                title = "Todo ${todo.title}",
+                message = todo.description ?: "Your task is starting now!",
+                targetTimestamp = todo.toTimestamp()
+            )
         }
     }
 

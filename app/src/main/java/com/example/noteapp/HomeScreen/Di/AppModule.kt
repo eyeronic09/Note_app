@@ -123,9 +123,9 @@ class AppModule () : Application() {
         }
         
         // Notification Helper
-        single {
+        single<NotificationHelper> {
             NotificationHelper(
-                context = androidContext(), // ✅ Application context
+                context = androidContext(),
                 manager = NotificationManagerCompat.from(androidContext())
             )
         }

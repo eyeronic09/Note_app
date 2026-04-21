@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
@@ -40,7 +42,7 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted : Boolean ->
         if (isGranted) {
-            // Success! Logic for when they click "Allow"
+
             Toast.makeText(this, "Notification permission Granted", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(this, "Notification permission Denied", Toast.LENGTH_SHORT).show()
@@ -48,6 +50,7 @@ class MainActivity : ComponentActivity() {
     }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         checkAndRequestNotificationPermission()
         super.onCreate(savedInstanceState)
         
@@ -60,6 +63,7 @@ class MainActivity : ComponentActivity() {
             NoteAppTheme {
                 TabNavigator(NoteTab) { _ ->
                     Scaffold(
+                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
                         bottomBar = {
                             NavigationBar {
                                 TabNavigationItem(NoteTab)
