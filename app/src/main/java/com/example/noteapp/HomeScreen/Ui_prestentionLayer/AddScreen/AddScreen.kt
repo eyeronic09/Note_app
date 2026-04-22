@@ -1,6 +1,9 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen
 
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +22,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.NoteAdd
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.InsertPhoto
 import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -70,6 +75,15 @@ class _AddScreen() : Screen {
         onAction: (HomeScreenEvent) -> Unit,
         modifier: Modifier
     ) {
+
+        val pickMultipleMedia = rememberLauncherForActivityResult(
+            ActivityResultContracts.PickMultipleVisualMedia()
+        ) { uri ->
+            if (uri.isNotEmpty()){
+                state.imageUri + uri
+            }
+        }
+
         Scaffold(
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
@@ -99,10 +113,23 @@ class _AddScreen() : Screen {
                                 contentDescription = "Add_Notes"
                             )
                         }
+                        IconButton(
+                            onClick = {
+                                pickMultipleMedia.launch(
+                                    input =  PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.InsertPhoto,
+                                contentDescription = null
+                            )
+                        }
                     }
                 )
             }
         ) { it: PaddingValues ->
+
             AddScreenContent(
                 state = state,
                 onAction = onAction,

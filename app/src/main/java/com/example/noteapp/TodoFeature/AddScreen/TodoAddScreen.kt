@@ -1,6 +1,9 @@
 package com.example.noteapp.TodoFeature.AddScreen
 
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.InsertPhoto
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -59,12 +63,23 @@ fun TodoAddScreen(
                             )
                         }
                     }
+                    IconButton(
+                        onClick = {
+
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.InsertPhoto,
+                            contentDescription = null
+                        )
+                    }
                 }
 
             )
         },
 
     ) { paddingValues ->
+
         Column(
             modifier = modifier
                 .fillMaxSize()

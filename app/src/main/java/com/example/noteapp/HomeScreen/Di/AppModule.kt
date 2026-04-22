@@ -16,16 +16,14 @@ import com.example.noteapp.HomeScreen.domain_layer.Use_Case.DeleteNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.UpdateNotesUseCase
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
-import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreenVM
 import com.example.noteapp.TodoFeature.AddScreen.TodoAddScreenVM
+import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreenVM
 import com.example.noteapp.TodoFeature.HomeScreen.data.Repository.TodoRepositoryImpl
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSources
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSourcesImpl
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Database.TodoDataBase
 import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
-import androidx.core.app.NotificationManagerCompat
 import com.example.noteapp.TodoFeature.Todo_Notification.NotificationConstants
-import com.example.noteapp.TodoFeature.Todo_Notification.NotificationHelper
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -122,15 +120,9 @@ class AppModule () : Application() {
             TodoRepositoryImpl(get())
         }
         
-        // Notification Helper
-        single<NotificationHelper> {
-            NotificationHelper(
-                context = androidContext(),
-                manager = NotificationManagerCompat.from(androidContext())
-            )
-        }
+
         viewModel {
-            TodoHomeScreenVM(get(),get())
+            TodoHomeScreenVM(get() , )
         }
         viewModel {
             TodoAddScreenVM(get(),get())

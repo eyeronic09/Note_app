@@ -2,6 +2,7 @@ package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 
 import android.annotation.SuppressLint
 import android.graphics.Color.argb
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -28,6 +29,7 @@ data class HomeScreenUIState(
     val title: String = "",
     val content: String = "",
     val notes: List<Note> = emptyList(),
+    val imageUri: List<Uri> = emptyList(),
     val error: String? = null,
     val currentNoteId: Int? = null,
     val isLoading: Boolean = false,
@@ -36,7 +38,7 @@ data class HomeScreenUIState(
     var searchedText : String  = "",
     val isSearching : Boolean = false,
     val isOldest : Boolean  = false,
-    val isNewest : Boolean = true, // <-- default newest selected
+    val isNewest : Boolean = true,
 )
 
 
@@ -283,7 +285,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                     Log.d("Add_Note", note.toString())
                 }
                 // Reset state after adding
-                 _uiState.update { it.copy(
+                _uiState.update { it.copy(
                     title = "",
                     content = "",
                     isLoading = false

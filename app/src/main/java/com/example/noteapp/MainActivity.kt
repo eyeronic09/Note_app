@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
             NoteAppTheme {
                 TabNavigator(NoteTab) { _ ->
                     Scaffold(
-                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                        contentWindowInsets = WindowInsets(0, 10, 0, 0),
                         bottomBar = {
                             NavigationBar {
                                 TabNavigationItem(NoteTab)

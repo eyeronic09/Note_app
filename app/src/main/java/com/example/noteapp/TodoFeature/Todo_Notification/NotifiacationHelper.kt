@@ -37,7 +37,6 @@ class NotificationReceiver : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()
-
         notificationManager.notify(1, notification)
     }
 }
@@ -71,9 +70,3 @@ fun scheduleTodoNotification(
         )
     }
 }
-
-class NotificationHelper(
-    private val context: Context,
-    private val manager: NotificationManagerCompat
-)
-

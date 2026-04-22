@@ -9,7 +9,8 @@ fun NoteEntity.toDomain() : Note {
         title = this.title,
         content = this.content,
         date = this.date,
-        color = this.color
+        color = this.color,
+        listOfImageUri = this.listOfImageUri
     )
 }
 
@@ -21,6 +22,7 @@ fun Note.toEntity() : NoteEntity {
         title = this.title,
         content = this.content,
         date = this.date,
-        color = this.color
+        color = this.color,
+        listOfImageUri = this.listOfImageUri
     )
 }

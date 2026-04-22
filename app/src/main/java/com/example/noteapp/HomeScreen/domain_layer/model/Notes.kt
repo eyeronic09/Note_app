@@ -8,5 +8,6 @@ data class Note(
     val title: String,
     val content: String,
     val date: String,
-    val color: Int
+    val color: Int,
+    val listOfImageUri: List<String>? = emptyList()
 )

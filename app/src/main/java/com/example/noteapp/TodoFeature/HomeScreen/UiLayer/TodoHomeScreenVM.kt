@@ -36,7 +36,6 @@ sealed interface TodoHomeScreenEvent {
 @RequiresApi(Build.VERSION_CODES.O)
 class TodoHomeScreenVM(
     private val repository: TodoRepository,
-    private val notificationHelper: NotificationHelper
 ) : ViewModel() {
     @RequiresApi(Build.VERSION_CODES.O)
     private val _uiState = MutableStateFlow(HomeScreenUiState(
