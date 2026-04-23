@@ -8,7 +8,7 @@ import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
 
 @Database(
     entities = [NoteEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(NoteConverters::class)

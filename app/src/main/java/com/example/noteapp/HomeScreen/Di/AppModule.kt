@@ -122,7 +122,7 @@ class AppModule () : Application() {
         
 
         viewModel {
-            TodoHomeScreenVM(get() , )
+            TodoHomeScreenVM(get())
         }
         viewModel {
             TodoAddScreenVM(get(),get())

@@ -100,7 +100,7 @@ fun TodoHomeContentMain(
             FloatingActionButton(
                 modifier = Modifier.navigationBarsPadding(),
                 onClick = {
-                    navigator?.push(_TodoAddScreen())
+                    navigator?.parent?.parent?.push(_TodoAddScreen())
                 }
             ) {
                 Icon(Icons.Default.Add, "add todo")

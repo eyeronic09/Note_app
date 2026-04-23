@@ -77,9 +77,12 @@ dependencies {
     implementation("cafe.adriel.voyager:voyager-navigator:${voyagerVersion}")
     implementation("cafe.adriel.voyager:voyager-koin:${voyagerVersion}")
     implementation("cafe.adriel.voyager:voyager-tab-navigator:${voyagerVersion}")
+    implementation("cafe.adriel.voyager:voyager-transitions:${voyagerVersion}")
 
     implementation("com.kizitonwose.calendar:compose:2.10.0")
 
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

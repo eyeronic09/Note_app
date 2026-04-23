@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen._AddScreen
@@ -82,7 +83,7 @@ fun HomeScreen(
     state: HomeScreenUIState,
     onAction: (HomeScreenEvent) -> Unit
 ) {
-    val navigator = LocalNavigator.current
+    val navigator = LocalNavigator.currentOrThrow
     val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -93,17 +94,26 @@ fun HomeScreen(
                         state.searchedText,
                         onValueChange = { onAction(HomeScreenEvent.OnSearchQueryChanged(it)) },
                         onCloseClick = { onAction(HomeScreenEvent.CloseSearch) }
+
                     )
                 } else {
                     DefaultAppBar(
-                        onSearchClicked = { onAction(HomeScreenEvent.TapToSearch) }
+                        onSearchClicked = {
+                            onAction(HomeScreenEvent.TapToSearch)
+                            onAction(HomeScreenEvent.LoadNotes)
+                        }
                     )
                 }
             },
             floatingActionButton = {
                 FloatingActionButton(
                     modifier = Modifier.navigationBarsPadding(),
-                    onClick = { navigator?.push(_AddScreen()) }
+                    onClick = { 
+                        // navigator is the inner navigator (NoteTab)
+                        // navigator.parent is the TabNavigator
+                        // navigator.parent?.parent is the Root Navigator
+                        navigator.parent?.parent?.push(_AddScreen()) 
+                    }
                 ) {
                     Icon(Icons.Default.Add, "add note")
                 }
@@ -147,7 +157,7 @@ fun HomeScreenContent(
                                 "Navigation",
                                 "Pushing Screen. Current stack size: ${navigator?.items?.size} and ${notes.id}"
                             )
-                            navigator?.push(item = _ViewAndEditScreen(notes.id))
+                            navigator?.parent?.parent?.push(item = _ViewAndEditScreen(notes.id))
                             Log.d(
                                 "Navigation",
                                 "Push successful. New last item: ${navigator?.lastItem}"

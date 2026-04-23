@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
+import androidx.core.net.toUri
 
 
 data class HomeScreenUIState(
@@ -45,6 +46,7 @@ data class HomeScreenUIState(
 sealed interface HomeScreenEvent {
     data object SetToEdit : HomeScreenEvent
 
+
     data class UpdateTitle(val title: String) : HomeScreenEvent
     data class UpdateContent(val content: String) : HomeScreenEvent
     object AddNote : HomeScreenEvent
@@ -63,6 +65,7 @@ sealed interface HomeScreenEvent {
     data object Newest : HomeScreenEvent
 
     data object OnUnSelectNewest : HomeScreenEvent
+    data class OnImageSelected(val uris: List<Uri>) : HomeScreenEvent
 
 }
 
@@ -107,6 +110,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             }
             is HomeScreenEvent.LoadNotes -> {
                 print("loaded")
+                selectNewest()
             }
 
             is HomeScreenEvent.ShowResult -> search()
@@ -131,11 +135,13 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             is HomeScreenEvent.OnUnSelectNewest -> {
                 selectNewest()
             }
+            is HomeScreenEvent.OnImageSelected -> {
+                _uiState.update { it.copy(imageUri = it.imageUri + event.uris) }
+            }
         }
     }
 
     init {
-        // load newest by default
         selectNewest()
     }
 
@@ -216,7 +222,8 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                         title = _uiState.value.title,
                         content = _uiState.value.content,
                         date = "",
-                        color = _uiState.value.color ?: randomColor()
+                        color = _uiState.value.color ?: randomColor(),
+                        listOfImageUri = _uiState.value.imageUri.map { it.toString() }
                     )
 
                     repository.updateNotes(updatedNote)
@@ -225,6 +232,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                         it.copy(
                             title = "",
                             content = "",
+                            imageUri = emptyList(),
                             currentNoteId = null,
                             isLoading = false
                         )
@@ -250,7 +258,8 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                         currentNoteId = noteId,
                         isLoading = false,
                         isWriting = true,
-                        color = note.color
+                        color = note.color,
+                        imageUri = note.listOfImageUri?.map { it.toUri() } ?: emptyList()
                     )
                 }.also {
                     Log.d("LoadedNote" , _uiState.value.toString())
@@ -279,7 +288,8 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                     title = _uiState.value.title,
                     content = _uiState.value.content,
                     date = currentDate,
-                    color = randomColor()
+                    color = randomColor(),
+                    listOfImageUri = _uiState.value.imageUri.map { it.toString() }
                 )
                 repository.addNotes(note).also {
                     Log.d("Add_Note", note.toString())
@@ -305,7 +315,11 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
             try {
                 repository.getNotesOldestFirst().collectLatest { notes ->
                     _uiState.update {
-                        it.copy(notes = notes, isLoading = false, error = null)
+                        it.copy(
+                            notes = notes,
+                            isLoading = false,
+                            error = null
+                        )
                     }
                 }
             } catch (e: Exception) {
