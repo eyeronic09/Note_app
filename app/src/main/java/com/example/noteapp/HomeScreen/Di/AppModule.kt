@@ -14,6 +14,8 @@ import com.example.noteapp.HomeScreen.data_layer.repository.RepositoryImpl
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.AddNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.DeleteNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllNoteUseCase
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetNoteByIdUseCase
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.UpdateNotesUseCase
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import com.example.noteapp.TodoFeature.AddScreen.TodoAddScreenVM
@@ -90,6 +92,17 @@ class AppModule () : Application() {
         factory { AddNoteUseCase(get()) }
         factory { UpdateNotesUseCase(get()) }
         factory { DeleteNoteUseCase(get()) }
+        factory { GetNoteByIdUseCase(get()) }
+
+        factory {
+            NoteUseCases(
+                getAllNoteUseCase = get(),
+                deleteNoteUseCase = get(),
+                addNoteUseCase = get(),
+                updateNotesUseCase = get(),
+                getNoteByIdUseCase = get()
+            )
+        }
 
         viewModel {
             HomeScreenViewModel(get())

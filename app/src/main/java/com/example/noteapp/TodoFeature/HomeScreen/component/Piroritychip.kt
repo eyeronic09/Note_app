@@ -22,7 +22,7 @@ import java.time.LocalTime
 
 @Composable
 fun PriorityChip(todo: Todo) {
-    //val color = chipColor(todo.priority)
+    //val Color = chipColor(todo.priority)
     val backgroundChip = chipColorBackGround(todo.priority)
     Box(
         modifier = Modifier

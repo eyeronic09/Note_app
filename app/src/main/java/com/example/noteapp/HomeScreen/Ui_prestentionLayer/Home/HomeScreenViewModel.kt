@@ -9,12 +9,10 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
-import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -24,7 +22,12 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import androidx.core.net.toUri
-
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteOrder
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.OrderType
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 data class HomeScreenUIState(
     val title: String = "",
@@ -38,14 +41,15 @@ data class HomeScreenUIState(
     val color : Int? = null,
     var searchedText : String  = "",
     val isSearching : Boolean = false,
-    val isOldest : Boolean  = false,
-    val isNewest : Boolean = true,
+    val noteOrder : NoteOrder = NoteOrder.Title(order = OrderType.Ascending),
+    val isOrderSectionVisibility : Boolean = false
 )
 
 
 sealed interface HomeScreenEvent {
     data object SetToEdit : HomeScreenEvent
-
+    object ToggleOrderSection : HomeScreenEvent
+    data class Order(val noteOrder: NoteOrder): HomeScreenEvent
 
     data class UpdateTitle(val title: String) : HomeScreenEvent
     data class UpdateContent(val content: String) : HomeScreenEvent
@@ -58,22 +62,24 @@ sealed interface HomeScreenEvent {
     data object ShowResult : HomeScreenEvent
     data object TapToSearch : HomeScreenEvent
     data object CloseSearch : HomeScreenEvent
-    data object Oldest : HomeScreenEvent
 
-    data object OnUnSelectOldest : HomeScreenEvent
-
-    data object Newest : HomeScreenEvent
-
-    data object OnUnSelectNewest : HomeScreenEvent
     data class OnImageSelected(val uris: List<Uri>) : HomeScreenEvent
 
 }
 
 @OptIn(FlowPreview::class)
-class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() {
+class HomeScreenViewModel(
+    private val noteUseCases: NoteUseCases
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeScreenUIState())
     val uiState: StateFlow<HomeScreenUIState> = _uiState.asStateFlow()
+
+    private var getNotesJob: Job? = null
+
+    init {
+       getNotes(NoteOrder.Date(OrderType.Descending))
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onEvent(event: HomeScreenEvent) {
@@ -84,15 +90,19 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                 }
 
             }
+
             is HomeScreenEvent.SetToEdit -> {
                 setToEditMode()
             }
+
             is HomeScreenEvent.AddNote -> {
                 insertNote()
             }
+
             is HomeScreenEvent.OpenToReadAndUpdate -> {
                 loadNoteById(event.noteId)
             }
+
             is HomeScreenEvent.UpdateContent -> {
                 _uiState.update { it.copy(content = event.content) }
             }
@@ -102,55 +112,66 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                     it.copy(title = event.title)
                 }
             }
+
             is HomeScreenEvent.UpdateNote -> {
                 updateNote()
             }
+
             is HomeScreenEvent.OnSearchQueryChanged -> {
                 onSearchQueryChange(event.query)
             }
+
             is HomeScreenEvent.LoadNotes -> {
                 print("loaded")
-                selectNewest()
+
             }
 
             is HomeScreenEvent.ShowResult -> search()
             HomeScreenEvent.TapToSearch -> {
                 _uiState.update { it.copy(isSearching = true) }
             }
+
             is HomeScreenEvent.CloseSearch -> {
-                _uiState.update { it.copy(isSearching = false , searchedText = "") }
-            }
-            is HomeScreenEvent.Oldest -> {
-                selectOldest()
+                _uiState.update { it.copy(isSearching = false, searchedText = "") }
             }
 
-            is HomeScreenEvent.OnUnSelectOldest -> {
-
-                selectNewest()
-            }
-
-            is HomeScreenEvent.Newest -> {
-                selectNewest()
-            }
-            is HomeScreenEvent.OnUnSelectNewest -> {
-                selectNewest()
-            }
             is HomeScreenEvent.OnImageSelected -> {
                 _uiState.update { it.copy(imageUri = it.imageUri + event.uris) }
+            }
+
+            HomeScreenEvent.ToggleOrderSection -> {
+                _uiState.value = uiState.value.copy(
+                    isOrderSectionVisibility = !uiState.value.isOrderSectionVisibility
+                )
+            }
+
+            is HomeScreenEvent.Order -> {
+                if (
+                    _uiState.value.noteOrder == event.noteOrder.orderType &&
+                    _uiState.value.noteOrder.orderType == event.noteOrder.orderType
+                ) {
+                    return
+                }
+                getNotes(event.noteOrder)
             }
         }
     }
 
-    init {
-        selectNewest()
+    private fun getNotes(noteOrder: NoteOrder) {
+        getNotesJob?.cancel()
+        getNotesJob = noteUseCases.getAllNoteUseCase(noteOrder).onEach { notes ->
+            _uiState.value = uiState.value.copy(
+                notes = notes,
+                noteOrder = noteOrder
+            )
+        }
+            .launchIn(viewModelScope)
     }
-
-
 
     fun search() {
         if(_uiState.value.isSearching) {
             viewModelScope.launch {
-                val allNotesFlow = repository.getNotesNewestFirst()
+                val allNotesFlow = noteUseCases.getAllNoteUseCase()
                 val searchedTextFlow = _uiState.map { it.searchedText }.distinctUntilChanged()
                 allNotesFlow
                      // This prevents the app from searching on every single keystroke, improving performance.
@@ -207,7 +228,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
     }
 
     private suspend fun deleteNote(note: Note){
-        repository.deleteNotes(note)
+        noteUseCases.deleteNoteUseCase(note)
     }
 
     private fun updateNote(){
@@ -226,7 +247,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                         listOfImageUri = _uiState.value.imageUri.map { it.toString() }
                     )
 
-                    repository.updateNotes(updatedNote)
+                    noteUseCases.updateNotesUseCase(updatedNote)
 
                     _uiState.update {
                         it.copy(
@@ -250,7 +271,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         viewModelScope.launch{
             try {
                 _uiState.update { it.copy(isLoading = true) }
-                val note = repository.getNoteById(noteId)
+                val note = noteUseCases.getNoteByIdUseCase(noteId)
                 _uiState.update { currentState ->
                     currentState.copy(
                         title = note.title,
@@ -291,7 +312,7 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
                     color = randomColor(),
                     listOfImageUri = _uiState.value.imageUri.map { it.toString() }
                 )
-                repository.addNotes(note).also {
+                noteUseCases.addNoteUseCase(note).also {
                     Log.d("Add_Note", note.toString())
                 }
                 // Reset state after adding
@@ -309,37 +330,5 @@ class HomeScreenViewModel(private val repository: NoteRepository) : ViewModel() 
         }
     }
 
-    private fun selectOldest() {
-        _uiState.update { it.copy(isOldest = true, isNewest = false, isLoading = true) }
-        viewModelScope.launch {
-            try {
-                repository.getNotesOldestFirst().collectLatest { notes ->
-                    _uiState.update {
-                        it.copy(
-                            notes = notes,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                }
-            } catch (e: Exception) {
-                Log.d("HomeScreen_error", e.toString())
-            }
-        }
-    }
 
-    private fun selectNewest() {
-        _uiState.update { it.copy(isOldest = false, isNewest = true, isLoading = true) }
-        viewModelScope.launch {
-            try {
-                repository.getNotesNewestFirst().collectLatest { notes ->
-                    _uiState.update {
-                        it.copy(notes = notes, isLoading = false, error = null)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.d("HomeScreen_error", e.toString())
-            }
-        }
-    }
 }
