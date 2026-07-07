@@ -140,6 +140,10 @@ class AppModule () : Application() {
         viewModel {
             TodoAddScreenVM(get(),get())
         }
+
+        factory {
+
+        }
     }
 
 }

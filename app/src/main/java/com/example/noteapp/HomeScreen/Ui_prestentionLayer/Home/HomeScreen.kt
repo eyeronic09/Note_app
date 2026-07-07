@@ -7,11 +7,18 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -37,6 +45,7 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen._AddScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen._ViewAndEditScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OrderSection
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNotes
 import org.koin.androidx.compose.koinViewModel
@@ -101,6 +110,9 @@ fun HomeScreen(
                         onSearchClicked = {
                             onAction(HomeScreenEvent.TapToSearch)
                             onAction(HomeScreenEvent.LoadNotes)
+                        },
+                        onSortClicked = {
+                            onAction(HomeScreenEvent.ToggleOrderSection)
                         }
                     )
                 }
@@ -119,13 +131,34 @@ fun HomeScreen(
                 }
             }
         ) { innerPadding ->
-            HomeScreenContent(
-                state = state,
-                modifier = Modifier.padding(innerPadding),
-                onAction = onAction,
-                navigator = navigator,
-                context = context
-            )
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+            ) {
+                AnimatedVisibility(
+                    visible = state.isOrderSectionVisibility,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    OrderSection(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        noteOrder = state.noteOrder,
+                        onOrderChange = {
+                            onAction(HomeScreenEvent.Order(it))
+                        }
+                    )
+                }
+                HomeScreenContent(
+                    state = state,
+                    modifier = Modifier.weight(1f),
+                    onAction = onAction,
+                    navigator = navigator,
+                    context = context
+                )
+            }
         }
     }
 
