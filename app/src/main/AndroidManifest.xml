@@ -30,7 +30,7 @@
             </intent-filter>
 
         </activity>
-        <receiver android:name=".TodoFeature.Todo_Notification.NotificationReceiver" android:enabled="true" android:exported="false" />
+        <receiver android:name=".TodoFeature.Todo_Notification.Scheduler.NotificationReceiver" android:enabled="true" android:exported="false" />
     </application>
 
 </manifest>

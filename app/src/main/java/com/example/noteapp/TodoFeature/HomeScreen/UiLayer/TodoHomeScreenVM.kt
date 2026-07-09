@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.WrapperUseCase
 import com.kizitonwose.calendar.core.WeekDay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +35,8 @@ sealed interface TodoHomeScreenEvent {
 
 @RequiresApi(Build.VERSION_CODES.O)
 class TodoHomeScreenVM(
-    private val repository: TodoRepository,
+    private val useCase: WrapperUseCase,
+    private val repository: TodoRepository
 ) : ViewModel() {
     @RequiresApi(Build.VERSION_CODES.O)
     private val _uiState = MutableStateFlow(HomeScreenUiState(
@@ -80,21 +82,11 @@ class TodoHomeScreenVM(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getAllTodos() {
         viewModelScope.launch {
-            _uiState.update { state ->
-                state.copy(isLoading = false)
-            }
-            try {
-                val todo = repository.getSpecificTodoFromDate(LocalDate.now()).collectLatest {
-                    _uiState.update { state ->
-                        state.copy(todo = it)
-                    }
+            useCase.getAllTodosUseCase.invoke().collect { todos ->
+                _uiState.update {
+                    it.copy(todo = todos)
                 }
-                Log.d("todos", "getAllTodos: ${todo})")
-            } catch (e: Exception) {
-                Log.d("todos", "getAllTodos: ${e.message}")
             }
-
-
         }
     }
     fun deleteTodo(event: TodoHomeScreenEvent.DeleteTodoHomeScreen) {

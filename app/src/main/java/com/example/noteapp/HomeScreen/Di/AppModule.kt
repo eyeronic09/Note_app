@@ -25,7 +25,8 @@ import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDat
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSourcesImpl
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Database.TodoDataBase
 import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
-import com.example.noteapp.TodoFeature.Todo_Notification.NotificationConstants
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.GetAllTodosUseCase
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.WrapperUseCase
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -50,8 +51,8 @@ class AppModule () : Application() {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
-                NotificationConstants.CHANNEL_ID,
-                NotificationConstants.CHANNEL_NAME,
+                "todo_channel",
+                "Notification",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
 
@@ -132,10 +133,14 @@ class AppModule () : Application() {
         single<TodoRepository> {
             TodoRepositoryImpl(get())
         }
-        
+
+        // UseCase
+        factory { GetAllTodosUseCase(get()) }
+        factory { WrapperUseCase(get()) }
+
 
         viewModel {
-            TodoHomeScreenVM(get())
+            TodoHomeScreenVM(get() , get())
         }
         viewModel {
             TodoAddScreenVM(get(),get())
