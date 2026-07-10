@@ -6,8 +6,7 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
-import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
-import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.WrapperUseCase
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.TodoUseCases
 import com.kizitonwose.calendar.core.WeekDay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,8 +34,7 @@ sealed interface TodoHomeScreenEvent {
 
 @RequiresApi(Build.VERSION_CODES.O)
 class TodoHomeScreenVM(
-    private val useCase: WrapperUseCase,
-    private val repository: TodoRepository
+    private val todoUseCases: TodoUseCases
 ) : ViewModel() {
     @RequiresApi(Build.VERSION_CODES.O)
     private val _uiState = MutableStateFlow(HomeScreenUiState(
@@ -71,7 +69,7 @@ class TodoHomeScreenVM(
         viewModelScope.launch {
             try {
                 val updatedTodo = todo.copy(isCompleted = !todo.isCompleted)
-                repository.updateTodo(updatedTodo)
+                todoUseCases.updateTodoUseCase(updatedTodo)
 
 
             } catch (e: Exception) {
@@ -82,7 +80,7 @@ class TodoHomeScreenVM(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getAllTodos() {
         viewModelScope.launch {
-            useCase.getAllTodosUseCase.invoke().collect { todos ->
+            todoUseCases.getAllTodosUseCase.invoke().collect { todos ->
                 _uiState.update {
                     it.copy(todo = todos)
                 }
@@ -91,7 +89,7 @@ class TodoHomeScreenVM(
     }
     fun deleteTodo(event: TodoHomeScreenEvent.DeleteTodoHomeScreen) {
         viewModelScope.launch {
-            repository.deleteTodo(event.todo)
+            todoUseCases.deleteTodoUseCase(event.todo)
         }
     }
     private fun getSpecificTodoFromDate(event: TodoHomeScreenEvent.OnSpecificDate) {
@@ -105,7 +103,7 @@ class TodoHomeScreenVM(
                 val completedTodos = _uiState.value.todo.filter { it ->
                     it.isCompleted
                 }
-                val todo = repository.getSpecificTodoFromDate(selectedDate).collectLatest { todo ->
+                todoUseCases.getTodosByDateUseCase(selectedDate).collectLatest { todo ->
                     _uiState.update { state ->
                         state.copy(
                             todo = todo,

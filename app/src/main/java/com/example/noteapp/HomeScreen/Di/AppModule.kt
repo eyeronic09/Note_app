@@ -25,8 +25,16 @@ import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDat
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.DataSource.LocalDataSourcesImpl
 import com.example.noteapp.TodoFeature.HomeScreen.data.local.Database.TodoDataBase
 import com.example.noteapp.TodoFeature.HomeScreen.domain.repository.TodoRepository
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.AddTodoUseCase
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.DeleteTodoUseCase
 import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.GetAllTodosUseCase
-import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.WrapperUseCase
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.GetTodoByIdUseCase
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.GetTodosByDateUseCase
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.TodoUseCases
+import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.UpdateTodoUseCase
+import com.example.noteapp.TodoFeature.Todo_Notification.NotificationDataSource.NotificationActions
+import com.example.noteapp.TodoFeature.Todo_Notification.Scheduler.NotificationScheduler
+import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -88,9 +96,13 @@ class AppModule () : Application() {
             RepositoryImpl(get())
         }
 
+
         //UseCase
         factory { GetAllNoteUseCase(get()) }
-        factory { AddNoteUseCase(get()) }
+        factory { AddNoteUseCase(
+            repository = get(),
+
+        ) }
         factory { UpdateNotesUseCase(get()) }
         factory { DeleteNoteUseCase(get()) }
         factory { GetNoteByIdUseCase(get()) }
@@ -128,6 +140,7 @@ class AppModule () : Application() {
         single<LocalDataSources> {
             LocalDataSourcesImpl(get())
         }
+        single<NotificationActions> { NotificationScheduler(androidContext()) }
 
         // Repository
         single<TodoRepository> {
@@ -136,19 +149,32 @@ class AppModule () : Application() {
 
         // UseCase
         factory { GetAllTodosUseCase(get()) }
-        factory { WrapperUseCase(get()) }
-
-
-        viewModel {
-            TodoHomeScreenVM(get() , get())
-        }
-        viewModel {
-            TodoAddScreenVM(get(),get())
-        }
+        factory { AddTodoUseCase(get() , get()) }
+        factory { DeleteTodoUseCase(get()) }
+        factory { UpdateTodoUseCase(get()) }
+        factory { GetTodosByDateUseCase(get()) }
+        factory { GetTodoByIdUseCase(get()) }
 
         factory {
-
+            TodoUseCases(
+                getAllTodosUseCase = get(),
+                addTodoUseCase = get(),
+                deleteTodoUseCase = get(),
+                updateTodoUseCase = get(),
+                getTodosByDateUseCase = get(),
+                getTodoByIdUseCase = get()
+            )
         }
+
+
+        viewModel {
+            TodoHomeScreenVM(get())
+        }
+        viewModel {
+            TodoAddScreenVM(get(), androidApplication())
+        }
+
+
     }
 
 }

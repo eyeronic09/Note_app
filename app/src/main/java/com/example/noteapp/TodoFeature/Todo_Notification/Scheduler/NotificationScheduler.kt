@@ -18,7 +18,7 @@ class NotificationScheduler(
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
     @RequiresApi(Build.VERSION_CODES.O)
     override fun scheduler(item: NotificationContent){
-        val intent = Intent( context , NotificationScheduler::class.java).apply {
+        val intent = Intent( context , NotificationReceiver::class.java).apply {
             putExtra("EXTRA_TITLE" , item.todoMessage)
         }
         alarmManager.setExactAndAllowWhileIdle(
@@ -35,12 +35,14 @@ class NotificationScheduler(
 
 
     override fun cancel(item: NotificationContent) {
-        PendingIntent.getBroadcast(
+        val intent = Intent(context, NotificationReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
             context,
             item.hashCode(),
-            Intent(),
+            intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        alarmManager.cancel(pendingIntent)
     }
 
 }
