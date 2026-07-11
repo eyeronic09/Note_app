@@ -24,10 +24,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.noteapp.TodoFeature.AddScreen.compontent.MoreOptionMenu
+import com.example.noteapp.TodoFeature.AddScreen.compontent.PrioritySelecterSegmentButton
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -107,9 +113,16 @@ fun TodoAddScreen(
                     onValueChange = { onAction(todoCreationEvent.Description(it)) }
                 )
                 MoreOptionMenu(state , onAction)
+                PrioritySelecterSegmentButton(
+                    options = state.priority,
+                    onPrioritySelected = {
+                        onAction(todoCreationEvent.SetPriority(it))
+                    },
+                )
 
             }
 
         }
     }
 }
+
