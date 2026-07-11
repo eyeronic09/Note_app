@@ -42,7 +42,7 @@ sealed interface todoCreationEvent {
     data class Description(val description: String) : todoCreationEvent
     data class SetPriority(val priority: Prioritise) : todoCreationEvent
     data class SetDate(val date: Long?) : todoCreationEvent
-    data class SetTime(val time: LocalTime): todoCreationEvent
+    data class SetTime(val time: LocalTime?): todoCreationEvent
 
     object AddTodo : todoCreationEvent
     object ChangeToEditMode : todoCreationEvent
@@ -186,7 +186,7 @@ class TodoAddScreenVM (val todoUseCases: TodoUseCases, application: Application)
                 title = _UiState.value.title,
                 description = _UiState.value.description,
                 date = (_UiState.value.date ?: today),
-                time = _UiState.value.time ?: LocalTime.now(),
+                time = _UiState.value.time,
                 priority = _UiState.value.priority.name,
                 isCompleted = false
             )

@@ -16,7 +16,7 @@ class AddTodoUseCase(private val todoRepository: TodoRepository , private val no
         title : String,
         description: String,
         date : LocalDate ,
-        time : LocalTime,
+        time : LocalTime?,
         priority : String,
         isCompleted : Boolean = false
     ) {
@@ -30,10 +30,13 @@ class AddTodoUseCase(private val todoRepository: TodoRepository , private val no
             isCompleted = isCompleted
         )
         todoRepository.insertTodo(todo)
-        val notificationContent = NotificationContent(
-            triggerTime = LocalDateTime.of(date, time),
-            todoMessage = title
-        )
-        notificationAccess.scheduler(notificationContent)
+        if (time != null){
+            val notificationContent = NotificationContent(
+                triggerTime = LocalDateTime.of(date, time),
+                todoMessage = title
+            )
+            notificationAccess.scheduler(notificationContent)
+        }
+
     }
 }
