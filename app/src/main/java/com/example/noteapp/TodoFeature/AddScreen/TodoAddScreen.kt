@@ -56,11 +56,13 @@ fun TodoAddScreen(
                 },
                 title = { Text(if (state.isEditing) "Edit Task" else "Add Task") },
                 actions = {
-                    if (!state.isEditing) {
                         IconButton(
                             onClick = {
-                                onAction(todoCreationEvent.AddTodo)
-
+                                if (state.isEditing) {
+                                    onAction(todoCreationEvent.OnupdateTodo)
+                                } else {
+                                    onAction(todoCreationEvent.AddTodo)
+                                }
                             }
                         ) {
                             Icon(
@@ -68,17 +70,7 @@ fun TodoAddScreen(
                                 contentDescription = "Save Todo"
                             )
                         }
-                    }
-                    IconButton(
-                        onClick = {
 
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.InsertPhoto,
-                            contentDescription = null
-                        )
-                    }
                 }
 
             )

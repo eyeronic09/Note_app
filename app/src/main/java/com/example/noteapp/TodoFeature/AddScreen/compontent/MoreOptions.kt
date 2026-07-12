@@ -31,7 +31,6 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MoreOptionMenu(state: TodoAddScreenUiState, onAction:(todoCreationEvent) -> Unit ){
-    val isEditing = state.isEditing
     var selectDate by remember {mutableStateOf(value = false)  }
     var selectTime by remember {mutableStateOf(value = false)  }
     Column(modifier = Modifier
@@ -72,14 +71,6 @@ fun MoreOptionMenu(state: TodoAddScreenUiState, onAction:(todoCreationEvent) -> 
                     Text(text = time.format(formatter))
                 }
             }
-        }
-    }
-    if(isEditing){
-        Button(
-            onClick = {onAction(todoCreationEvent.OnupdateTodo)},
-
-        ) {
-            Text("save")
         }
     }
     if (selectDate) {
