@@ -43,79 +43,103 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoCard(
     todo: Todo,
     onAction: (TodoHomeScreenEvent) -> Unit,
-    onEdit:(todoCreationEvent) ->  Unit,
+    onEdit: (todoCreationEvent) -> Unit,
     navigator: Navigator,
     modifier: Modifier = Modifier
 ) {
-    Card(onClick = {} ,
-        shape = RoundedCornerShape(8.dp),
+    Card(
+        onClick = {
+            onEdit(todoCreationEvent.TakeTodoId(todo.id))
+            navigator.push(_EditScreen(todo.id))
+        },
+        shape = RoundedCornerShape(16.dp),
         modifier = modifier
-            .padding(16.dp)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth(),
-
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-
         Row(
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left side: an icon
             Checkbox(
                 checked = todo.isCompleted,
                 onCheckedChange = {
                     onAction(TodoHomeScreenEvent.OnToggleCompleted(todo))
-                }
+                },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = MaterialTheme.colorScheme.primary,
+                    uncheckedColor = MaterialTheme.colorScheme.outline
+                )
             )
 
-            // Space between icon and text
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
-            // Right side: a Column for text content
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = todo.title,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else TextDecoration.None
+                    ),
+                    color = if (todo.isCompleted) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                Text(
-                    text = todo.description.toString(),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = todo.date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-                )
-                Row(modifier = Modifier.fillMaxWidth().padding( 8.dp),
-                    horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+                if (!todo.description.isNullOrBlank()) {
+                    Text(
+                        text = todo.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        text = todo.time?.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "No time",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     PriorityChip(todo)
-                    IconButton(onClick = {
-                        onAction(TodoHomeScreenEvent.DeleteTodoHomeScreen(todo))
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete"
-                        )
-                    }
-                    IconButton(onClick = {
-                        onEdit(todoCreationEvent.TakeTodoId(todo.id))
-                        navigator.push(_EditScreen(todo.id))
+                }
+            }
 
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "edit"
-                        )
-                    }
+            Row {
+                IconButton(onClick = {
+                    onAction(TodoHomeScreenEvent.DeleteTodoHomeScreen(todo))
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }
     }
-
 }
 //
 //

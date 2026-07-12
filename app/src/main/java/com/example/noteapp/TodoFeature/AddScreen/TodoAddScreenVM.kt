@@ -55,8 +55,6 @@ class TodoAddScreenVM (val todoUseCases: TodoUseCases, application: Application)
     private val _UiState = MutableStateFlow(TodoAddScreenUiState())
     val UiState: StateFlow<TodoAddScreenUiState> = _UiState.asStateFlow()
 
-    private val _requestNotification = MutableSharedFlow<Unit>()
-    val requestNotification = _requestNotification
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -95,7 +93,7 @@ class TodoAddScreenVM (val todoUseCases: TodoUseCases, application: Application)
                 it.copy(title = onEvent.title)
             }
             is todoCreationEvent.SetTime -> {
-                _UiState.update { it ->
+                _UiState.update {
                     it.copy(
                         time = onEvent.time
                     )
@@ -111,7 +109,7 @@ class TodoAddScreenVM (val todoUseCases: TodoUseCases, application: Application)
                 }
             }
             todoCreationEvent.ChangeToEditMode -> {
-                _UiState.update { it ->
+                _UiState.update {
                     it.copy(
                         isEditing = true,
                     )

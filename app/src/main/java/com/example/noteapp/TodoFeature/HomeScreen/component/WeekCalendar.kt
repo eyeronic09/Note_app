@@ -9,10 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,12 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.Navigator
 import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.HomeScreenUiState
 import com.example.noteapp.TodoFeature.HomeScreen.UiLayer.TodoHomeScreenEvent
 import com.kizitonwose.calendar.compose.WeekCalendar
 import com.kizitonwose.calendar.compose.weekcalendar.rememberWeekCalendarState
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
-import cafe.adriel.voyager.navigator.Navigator
 
 //
 //@RequiresApi(Build.VERSION_CODES.O)
@@ -71,31 +75,36 @@ fun WeekCalendarHomeScreen(uiState : HomeScreenUiState, onAction: (TodoHomeScree
     val endDate = remember { currentDate.plusDays(500) }
     val firstDayOfWeek = remember { firstDayOfWeekFromLocale() }
     val selectedDate = uiState.selectedDate
-    Log.d("selectedDate" , selectedDate.toString())
     val state = rememberWeekCalendarState(
         startDate = startDate,
         endDate = endDate ,
         firstVisibleWeekDate = currentDate,
         firstDayOfWeek = firstDayOfWeek
     )
-    Column(modifier = Modifier.fillMaxSize()) {
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(16.dp)
+    ) {
         WeekCalendar(
+            modifier = Modifier.padding(vertical = 8.dp),
             state = state,
             dayContent = { day ->
-                Log.d("todayDay" , day.date.toString())
-                val textColor = if (selectedDate != null && day.date == selectedDate) {
-                    Color.Green
-                } else {
-                    Color.Gray
-                }
+                val isSelected = selectedDate != null && day.date == selectedDate
+                val isToday = day.date == currentDate
+                
                 Box(
                     modifier = Modifier
                         .aspectRatio(1f)
+                        .padding(4.dp)
                         .background(
-                            if (selectedDate != null && day.date == selectedDate) {
-                                MaterialTheme.colorScheme.onSecondary
-                            } else {
-                                Color.Transparent
+                            color = when {
+                                isSelected -> MaterialTheme.colorScheme.primary
+                                isToday -> MaterialTheme.colorScheme.secondaryContainer
+                                else -> Color.Transparent
                             },
                             shape = CircleShape
                         )
@@ -104,26 +113,20 @@ fun WeekCalendarHomeScreen(uiState : HomeScreenUiState, onAction: (TodoHomeScree
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = day.date.dayOfMonth.toString(),
-                        color = textColor
-                    )
-
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = day.date.dayOfWeek.name.take(1),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = day.date.dayOfMonth.toString(),
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                            color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             },
-
         )
-
-        LazyColumn() {
-            items(uiState.todo){ it
-                TodoCard(
-                    todo = it,
-                    onAction = onAction,
-                    navigator = navigator,
-                    modifier = Modifier,
-                    onEdit = {},
-                )
-            }
-        }
     }
 }
