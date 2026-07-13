@@ -2,7 +2,6 @@ package com.example.noteapp.TodoFeature.HomeScreen.UiLayer
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -16,16 +15,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -81,48 +75,8 @@ fun TodoHomeScreen(
     state : HomeScreenUiState,
     onAction :(TodoHomeScreenEvent) -> Unit
 ){
-
-    TodoHomeContentMain(
-        state = state,
-        modifier = Modifier.fillMaxSize(),
-        onEvent = onAction
-    )
-
-}
-@RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TodoHomeContentMain(
-    state: HomeScreenUiState,
-    modifier: Modifier,
-    onEvent: (TodoHomeScreenEvent) -> Unit
-) {
     val navigator = LocalNavigator.current
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            "My Tasks",
-                            style = MaterialTheme.typography.headlineMedium.copy(
-                                fontWeight = FontWeight.ExtraBold,
-                                letterSpacing = (-0.5).sp
-                            )
-                        )
-                        Text(
-                            state.todayDate.toString(),
-                            style = MaterialTheme.typography.titleSmall,
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    titleContentColor = MaterialTheme.colorScheme.onSurface,
-                )
-            )
-        },
         floatingActionButton = {
             FloatingActionButton(
                 modifier = Modifier.navigationBarsPadding(),
@@ -140,16 +94,38 @@ fun TodoHomeContentMain(
                 )
             }
         },
-        modifier = modifier,
         contentWindowInsets = WindowInsets(0, 0, 0, 0)
-    ) { paddingValues ->
-        navigator?.let { it1 ->
-            TodoHomeScreen(
-                state = state,
-                onAction = onEvent,
-                navigator = it1,
-                modifier = Modifier.padding(paddingValues)
-            )
-        }
+    ) { padding ->
+        TodoHomeContentMain(
+            state = state,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            navigator = navigator,
+            onEvent = onAction
+        )
+    }
+
+
+
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TodoHomeContentMain(
+    state: HomeScreenUiState,
+    navigator: Navigator?,
+    modifier: Modifier,
+    onEvent: (TodoHomeScreenEvent) -> Unit
+) {
+
+    navigator?.let {
+        TodoHomeScreen(
+            state = state,
+            onAction = onEvent,
+            navigator = it,
+            modifier = modifier
+        )
     }
 }

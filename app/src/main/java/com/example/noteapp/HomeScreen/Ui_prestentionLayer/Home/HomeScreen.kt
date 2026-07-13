@@ -1,7 +1,6 @@
-@file:Suppress("DEPRECATION")
-
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -14,11 +13,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -48,8 +44,8 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OrderSection
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNotes
-import org.koin.androidx.compose.koinViewModel
 import com.example.noteapp.R
+import org.koin.androidx.compose.koinViewModel
 
 object NoteTab : Tab {
     override val options: TabOptions
@@ -87,6 +83,7 @@ fun HomeScreenRoute(viewModel: HomeScreenViewModel = koinViewModel()) {
     )
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun HomeScreen(
     state: HomeScreenUIState,
@@ -95,7 +92,6 @@ fun HomeScreen(
     val navigator = LocalNavigator.currentOrThrow
     val context = LocalContext.current
 
-    Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
                 if (state.isSearching) {
@@ -162,7 +158,6 @@ fun HomeScreen(
         }
     }
 
-}
 
 @Composable
 fun HomeScreenContent(
@@ -178,6 +173,7 @@ fun HomeScreenContent(
                 emptyNotes()
             }
         }
+
         else -> {
             LazyColumn(
                 modifier = modifier.fillMaxSize()

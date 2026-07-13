@@ -110,6 +110,7 @@ fun TodoAddScreen(
                     onPrioritySelected = {
                         onAction(todoCreationEvent.SetPriority(it))
                     },
+                    modifier = Modifier.padding(16.dp)
                 )
 
             }

@@ -85,7 +85,7 @@ fun WeekCalendarHomeScreen(uiState : HomeScreenUiState, onAction: (TodoHomeScree
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
         shape = RoundedCornerShape(16.dp)
     ) {
