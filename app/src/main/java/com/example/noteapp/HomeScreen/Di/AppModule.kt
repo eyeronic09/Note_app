@@ -150,7 +150,7 @@ class AppModule () : Application() {
         // UseCase
         factory { GetAllTodosUseCase(get()) }
         factory { AddTodoUseCase(get() , get()) }
-        factory { DeleteTodoUseCase(get()) }
+        factory { DeleteTodoUseCase(get(),get()) }
         factory { UpdateTodoUseCase(get()) }
         factory { GetTodosByDateUseCase(get()) }
         factory { GetTodoByIdUseCase(get()) }
