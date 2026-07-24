@@ -45,7 +45,8 @@ fun NoteCard(
     note: Note,
     onNoteClick: () -> Unit,
     onClickDelete: () -> Unit,
-    onShare:() -> Unit
+    onShare:() -> Unit, 
+    onPin :() -> Unit 
 ) {
     OutlinedCard(modifier = Modifier
         .fillMaxWidth()
@@ -89,7 +90,8 @@ fun NoteCard(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             BasicDropdownMenu(
                 onClickDelete,
-                onShare
+                onShare,
+                onPin ,
             )
         }
 
@@ -112,6 +114,7 @@ private fun NoteCardPreview() {
         note = note,
         onNoteClick = {},
         onClickDelete = {},
-        onShare = {}
+        onShare = {},
+        onPin = {},
     )
 }

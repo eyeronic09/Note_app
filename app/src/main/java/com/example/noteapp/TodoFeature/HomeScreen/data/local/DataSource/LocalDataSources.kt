@@ -13,4 +13,5 @@ interface LocalDataSources {
     suspend fun getSpecificTodoFromDate(date : LocalDate) : Flow<List<TodoEntity>>
 
     suspend fun getTodoById(id: Int) : TodoEntity?
+
 }

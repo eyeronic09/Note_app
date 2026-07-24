@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import androidx.core.net.toUri
+import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteOrder
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.OrderType
@@ -42,12 +43,14 @@ data class HomeScreenUIState(
     var searchedText : String  = "",
     val isSearching : Boolean = false,
     val noteOrder : NoteOrder = NoteOrder.Title(order = OrderType.Ascending),
+    val isPin: Boolean = false,
     val isOrderSectionVisibility : Boolean = false
 )
 
 
 sealed interface HomeScreenEvent {
     data object SetToEdit : HomeScreenEvent
+    data class pinNote(val note : Note) : HomeScreenEvent
     object ToggleOrderSection : HomeScreenEvent
     data class Order(val noteOrder: NoteOrder): HomeScreenEvent
 
@@ -153,6 +156,9 @@ class HomeScreenViewModel(
                     return
                 }
                 getNotes(event.noteOrder)
+            }
+            is HomeScreenEvent.pinNote -> {
+                pinNote(event.note)
             }
         }
     }
@@ -329,6 +335,17 @@ class HomeScreenViewModel(
             }
         }
     }
-
-
+    fun pinNote(note : Note){
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isLoading = true) }
+                noteUseCases.pinNoteUseCase.invoke(note)
+            }catch (e: Exception){
+                _uiState.update { it.copy(
+                    error = e.toString(),
+                    isLoading = false
+                ) }
+            }
+        }
+    }
 }

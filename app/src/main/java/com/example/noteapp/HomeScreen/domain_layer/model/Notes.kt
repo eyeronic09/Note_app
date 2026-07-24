@@ -9,5 +9,6 @@ data class Note(
     val content: String,
     val date: String,
     val color: Int,
-    val listOfImageUri: List<String>? = emptyList()
+    val listOfImageUri: List<String>? = emptyList(),
+    val isPin : Boolean = false
 )

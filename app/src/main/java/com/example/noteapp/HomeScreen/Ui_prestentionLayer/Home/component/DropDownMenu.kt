@@ -17,12 +17,13 @@ import androidx.compose.runtime.setValue
 @Composable
 fun BasicDropdownMenu(
     onClickDelete:() -> Unit,
-    onShare: () -> Unit
+    onShare: () -> Unit,
+    onPin: () -> Unit
 ) {
     var isDropDownExpanded by remember {
         mutableStateOf(false)
     }
-    Box(){
+    Box {
         IconButton(
             onClick = {isDropDownExpanded = !isDropDownExpanded}
         ) {
@@ -46,6 +47,10 @@ fun BasicDropdownMenu(
                 onClick = {
                     onShare()
                 }
+            )
+            DropdownMenuItem(
+                text = {Text("Pin")},
+                onClick = onPin
             )
         }
     }

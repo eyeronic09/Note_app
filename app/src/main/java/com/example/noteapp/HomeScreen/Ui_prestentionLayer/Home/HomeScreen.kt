@@ -39,6 +39,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen._AddScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen._ViewAndEditScreen
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent.pinNote
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OrderSection
@@ -205,7 +206,10 @@ fun HomeScreenContent(
                             }
                             val chooser = Intent.createChooser(sendIntent, "share using")
                             context.startActivity(chooser)
-                        }
+                        },
+                        onPin = {
+                            onAction(HomeScreenEvent.pinNote(notes))
+                        },
                     )
                 }
             }

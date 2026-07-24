@@ -16,6 +16,7 @@ import com.example.noteapp.HomeScreen.domain_layer.Use_Case.DeleteNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetNoteByIdUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.PinNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.UpdateNotesUseCase
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import com.example.noteapp.TodoFeature.AddScreen.TodoAddScreenVM
@@ -34,7 +35,6 @@ import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.TodoUseCases
 import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.UpdateTodoUseCase
 import com.example.noteapp.TodoFeature.Todo_Notification.NotificationDataSource.NotificationActions
 import com.example.noteapp.TodoFeature.Todo_Notification.Scheduler.NotificationScheduler
-import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -106,6 +106,7 @@ class AppModule () : Application() {
         factory { UpdateNotesUseCase(get()) }
         factory { DeleteNoteUseCase(get()) }
         factory { GetNoteByIdUseCase(get()) }
+        factory { PinNoteUseCase(get()) }
 
         factory {
             NoteUseCases(
@@ -113,7 +114,8 @@ class AppModule () : Application() {
                 deleteNoteUseCase = get(),
                 addNoteUseCase = get(),
                 updateNotesUseCase = get(),
-                getNoteByIdUseCase = get()
+                getNoteByIdUseCase = get(),
+                pinNoteUseCase = get(),
             )
         }
 
