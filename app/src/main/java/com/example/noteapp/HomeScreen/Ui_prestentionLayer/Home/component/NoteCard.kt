@@ -86,6 +86,7 @@ fun NoteCard(
             Spacer(modifier = Modifier.padding(4.dp))
             Text(text = note.content)
             Text(text = note.date)
+            Text(text = note.isPin.toString())
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             BasicDropdownMenu(

@@ -68,6 +68,13 @@ fun OrderSection(
                     onOrderChange(NoteOrder.Color(noteOrder.orderType))
                 }
             )
+            DefaultRadioButton(
+                text = "Pin",
+                selected = noteOrder is NoteOrder.Pin,
+                onSelected = {
+                    onOrderChange(NoteOrder.Pin(noteOrder.orderType))
+                }
+            )
             Spacer(modifier = Modifier.width(8.dp))
             DefaultRadioButton(
                 text = "Date",

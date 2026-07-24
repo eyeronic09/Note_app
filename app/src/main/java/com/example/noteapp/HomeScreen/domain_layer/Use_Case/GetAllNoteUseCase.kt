@@ -17,7 +17,9 @@ class GetAllNoteUseCase(private val repository: NoteRepository) {
                         is NoteOrder.Date -> notes.sortedBy { it.date }
                         is NoteOrder.Title -> notes.sortedBy { it.title }
                         is NoteOrder.Color -> notes.sortedBy { it.color }
-                        is NoteOrder.Pin -> notes.sortedBy { it.isPin }
+                        is NoteOrder.Pin -> {
+                            notes.sortedByDescending { it.isPin }
+                        }
                     }
                 }
                 OrderType.Descending -> {
@@ -25,7 +27,9 @@ class GetAllNoteUseCase(private val repository: NoteRepository) {
                         is NoteOrder.Date -> notes.sortedByDescending { it.date }
                         is NoteOrder.Title -> notes.sortedByDescending { it.title }
                         is NoteOrder.Color -> notes.sortedByDescending { it.color }
-                        is NoteOrder.Pin -> notes.sortedBy { it.isPin }
+                        is NoteOrder.Pin -> {
+                            notes.sortedByDescending { it.isPin }
+                        }
                     }
                 }
             }
@@ -46,9 +50,9 @@ sealed class NoteOrder(val orderType: OrderType) {
 
     fun copy(orderType: OrderType) : NoteOrder {
         return when(this){
-            is Color -> Title(orderType)
+            is Title -> Title(orderType)
             is Date -> Date(orderType)
-            is Title -> Color(orderType)
+            is Color -> Color(orderType)
             is Pin -> Pin(orderType)
         }
     }
