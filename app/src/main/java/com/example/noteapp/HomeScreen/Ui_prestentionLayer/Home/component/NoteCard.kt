@@ -57,8 +57,7 @@ fun NoteCard(
                 containerColor = Color(note.color),
                 contentColor = if(isSystemInDarkTheme()) Color.White else Color.Black
             )
-
-    )
+        )
     {
         Column(modifier = Modifier.padding(16.dp)) {
             if (!note.listOfImageUri.isNullOrEmpty()) {
@@ -86,13 +85,13 @@ fun NoteCard(
             Spacer(modifier = Modifier.padding(4.dp))
             Text(text = note.content)
             Text(text = note.date)
-            Text(text = note.isPin.toString())
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             BasicDropdownMenu(
-                onClickDelete,
-                onShare,
-                onPin ,
+                onClickDelete = onClickDelete,
+                isAlreadyPin = note.isPin,
+                onShare = onShare,
+                onPin = onPin
             )
         }
 

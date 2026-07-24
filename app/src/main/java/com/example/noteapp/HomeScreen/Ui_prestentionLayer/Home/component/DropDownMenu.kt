@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 @Composable
 fun BasicDropdownMenu(
     onClickDelete:() -> Unit,
+    isAlreadyPin : Boolean,
     onShare: () -> Unit,
     onPin: () -> Unit
 ) {
@@ -35,9 +36,8 @@ fun BasicDropdownMenu(
         ){
             DropdownMenuItem(
                 text = {
-
                     Text("Delete")
-                 },
+                },
                 onClick = {
                     onClickDelete()
                 }
@@ -49,7 +49,7 @@ fun BasicDropdownMenu(
                 }
             )
             DropdownMenuItem(
-                text = {Text("Pin")},
+                text = {Text(if(isAlreadyPin)"un Pin" else "Pin" )},
                 onClick = onPin
             )
         }
