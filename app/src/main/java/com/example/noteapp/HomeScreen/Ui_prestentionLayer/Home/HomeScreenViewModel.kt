@@ -42,7 +42,9 @@ data class HomeScreenUIState(
     val color : Int? = null,
     var searchedText : String  = "",
     val isSearching : Boolean = false,
-    val noteOrder : NoteOrder = NoteOrder.Title(order = OrderType.Ascending),
+    val noteOrder : NoteOrder = NoteOrder.Title(
+        orderType = OrderType.Ascending,
+    ),
     val isPin: Boolean = false,
     val isOrderSectionVisibility : Boolean = false
 )

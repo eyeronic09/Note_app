@@ -21,11 +21,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,7 +54,9 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OrderSe
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNotes
 import com.example.noteapp.R
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.component.getScopeName
 
 object NoteTab : Tab {
     override val options: TabOptions
@@ -92,12 +102,28 @@ fun HomeScreen(
 ) {
     val navigator = LocalNavigator.currentOrThrow
     val context = LocalContext.current
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                HorizontalDivider()
+                NavigationDrawerItem(
+                    label = { Text("Archived") },
+                    selected = false,
+                    onClick = {
 
+                    }
+                )
+            }
+        },
+    ) {
         Scaffold(
             topBar = {
                 if (state.isSearching) {
                     SearchAppBar(
-                        state.searchedText,
+                        value = state.searchedText,
                         onValueChange = { onAction(HomeScreenEvent.OnSearchQueryChanged(it)) },
                         onCloseClick = { onAction(HomeScreenEvent.CloseSearch) }
 
@@ -110,18 +136,23 @@ fun HomeScreen(
                         },
                         onSortClicked = {
                             onAction(HomeScreenEvent.ToggleOrderSection)
-                        }
+                        },
+                        onSideBar = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        },
                     )
                 }
             },
             floatingActionButton = {
                 FloatingActionButton(
                     modifier = Modifier.navigationBarsPadding(),
-                    onClick = { 
+                    onClick = {
                         // navigator is the inner navigator (NoteTab)
                         // navigator.parent is the TabNavigator
                         // navigator.parent?.parent is the Root Navigator
-                        navigator.parent?.parent?.push(_AddScreen()) 
+                        navigator.parent?.parent?.push(_AddScreen())
                     }
                 ) {
                     Icon(Icons.Default.Add, "add note")
@@ -158,6 +189,7 @@ fun HomeScreen(
             }
         }
     }
+}
 
 
 @Composable
@@ -208,7 +240,7 @@ fun HomeScreenContent(
                             context.startActivity(chooser)
                         },
                         onPin = {
-                            onAction(HomeScreenEvent.pinNote(notes))
+                            onAction(pinNote(notes))
                         },
                     )
                 }

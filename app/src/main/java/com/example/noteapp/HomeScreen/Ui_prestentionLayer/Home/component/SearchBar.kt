@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,7 +64,8 @@ fun SearchAppBar(
 @Composable
 fun DefaultAppBar(
     onSearchClicked: () -> Unit,
-    onSortClicked: () -> Unit
+    onSortClicked: () -> Unit,
+    onSideBar:() -> Unit
 ) {
     TopAppBar(
         windowInsets = WindowInsets(0, 0, 0, 0),
@@ -84,6 +86,12 @@ fun DefaultAppBar(
                 )
             }
 
+        },
+        navigationIcon = {
+            IconButton(onClick = onSideBar)
+             {
+                Icon(Icons.Default.Menu, contentDescription = "Menu")
+            }
         }
     )
 }

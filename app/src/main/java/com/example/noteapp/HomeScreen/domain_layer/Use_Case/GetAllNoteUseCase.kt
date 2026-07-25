@@ -43,7 +43,7 @@ sealed class OrderType {
 }
 
 sealed class NoteOrder(val orderType: OrderType) {
-    class Title(order: OrderType) : NoteOrder(order)
+    class Title(orderType: OrderType) : NoteOrder(orderType)
     class Date(orderType: OrderType) : NoteOrder(orderType)
     class Color(orderType: OrderType) : NoteOrder(orderType)
     class Pin(orderType: OrderType) : NoteOrder(orderType)

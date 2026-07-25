@@ -228,7 +228,8 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
                     onAction(HomeScreenEvent.UpdateContent(content = updatedTitle))
                 },
                 label = { Text("Content") },
-                maxLines = Int.MAX_VALUE
+                maxLines = Int.MAX_VALUE,
+
             )
         }
     }
