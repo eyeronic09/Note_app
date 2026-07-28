@@ -11,7 +11,8 @@ fun NoteEntity.toDomain() : Note {
         date = this.date,
         color = this.color,
         listOfImageUri = this.listOfImageUri,
-        isPin = this.isPin
+        isPin = this.isPin,
+        isArchived = this.isArchived
     )
 }
 
@@ -25,6 +26,7 @@ fun Note.toEntity() : NoteEntity {
         date = this.date,
         color = this.color,
         listOfImageUri = this.listOfImageUri,
-        isPin = this.isPin
+        isPin = this.isPin,
+        isArchived = this.isArchived
     )
 }

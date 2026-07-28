@@ -47,7 +47,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen._AddScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen._ViewAndEditScreen
-import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent.pinNote
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent.PinNote
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCard
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OrderSection
@@ -56,7 +56,6 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNo
 import com.example.noteapp.R
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.component.getScopeName
 
 object NoteTab : Tab {
     override val options: TabOptions
@@ -113,7 +112,7 @@ fun HomeScreen(
                     label = { Text("Archived") },
                     selected = false,
                     onClick = {
-
+                      //  navigator.parent?.parent.push()
                     }
                 )
             }
@@ -240,7 +239,7 @@ fun HomeScreenContent(
                             context.startActivity(chooser)
                         },
                         onPin = {
-                            onAction(pinNote(notes))
+                            onAction(PinNote(notes))
                         },
                     )
                 }

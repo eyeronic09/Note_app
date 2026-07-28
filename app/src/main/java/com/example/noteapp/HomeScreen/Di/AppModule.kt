@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.room.Room.databaseBuilder
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.ArchiveScreen.ArchiverScreenViewModel
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSourcesImpl
@@ -116,11 +117,15 @@ class AppModule () : Application() {
                 updateNotesUseCase = get(),
                 getNoteByIdUseCase = get(),
                 pinNoteUseCase = get(),
+                unArchiverUseCases = get(),
             )
         }
 
         viewModel {
             HomeScreenViewModel(get())
+        }
+        viewModel {
+            ArchiverScreenViewModel(get())
         }
 
 

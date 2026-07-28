@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NotesDao {
-    @Query("SELECT * FROM notes ORDER BY date DESC")
-    fun getNotesOldestFirst(): Flow<List<NoteEntity>>
+    @Query("SELECT * FROM notes WHERE isArchived = :isArchived ORDER BY date DESC")
+    fun getNotesOldestFirst(isArchived: Boolean = false): Flow<List<NoteEntity>>
 
-    @Query("SELECT * FROM notes ORDER BY date ASC")
-    fun getNotesNewestFirst(): Flow<List<NoteEntity>>
+    @Query("SELECT * FROM notes WHERE isArchived = :isArchived ORDER BY date ASC")
+    fun getNotesNewestFirst(isArchived: Boolean = false): Flow<List<NoteEntity>>
 
     @Query("SELECT * FROM notes WHERE id = :noteId")
     suspend fun getNoteById(noteId: Int): NoteEntity

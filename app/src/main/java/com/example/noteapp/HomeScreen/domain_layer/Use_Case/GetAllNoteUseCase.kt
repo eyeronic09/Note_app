@@ -8,27 +8,27 @@ import kotlinx.coroutines.flow.map
 
 class GetAllNoteUseCase(private val repository: NoteRepository) {
      operator fun invoke(
-         noteOrder: NoteOrder = NoteOrder.Title(OrderType.Ascending)
+         noteOrder: NoteOrder = NoteOrder.Title(OrderType.Ascending),
      ) : Flow<List<Note>> {
         return repository.getNotesNewestFirst().map { notes ->
             when(noteOrder.orderType){
                 OrderType.Ascending -> {
                     when(noteOrder){
-                        is NoteOrder.Date -> notes.sortedBy { it.date }
-                        is NoteOrder.Title -> notes.sortedBy { it.title }
-                        is NoteOrder.Color -> notes.sortedBy { it.color }
+                        is NoteOrder.Date -> notes.sortedBy { it.date }.filterNot { it.isArchived }
+                        is NoteOrder.Title -> notes.sortedBy { it.title }.filterNot { it.isArchived }
+                        is NoteOrder.Color -> notes.sortedBy { it.color }.filterNot { it.isArchived }
                         is NoteOrder.Pin -> {
-                            notes.sortedByDescending { it.isPin }
+                            notes.sortedByDescending { it.isPin }.filterNot { it.isArchived }
                         }
                     }
                 }
                 OrderType.Descending -> {
                     when(noteOrder){
-                        is NoteOrder.Date -> notes.sortedByDescending { it.date }
-                        is NoteOrder.Title -> notes.sortedByDescending { it.title }
-                        is NoteOrder.Color -> notes.sortedByDescending { it.color }
+                        is NoteOrder.Date -> notes.sortedByDescending { it.date }.filterNot { it.isArchived }
+                        is NoteOrder.Title -> notes.sortedByDescending { it.title }.filterNot { it.isArchived }
+                        is NoteOrder.Color -> notes.sortedByDescending { it.color }.filterNot { it.isArchived }
                         is NoteOrder.Pin -> {
-                            notes.sortedByDescending { it.isPin }
+                            notes.sortedByDescending { it.isPin }.filterNot { it.isArchived }
                         }
                     }
                 }

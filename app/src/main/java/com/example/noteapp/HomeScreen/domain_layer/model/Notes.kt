@@ -10,5 +10,6 @@ data class Note(
     val date: String,
     val color: Int,
     val listOfImageUri: List<String>? = emptyList(),
-    val isPin : Boolean = false
+    val isPin : Boolean = false,
+    val isArchived : Boolean = false
 )

@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import androidx.core.net.toUri
-import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteOrder
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.OrderType
@@ -52,7 +51,7 @@ data class HomeScreenUIState(
 
 sealed interface HomeScreenEvent {
     data object SetToEdit : HomeScreenEvent
-    data class pinNote(val note : Note) : HomeScreenEvent
+    data class PinNote(val note : Note) : HomeScreenEvent
     object ToggleOrderSection : HomeScreenEvent
     data class Order(val noteOrder: NoteOrder): HomeScreenEvent
 
@@ -159,7 +158,7 @@ class HomeScreenViewModel(
                 }
                 getNotes(event.noteOrder)
             }
-            is HomeScreenEvent.pinNote -> {
+            is HomeScreenEvent.PinNote -> {
                 pinNote(event.note)
             }
         }

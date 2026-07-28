@@ -12,5 +12,6 @@ data class NoteEntity(
     val date: String ,
     val color : Int = WHITE,
     val listOfImageUri : List<String>? = emptyList(),
-    val isPin : Boolean = false
+    val isPin : Boolean = false,
+    val isArchived : Boolean = false
 )
