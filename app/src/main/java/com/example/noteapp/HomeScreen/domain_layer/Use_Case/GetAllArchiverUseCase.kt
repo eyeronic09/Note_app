@@ -11,6 +11,6 @@ class GetAllArchiverUseCase(
     private val repository: NoteRepository
 ) {
     operator fun invoke() : Flow<List<Note>> {
-        return repository.getNotesNewestFirst().map { notes -> notes.filter { it.isArchived }}
+        return repository.getNotesNewestFirst(isArchived = true)
     }
 }

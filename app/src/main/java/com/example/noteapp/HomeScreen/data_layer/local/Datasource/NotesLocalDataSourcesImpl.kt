@@ -5,12 +5,12 @@ import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
 import kotlinx.coroutines.flow.Flow
 
 class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSources {
-    override fun getNotesNewestFirst(): Flow<List<NoteEntity>> {
-        return dao.getNotesNewestFirst()
+    override fun getNotesNewestFirst(isArchived: Boolean): Flow<List<NoteEntity>> {
+        return dao.getNotesNewestFirst(isArchived)
     }
 
-    override fun getNotesOldestFirst(): Flow<List<NoteEntity>> {
-        return dao.getNotesOldestFirst()
+    override fun getNotesOldestFirst(isArchived: Boolean): Flow<List<NoteEntity>> {
+        return dao.getNotesOldestFirst(isArchived)
     }
 
 

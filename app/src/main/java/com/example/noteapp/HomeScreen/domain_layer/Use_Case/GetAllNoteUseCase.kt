@@ -11,30 +11,25 @@ class GetAllNoteUseCase(private val repository: NoteRepository) {
          noteOrder: NoteOrder = NoteOrder.Title(OrderType.Ascending),
          isArchived: Boolean = false
      ) : Flow<List<Note>> {
-        return repository.getNotesNewestFirst().map { notes ->
-            val filteredNotes = if (isArchived) {
-                notes.filter { it.isArchived }
-            } else {
-                notes.filterNot { it.isArchived }
-            }
+        return repository.getNotesNewestFirst(isArchived).map { notes ->
             when(noteOrder.orderType){
                 OrderType.Ascending -> {
                     when(noteOrder){
-                        is NoteOrder.Date -> filteredNotes.sortedBy { it.date }
-                        is NoteOrder.Title -> filteredNotes.sortedBy { it.title }
-                        is NoteOrder.Color -> filteredNotes.sortedBy { it.color }
+                        is NoteOrder.Date -> notes.sortedBy { it.date }
+                        is NoteOrder.Title -> notes.sortedBy { it.title }
+                        is NoteOrder.Color -> notes.sortedBy { it.color }
                         is NoteOrder.Pin -> {
-                            filteredNotes.sortedByDescending { it.isPin }
+                            notes.sortedByDescending { it.isPin }
                         }
                     }
                 }
                 OrderType.Descending -> {
                     when(noteOrder){
-                        is NoteOrder.Date -> filteredNotes.sortedByDescending { it.date }
-                        is NoteOrder.Title -> filteredNotes.sortedByDescending { it.title }
-                        is NoteOrder.Color -> filteredNotes.sortedByDescending { it.color }
+                        is NoteOrder.Date -> notes.sortedByDescending { it.date }
+                        is NoteOrder.Title -> notes.sortedByDescending { it.title }
+                        is NoteOrder.Color -> notes.sortedByDescending { it.color }
                         is NoteOrder.Pin -> {
-                            filteredNotes.sortedByDescending { it.isPin }
+                            notes.sortedByDescending { it.isPin }
                         }
                     }
                 }

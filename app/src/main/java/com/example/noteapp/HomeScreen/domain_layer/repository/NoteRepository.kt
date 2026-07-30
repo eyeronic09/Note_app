@@ -5,9 +5,9 @@ import com.example.noteapp.HomeScreen.domain_layer.model.Note
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
-    fun getNotesNewestFirst(): Flow<List<Note>>
+    fun getNotesNewestFirst(isArchived: Boolean = false): Flow<List<Note>>
 
-    fun getNotesOldestFirst() : Flow<List<Note>>
+    fun getNotesOldestFirst(isArchived: Boolean = false) : Flow<List<Note>>
 
     suspend fun getNoteById(noteId: Int): Note
     suspend fun addNotes(note: Note)

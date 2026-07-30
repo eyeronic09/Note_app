@@ -45,7 +45,7 @@ class ArchiverScreenViewModel(
 
     init {
         viewModelScope.launch {
-            reposistory.getAllNoteUseCase.invoke().collect { note ->
+            reposistory.getAllArchiverUseCase.invoke().collect { note ->
                 Log.d("ArchiverScreenViewModel", "Emitted notes: $note")
                 _uiState.update { it ->
                     it.copy(listOfNote = note)

@@ -14,6 +14,7 @@ import com.example.noteapp.HomeScreen.data_layer.local.database.NoteRoomDatabase
 import com.example.noteapp.HomeScreen.data_layer.repository.RepositoryImpl
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.AddNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.DeleteNoteUseCase
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllArchiverUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetNoteByIdUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
@@ -110,6 +111,7 @@ class AppModule () : Application() {
         factory { GetNoteByIdUseCase(get()) }
         factory { PinNoteUseCase(get()) }
         factory { UnArchiverUseCase(get()) }
+        factory { GetAllArchiverUseCase(get()) }
 
         factory {
             NoteUseCases(
