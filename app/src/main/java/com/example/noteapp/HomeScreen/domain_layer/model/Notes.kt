@@ -11,5 +11,6 @@ data class Note(
     val color: Int,
     val listOfImageUri: List<String>? = emptyList(),
     val isPin : Boolean = false,
-    val isArchived : Boolean = false
+    val isArchived : Boolean = false,
+    val category : String? = null
 )
