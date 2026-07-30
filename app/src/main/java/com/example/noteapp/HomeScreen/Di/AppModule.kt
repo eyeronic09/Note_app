@@ -18,6 +18,7 @@ import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetAllNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.GetNoteByIdUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.PinNoteUseCase
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.UnArchiverUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.UpdateNotesUseCase
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import com.example.noteapp.TodoFeature.AddScreen.TodoAddScreenVM
@@ -108,6 +109,7 @@ class AppModule () : Application() {
         factory { DeleteNoteUseCase(get()) }
         factory { GetNoteByIdUseCase(get()) }
         factory { PinNoteUseCase(get()) }
+        factory { UnArchiverUseCase(get()) }
 
         factory {
             NoteUseCases(
@@ -118,6 +120,7 @@ class AppModule () : Application() {
                 getNoteByIdUseCase = get(),
                 pinNoteUseCase = get(),
                 unArchiverUseCases = get(),
+                getAllArchiverUseCase = get()
             )
         }
 

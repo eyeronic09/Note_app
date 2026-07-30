@@ -43,10 +43,11 @@ import com.example.noteapp.HomeScreen.domain_layer.model.Note
 @Composable
 fun NoteCard(
     note: Note,
-    onNoteClick: () -> Unit,
-    onClickDelete: () -> Unit,
-    onShare:() -> Unit, 
-    onPin :() -> Unit 
+    onNoteClick: () -> Unit = {},
+    onClickDelete: () -> Unit = {},
+    onShare:() -> Unit = {},
+    onPin :() -> Unit = {},
+    onArchiver:() -> Unit = {}
 ) {
     OutlinedCard(modifier = Modifier
         .fillMaxWidth()
@@ -85,13 +86,15 @@ fun NoteCard(
             Spacer(modifier = Modifier.padding(4.dp))
             Text(text = note.content)
             Text(text = note.date)
+            Text(text = note.isArchived.toString())
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             BasicDropdownMenu(
                 onClickDelete = onClickDelete,
                 isAlreadyPin = note.isPin,
                 onShare = onShare,
-                onPin = onPin
+                onPin = onPin,
+                onArchiver =onArchiver ,
             )
         }
 
@@ -116,5 +119,6 @@ private fun NoteCardPreview() {
         onClickDelete = {},
         onShare = {},
         onPin = {},
+        onArchiver = {},
     )
 }

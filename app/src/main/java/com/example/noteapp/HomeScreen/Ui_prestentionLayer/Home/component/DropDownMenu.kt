@@ -19,7 +19,8 @@ fun BasicDropdownMenu(
     onClickDelete:() -> Unit,
     isAlreadyPin : Boolean,
     onShare: () -> Unit,
-    onPin: () -> Unit
+    onPin: () -> Unit,
+    onArchiver:() -> Unit
 ) {
     var isDropDownExpanded by remember {
         mutableStateOf(false)
@@ -43,13 +44,21 @@ fun BasicDropdownMenu(
                 }
             )
             DropdownMenuItem(
+                text = {
+                    Text("Archiver")
+                },
+                onClick = {
+                    onArchiver()
+                }
+            )
+            DropdownMenuItem(
                 text = {Text("Share")},
                 onClick = {
                     onShare()
                 }
             )
             DropdownMenuItem(
-                text = {Text(if(isAlreadyPin)"un Pin" else "Pin" )},
+                text = {Text(if(isAlreadyPin)"Un Pin" else "Pin" )},
                 onClick = onPin
             )
         }

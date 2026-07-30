@@ -4,6 +4,7 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.ArchiveScreen.Archiver
 
 data class NoteUseCases(
     val getAllNoteUseCase: GetAllNoteUseCase,
+    val getAllArchiverUseCase: GetAllArchiverUseCase,
     val deleteNoteUseCase: DeleteNoteUseCase,
     val addNoteUseCase: AddNoteUseCase,
     val updateNotesUseCase: UpdateNotesUseCase,

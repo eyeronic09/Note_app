@@ -46,6 +46,8 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.AddScreen._AddScreen
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.ArchiveScreen.ArchiverScreen
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.ArchiveScreen._ArchiverScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.EditAndViewScreen._ViewAndEditScreen
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent.PinNote
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.DefaultAppBar
@@ -97,7 +99,7 @@ fun HomeScreenRoute(viewModel: HomeScreenViewModel = koinViewModel()) {
 @Composable
 fun HomeScreen(
     state: HomeScreenUIState,
-    onAction: (HomeScreenEvent) -> Unit
+    onAction: (HomeScreenEvent) -> Unit,
 ) {
     val navigator = LocalNavigator.currentOrThrow
     val context = LocalContext.current
@@ -112,7 +114,8 @@ fun HomeScreen(
                     label = { Text("Archived") },
                     selected = false,
                     onClick = {
-                      //  navigator.parent?.parent.push()
+                        navigator.parent?.parent?.push(_ArchiverScreen()) ?: return@NavigationDrawerItem
+
                     }
                 )
             }
@@ -197,7 +200,7 @@ fun HomeScreenContent(
     modifier: Modifier,
     onAction: (HomeScreenEvent) -> Unit,
     navigator: Navigator?,
-    context: Context
+    context: Context?
 ) {
     when {
         state.notes.isEmpty() -> {
@@ -236,11 +239,12 @@ fun HomeScreenContent(
                                 )
                             }
                             val chooser = Intent.createChooser(sendIntent, "share using")
-                            context.startActivity(chooser)
+                            context?.startActivity(chooser)
                         },
                         onPin = {
                             onAction(PinNote(notes))
                         },
+                        onArchiver = {onAction(HomeScreenEvent.ToggleArchiver(notes))},
                     )
                 }
             }

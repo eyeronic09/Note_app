@@ -50,6 +50,7 @@ data class HomeScreenUIState(
 
 
 sealed interface HomeScreenEvent {
+    data class ToggleArchiver(val note: Note) : HomeScreenEvent
     data object SetToEdit : HomeScreenEvent
     data class PinNote(val note : Note) : HomeScreenEvent
     object ToggleOrderSection : HomeScreenEvent
@@ -130,8 +131,10 @@ class HomeScreenViewModel(
 
             }
 
-            is HomeScreenEvent.ShowResult -> search()
-            HomeScreenEvent.TapToSearch -> {
+            is HomeScreenEvent.ShowResult -> {
+                search()
+            }
+            is HomeScreenEvent.TapToSearch -> {
                 _uiState.update { it.copy(isSearching = true) }
             }
 
@@ -161,6 +164,10 @@ class HomeScreenViewModel(
             is HomeScreenEvent.PinNote -> {
                 pinNote(event.note)
             }
+
+            is HomeScreenEvent.ToggleArchiver -> {
+                toggleArchiver(event.note)
+            }
         }
     }
 
@@ -173,6 +180,12 @@ class HomeScreenViewModel(
             )
         }
             .launchIn(viewModelScope)
+    }
+     fun toggleArchiver(note: Note){
+         viewModelScope.launch {
+             noteUseCases.unArchiverUseCases.invoke(note)
+         }
+
     }
 
     fun search() {
