@@ -8,6 +8,7 @@ fun NoteEntity.toDomain() : Note {
         id = this.id,
         title = this.title,
         content = this.content,
+        authUserId = this.authUserId,
         date = this.date,
         color = this.color,
         listOfImageUri = this.listOfImageUri,
@@ -16,13 +17,12 @@ fun NoteEntity.toDomain() : Note {
     )
 }
 
-
-
 fun Note.toEntity() : NoteEntity {
     return NoteEntity(
         id = this.id,
         title = this.title,
         content = this.content,
+        authUserId = this.authUserId,
         date = this.date,
         color = this.color,
         listOfImageUri = this.listOfImageUri,

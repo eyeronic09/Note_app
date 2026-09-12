@@ -13,9 +13,11 @@ class DeleteTodoUseCase(private val repository: TodoRepository ,private val noti
     @RequiresApi(Build.VERSION_CODES.O)
     suspend operator fun invoke(todo: Todo) {
         repository.deleteTodo(todo)
-        notificationActions.cancel(NotificationContent(
-            triggerTime = LocalDateTime.of(todo.date , todo.time),
-            todoMessage = todo.title
-        ))
+        if (todo.time != null) {
+            notificationActions.cancel(NotificationContent(
+                triggerTime = LocalDateTime.of(todo.date, todo.time),
+                todoMessage = todo.title
+            ))
+        }
     }
 }

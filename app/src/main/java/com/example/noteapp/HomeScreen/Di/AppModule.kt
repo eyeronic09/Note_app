@@ -8,8 +8,11 @@ import androidx.annotation.RequiresApi
 import androidx.room.Room.databaseBuilder
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.ArchiveScreen.ArchiverScreenViewModel
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
+import com.example.noteapp.HomeScreen.data_layer.local.Datasource.FirebaseDataSources
+import com.example.noteapp.HomeScreen.data_layer.local.Datasource.FirebaseDataSourcesImpl
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSourcesImpl
+import com.google.firebase.firestore.FirebaseFirestore
 import com.example.noteapp.HomeScreen.data_layer.local.database.NoteRoomDatabase
 import com.example.noteapp.HomeScreen.data_layer.repository.RepositoryImpl
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.AddNoteUseCase
@@ -38,6 +41,13 @@ import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.TodoUseCases
 import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.UpdateTodoUseCase
 import com.example.noteapp.TodoFeature.Todo_Notification.NotificationDataSource.NotificationActions
 import com.example.noteapp.TodoFeature.Todo_Notification.Scheduler.NotificationScheduler
+import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
+import com.example.noteapp.sign_in.presentations.GoogleAuthUiClient
+import com.example.noteapp.sign_in.presentations.state.SignInViewModel
+import com.example.noteapp.sign_in.remote.reposistoryImpl.AuthReposistoryImpl
+import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -55,7 +65,7 @@ class AppModule () : Application() {
         startKoin {
             androidLogger()
             androidContext(this@AppModule)
-            modules(noteModule , todoModule)
+            modules(noteModule , todoModule , authModule)
         }
     }
 
@@ -93,19 +103,24 @@ class AppModule () : Application() {
         single<NotesLocalDataSources> {
             NotesLocalDataSourcesImpl(get())
         }
+
+        // Firebase Firestore
+        single { FirebaseFirestore.getInstance() }
+
+        // Firebase Data Source
+        single<FirebaseDataSources> {
+            FirebaseDataSourcesImpl(get())
+        }
         
         // Repository
         single<NoteRepository> {
-            RepositoryImpl(get())
+            RepositoryImpl(get(), get())
         }
 
 
         //UseCase
         factory { GetAllNoteUseCase(get()) }
-        factory { AddNoteUseCase(
-            repository = get(),
-
-        ) }
+        factory { AddNoteUseCase(get(), get()) }
         factory { UpdateNotesUseCase(get()) }
         factory { DeleteNoteUseCase(get()) }
         factory { GetNoteByIdUseCase(get()) }
@@ -116,13 +131,13 @@ class AppModule () : Application() {
         factory {
             NoteUseCases(
                 getAllNoteUseCase = get(),
+                getAllArchiverUseCase = get(),
                 deleteNoteUseCase = get(),
                 addNoteUseCase = get(),
                 updateNotesUseCase = get(),
                 getNoteByIdUseCase = get(),
                 pinNoteUseCase = get(),
-                unArchiverUseCases = get(),
-                getAllArchiverUseCase = get()
+                unArchiverUseCases = get()
             )
         }
 
@@ -187,6 +202,28 @@ class AppModule () : Application() {
         }
 
 
+    }
+    val authModule = module {
+        single { FirebaseAuth.getInstance() }
+
+        single<SignInClient> {
+            Identity.getSignInClient(androidContext())
+        }
+
+        single {
+            GoogleAuthUiClient(
+                context = androidContext(),
+                oneTapClient = get()
+            )
+        }
+
+        single<AuthReposistory> {
+            AuthReposistoryImpl(get())
+        }
+
+        viewModel {
+            SignInViewModel()
+        }
     }
 
 }

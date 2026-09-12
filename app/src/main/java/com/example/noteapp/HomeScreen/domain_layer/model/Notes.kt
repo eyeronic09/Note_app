@@ -7,6 +7,7 @@ data class Note(
     val id: Int = 0 ,
     val title: String,
     val content: String,
+    val authUserId: String = "",
     val date: String,
     val color: Int,
     val listOfImageUri: List<String>? = emptyList(),

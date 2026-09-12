@@ -9,6 +9,7 @@ data class NoteEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val content: String,
+    val authUserId: String = "",
     val date: String ,
     val color : Int = WHITE,
     val listOfImageUri : List<String>? = emptyList(),
