@@ -1,10 +1,6 @@
 package com.example.noteapp.sign_in.presentations.screen
 
-import android.app.Activity
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -27,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,15 +31,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import com.example.noteapp.MainScreen
 import com.example.noteapp.R
-import com.example.noteapp.sign_in.presentations.GoogleAuthUiClient
-import com.example.noteapp.sign_in.presentations.state.SignInState
+import com.example.noteapp.sign_in.presentations.state.AuthUiState
 import com.example.noteapp.sign_in.presentations.state.SignInViewModel
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 
-class SignInScreenRouter : Screen  {
+class SignInScreenRouter : Screen {
     @Composable
     override fun Content() {
         _SingInScreen()
@@ -53,74 +47,58 @@ class SignInScreenRouter : Screen  {
 
 @Composable
 fun _SingInScreen(viewModel: SignInViewModel = koinViewModel()) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val googleAuthUiClient: GoogleAuthUiClient = koinInject()
+    val navigator = LocalNavigator.current
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                scope.launch {
-                    val signInResult = googleAuthUiClient.getSignInWithResultFromIntent(
-                        result.data ?: return@launch
-                    )
-                    viewModel.onSignInResult(signInResult)
-                }
+    LaunchedEffect(uiState) {
+        when (val state = uiState) {
+            is AuthUiState.Success -> {
+                Toast.makeText(
+                    context,
+                    "Sign in successful! Welcome ${state.user.displayName ?: ""}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                navigator?.replace(MainScreen())
             }
-        }
-    )
-
-    LaunchedEffect(state.isSignInSuccessful) {
-        if (state.isSignInSuccessful) {
-            Toast.makeText(context, "Sign in successful", Toast.LENGTH_SHORT).show()
-            viewModel.resetState()
+            is AuthUiState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+            }
+            else -> {}
         }
     }
 
     SingInScreen(
-        state = state,
+        uiState = uiState,
         onSignInClick = {
-            scope.launch {
-                val intentSender = googleAuthUiClient.signIn()
-                intentSender?.let { sender ->
-                    launcher.launch(
-                        IntentSenderRequest.Builder(sender).build()
-                    )
-                }
-            }
+            viewModel.signInWithGoogle(context)
         }
     )
 }
 
 @Composable
-fun SingInScreen(state: SignInState, onSignInClick: () -> Unit) {
-    val context = LocalContext.current
-    LaunchedEffect(keys = arrayOf(state.signInError)) {
-        state.signInError?.let { error ->
-            Toast.makeText(
-                context,
-                 error,
-                Toast.LENGTH_LONG
-            ).show()
-        }
-    }
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+fun SingInScreen(uiState: AuthUiState, onSignInClick: () -> Unit) {
+    val isLoading = uiState is AuthUiState.Loading
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         GoogleSignInButtonUi(
-            text = "Sign In",
+            text = "Sign In with Google",
             loadingText = "Signing In...",
+            isLoading = isLoading,
             onClicked = onSignInClick
         )
     }
 }
 
 @Composable
-fun GoogleSignInButtonUi(text: String, loadingText: String, onClicked: () -> Unit) {
-    val isLoading = false
-
+fun GoogleSignInButtonUi(
+    text: String,
+    loadingText: String,
+    isLoading: Boolean = false,
+    onClicked: () -> Unit
+) {
     Surface(
-        modifier = Modifier.clickable { onClicked() },
+        modifier = Modifier.clickable(enabled = !isLoading) { onClicked() },
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(width = 1.dp, color = Color.LightGray),
         color = MaterialTheme.colorScheme.surface

@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name" translatable="false">Momentum</string>
     <!-- Replace this with your Web Client ID from Firebase Console / Google Cloud Console -->
-    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_HERE</string>
+    <string name="default_web_client_id">277480059527-2am0gcm3qq962ofq2kfmfi054fmvenhm.apps.googleusercontent.com</string>
 </resources>

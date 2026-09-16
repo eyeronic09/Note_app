@@ -56,6 +56,7 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OrderSe
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNotes
 import com.example.noteapp.R
+import com.example.noteapp.sign_in.presentations.screen.SignInScreenRouter
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -115,6 +116,14 @@ fun HomeScreen(
                     selected = false,
                     onClick = {
                         navigator.parent?.parent?.push(_ArchiverScreen()) ?: return@NavigationDrawerItem
+
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text("sign in") },
+                    selected = false,
+                    onClick = {
+                        navigator.parent?.parent?.push(SignInScreenRouter()) ?: return@NavigationDrawerItem
 
                     }
                 )

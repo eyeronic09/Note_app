@@ -42,11 +42,8 @@ import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.UpdateTodoUseCa
 import com.example.noteapp.TodoFeature.Todo_Notification.NotificationDataSource.NotificationActions
 import com.example.noteapp.TodoFeature.Todo_Notification.Scheduler.NotificationScheduler
 import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
-import com.example.noteapp.sign_in.presentations.GoogleAuthUiClient
 import com.example.noteapp.sign_in.presentations.state.SignInViewModel
-import com.example.noteapp.sign_in.remote.reposistoryImpl.AuthReposistoryImpl
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.identity.SignInClient
+import com.example.noteapp.sign_in.data.reposistoryImpl.AuthRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -206,23 +203,12 @@ class AppModule () : Application() {
     val authModule = module {
         single { FirebaseAuth.getInstance() }
 
-        single<SignInClient> {
-            Identity.getSignInClient(androidContext())
-        }
-
-        single {
-            GoogleAuthUiClient(
-                context = androidContext(),
-                oneTapClient = get()
-            )
-        }
-
         single<AuthReposistory> {
-            AuthReposistoryImpl(get())
+            AuthRepositoryImpl(get())
         }
 
         viewModel {
-            SignInViewModel()
+            SignInViewModel(get())
         }
     }
 

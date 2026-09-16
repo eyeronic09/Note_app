@@ -10,9 +10,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.noteapp" />
-                  <option name="mobileSdkAppId" value="1:280856452590:android:bd328e5b0c892d39de82ff" />
-                  <option name="projectId" value="todoapp-837ac949" />
-                  <option name="projectNumber" value="280856452590" />
+                  <option name="mobileSdkAppId" value="1:277480059527:android:31a5a1a2ff61bdce533e22" />
+                  <option name="projectId" value="todoapp-b482d" />
+                  <option name="projectNumber" value="277480059527" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
