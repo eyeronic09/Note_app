@@ -5,6 +5,7 @@ import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
 import kotlinx.coroutines.flow.Flow
 
 class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSources {
+
     override fun getNotesNewestFirst(isArchived: Boolean): Flow<List<NoteEntity>> {
         return dao.getNotesNewestFirst(isArchived)
     }
@@ -13,9 +14,13 @@ class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSourc
         return dao.getNotesOldestFirst(isArchived)
     }
 
-
-    override suspend fun addNotes(noteEntity: NoteEntity) {
-       return dao.addNotes(noteEntity)
+    override suspend fun addNotes(noteEntity: NoteEntity) : Result<Unit> {
+        return try {
+            dao.addNotes(noteEntity)
+            Result.success(Unit)
+        } catch (e : Exception){
+            Result.failure(e)
+        }
     }
 
     override suspend fun getNoteById(noteId: Int): NoteEntity {
@@ -23,7 +28,7 @@ class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSourc
     }
 
     override suspend fun searchNotes(query: String): List<NoteEntity> {
-        return dao.searchNotes(query)
+        return dao.searchNotes(query)   
     }
 
     override suspend fun deleteNotes(noteEntity: NoteEntity) {

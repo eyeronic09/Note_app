@@ -8,8 +8,6 @@ import androidx.annotation.RequiresApi
 import androidx.room.Room.databaseBuilder
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.ArchiveScreen.ArchiverScreenViewModel
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
-import com.example.noteapp.HomeScreen.data_layer.local.Datasource.FirebaseDataSources
-import com.example.noteapp.HomeScreen.data_layer.local.Datasource.FirebaseDataSourcesImpl
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSourcesImpl
 import com.google.firebase.firestore.FirebaseFirestore
@@ -98,20 +96,16 @@ class AppModule () : Application() {
         
         // Data Source
         single<NotesLocalDataSources> {
-            NotesLocalDataSourcesImpl(get())
+            NotesLocalDataSourcesImpl(get() )
         }
 
         // Firebase Firestore
         single { FirebaseFirestore.getInstance() }
 
-        // Firebase Data Source
-        single<FirebaseDataSources> {
-            FirebaseDataSourcesImpl(get())
-        }
         
         // Repository
         single<NoteRepository> {
-            RepositoryImpl(get(), get())
+            RepositoryImpl(get(), get(), get())
         }
 
 

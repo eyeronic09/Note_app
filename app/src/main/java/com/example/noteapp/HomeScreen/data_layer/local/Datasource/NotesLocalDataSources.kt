@@ -10,8 +10,8 @@ interface NotesLocalDataSources {
     fun getNotesOldestFirst(isArchived: Boolean = false): Flow<List<NoteEntity>>
 
 
-    suspend fun addNotes(noteEntity: NoteEntity)
-     suspend fun getNoteById(noteId: Int): NoteEntity
+    suspend fun addNotes(noteEntity: NoteEntity): Result<Unit>
+    suspend fun getNoteById(noteId: Int): NoteEntity
 
     suspend fun searchNotes(query: String) : List<NoteEntity>
     suspend fun deleteNotes(noteEntity: NoteEntity)
