@@ -7,10 +7,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "notes")
 data class NoteEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val title: String,
-    val content: String,
+    val title: String = "",
+    val content: String = "",
     val authUserId: String = "",
-    val date: String ,
+    val date: String = "",
     val color : Int = WHITE,
     val listOfImageUri : List<String>? = emptyList(),
     val isPin : Boolean = false,

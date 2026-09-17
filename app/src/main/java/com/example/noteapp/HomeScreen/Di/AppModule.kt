@@ -10,8 +10,9 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.ArchiveScreen.Archiver
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSources
 import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalDataSourcesImpl
-import com.google.firebase.firestore.FirebaseFirestore
 import com.example.noteapp.HomeScreen.data_layer.local.database.NoteRoomDatabase
+import com.example.noteapp.HomeScreen.data_layer.remote.datasource.NotesFirebaseRemoteDataSource
+import com.example.noteapp.HomeScreen.data_layer.remote.datasource.NotesFirebaseRemoteDataSourceImpl
 import com.example.noteapp.HomeScreen.data_layer.repository.RepositoryImpl
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.AddNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.DeleteNoteUseCase
@@ -39,10 +40,11 @@ import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.TodoUseCases
 import com.example.noteapp.TodoFeature.HomeScreen.domain.usecase.UpdateTodoUseCase
 import com.example.noteapp.TodoFeature.Todo_Notification.NotificationDataSource.NotificationActions
 import com.example.noteapp.TodoFeature.Todo_Notification.Scheduler.NotificationScheduler
+import com.example.noteapp.sign_in.data.reposistoryImpl.AuthRepositoryImpl
 import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
 import com.example.noteapp.sign_in.presentations.state.SignInViewModel
-import com.example.noteapp.sign_in.data.reposistoryImpl.AuthRepositoryImpl
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -106,6 +108,9 @@ class AppModule () : Application() {
         // Repository
         single<NoteRepository> {
             RepositoryImpl(get(), get(), get())
+        }
+        single<NotesFirebaseRemoteDataSource> {
+            NotesFirebaseRemoteDataSourceImpl(get() , get())
         }
 
 
