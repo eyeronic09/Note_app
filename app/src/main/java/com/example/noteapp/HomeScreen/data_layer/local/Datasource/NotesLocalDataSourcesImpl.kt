@@ -10,9 +10,7 @@ class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSourc
         return dao.getNotesNewestFirst(isArchived)
     }
 
-    override fun getNotesOldestFirst(isArchived: Boolean): Flow<List<NoteEntity>> {
-        return dao.getNotesOldestFirst(isArchived)
-    }
+
 
     override suspend fun addNotes(noteEntity: NoteEntity) : Result<Unit> {
         return try {

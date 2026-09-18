@@ -15,4 +15,6 @@ data class NoteEntity(
     val listOfImageUri : List<String>? = emptyList(),
     val isPin : Boolean = false,
     val isArchived : Boolean = false,
+    val category : String? = null,
+    val syncedStatus : Boolean = false
 )

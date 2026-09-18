@@ -6,9 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
     fun getNotesNewestFirst(isArchived: Boolean = false): Flow<List<Note>>
-
-    fun getNotesOldestFirst(isArchived: Boolean = false) : Flow<List<Note>>
-
     suspend fun getNoteById(noteId: Int): Note
     suspend fun addNotes(note: Note)
     suspend fun deleteNotes(note: Note)

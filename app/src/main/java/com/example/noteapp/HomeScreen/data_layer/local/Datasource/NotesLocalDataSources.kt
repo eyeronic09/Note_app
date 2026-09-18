@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 interface NotesLocalDataSources {
     fun getNotesNewestFirst(isArchived: Boolean = false): Flow<List<NoteEntity>>
 
-    fun getNotesOldestFirst(isArchived: Boolean = false): Flow<List<NoteEntity>>
 
 
     suspend fun addNotes(noteEntity: NoteEntity): Result<Unit>

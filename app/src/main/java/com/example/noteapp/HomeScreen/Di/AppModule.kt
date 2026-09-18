@@ -107,7 +107,7 @@ class AppModule () : Application() {
         
         // Repository
         single<NoteRepository> {
-            RepositoryImpl(get(), get(), get())
+            RepositoryImpl(get(), get())
         }
         single<NotesFirebaseRemoteDataSource> {
             NotesFirebaseRemoteDataSourceImpl(get() , get())

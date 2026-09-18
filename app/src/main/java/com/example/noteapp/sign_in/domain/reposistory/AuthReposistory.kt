@@ -11,5 +11,6 @@ interface AuthReposistory {
     ): Result<FirebaseUser>
 
     suspend fun signOut() : Unit
+    suspend fun signInEmailAndPassword(): Unit
 
 }

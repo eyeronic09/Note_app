@@ -26,7 +26,6 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth = FirebaseAuth.getInstan
     override fun isUserisCurrentlyloggedIN(): Boolean {
         Log.d("AuthRepositoryImpl", "isUserisCurrentlyloggedIN called  ${user?.uid} ${user?.displayName}  ${user?.email}")
         return user != null
-
     }
 
     override suspend fun signInWithGoogle(context: Context): Result<FirebaseUser> {
@@ -76,6 +75,10 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth = FirebaseAuth.getInstan
             Log.e("AuthRepositoryImpl", "Google Sign In failed: ${e.message}")
             Result.failure(e)
         }
+    }
+
+    override suspend fun signInEmailAndPassword() {
+        // Implementation for email/password sign-in
     }
 
     override suspend fun signOut() {
