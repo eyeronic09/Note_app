@@ -11,6 +11,7 @@ import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.tasks.await
@@ -32,7 +33,6 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth = FirebaseAuth.getInstan
         return try {
             val credentialManager = CredentialManager.create(context)
             
-            // Note: Make sure default_web_client_id is available in strings.xml (usually from google-services.json)
             val webClientId = context.getString(R.string.default_web_client_id)
             
             val googleIdOption = GetGoogleIdOption.Builder()
@@ -75,10 +75,41 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth = FirebaseAuth.getInstan
             Log.e("AuthRepositoryImpl", "Google Sign In failed: ${e.message}")
             Result.failure(e)
         }
+        catch (collisionException: FirebaseAuthUserCollisionException) {
+            Log.d("AuthRepositoryImpl", "Account collision: email ${collisionException.email} is registered via Google/other provider")
+            Result.failure(Exception("An account already exists with ${collisionException.email} using Google Sign-In. Please sign in with Google."))
+        }
     }
 
-    override suspend fun signInEmailAndPassword() {
-        // Implementation for email/password sign-in
+    override suspend fun signInOrSignUpEmailAndPassword(email: String, password: String): Result<FirebaseUser> {
+        return try {
+            val authResult = auth.signInWithEmailAndPassword(email, password).await()
+            val firebaseUser = authResult.user
+            if (firebaseUser != null) {
+                user = firebaseUser
+                Result.success(firebaseUser)
+            } else {
+                Result.failure(Exception("Firebase user is null after sign in"))
+            }
+        } catch (e: Exception) {
+            // If sign in fails, attempt to create user (Sign Up)
+            try {
+                val createResult = auth.createUserWithEmailAndPassword(email, password).await()
+                val firebaseUser = createResult.user
+                if (firebaseUser != null) {
+                    user = firebaseUser
+                    Result.success(firebaseUser)
+                } else {
+                    Result.failure(Exception("Firebase user is null after sign up"))
+                }
+            } catch (collisionException: FirebaseAuthUserCollisionException) {
+                Log.d("AuthRepositoryImpl", "Account collision: email ${collisionException.email} is registered via Google/other provider")
+                Result.failure(Exception("An account already exists with ${collisionException.email }email using Google Sign-In. Please sign in with Google."))
+            } catch (signUpException: Exception) {
+                Log.d("AuthRepositoryImpl", "Sign in / Sign up failed: ${signUpException.message}")
+                Result.failure(signUpException)
+            }
+        }
     }
 
     override suspend fun signOut() {

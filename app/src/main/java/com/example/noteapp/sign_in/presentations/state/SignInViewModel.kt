@@ -32,25 +32,42 @@ class SignInViewModel(private val repository: AuthReposistory = AuthRepositoryIm
      */
     val uiState: StateFlow<SignInState> = _uiState.asStateFlow()
 
-    init {
-        if (repository.isUserisCurrentlyloggedIN()) {
-            _uiState.update { it.copy(userIsAlreadyLoggedIn = true) }
-        }
-    }
-
     fun onUiEvent(event: SignInEvent) {
         when (event) {
             is SignInEvent.ContinueWithGoogle -> {
                 signInWithGoogle(event.context)
             }
             is SignInEvent.SignInOrSignUp -> {
-                // TODO: Handle email/password authentication
+                signInOrSignUpEmailPassword()
             }
             is SignInEvent.EmailChanged -> {
                 _uiState.update { it.copy(email = event.email) }
             }
             is SignInEvent.PasswordChanged -> {
                 _uiState.update { it.copy(password = event.password) }
+            }
+        }
+    }
+
+    private fun signInOrSignUpEmailPassword() {
+        val email = _uiState.value.email.trim()
+        val password = _uiState.value.password.trim()
+
+        if (email.isEmpty() || password.isEmpty()) {
+            _uiState.update {
+                it.copy(authState = AuthUiState.Error("Email and password cannot be empty"))
+            }
+            return
+        }
+        viewModelScope.launch {
+            _uiState.update { it.copy(authState = AuthUiState.Loading) }
+            val result = repository.signInOrSignUpEmailAndPassword(email, password)
+            result.onSuccess { user ->
+                _uiState.update { it.copy(authState = AuthUiState.Success(user)) }
+            }.onFailure { exception ->
+                _uiState.update {
+                    it.copy(authState = AuthUiState.Error(exception.message ?: "Authentication failed"))
+                }
             }
         }
     }

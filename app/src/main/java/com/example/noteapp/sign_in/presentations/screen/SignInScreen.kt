@@ -2,11 +2,13 @@ package com.example.noteapp.sign_in.presentations.screen
 
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.EaseInSine
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import com.bumptech.glide.load.model.ModelLoaderFactory
 import com.example.noteapp.MainScreen
 import com.example.noteapp.R
 import com.example.noteapp.sign_in.presentations.state.AuthUiState
@@ -112,7 +116,8 @@ fun SingInScreen(
             text = "Sign In with Google",
             loadingText = "Signing In...",
             isLoading = isLoading,
-            onClicked = { onEvent(SignInEvent.ContinueWithGoogle(context)) }
+            onGoogleClicked = { onEvent(SignInEvent.ContinueWithGoogle(context)) },
+            onSignInSignUp = {onEvent(SignInEvent.SignInOrSignUp)},
         )
     }
 }
@@ -172,10 +177,11 @@ fun GoogleSignInButtonUi(
     text: String,
     loadingText: String,
     isLoading: Boolean = false,
-    onClicked: () -> Unit
+    onGoogleClicked: () -> Unit,
+    onSignInSignUp:() -> Unit
 ) {
     Surface(
-        modifier = Modifier.clickable(enabled = !isLoading) { onClicked() },
+        modifier = Modifier.clickable(enabled = !isLoading) { onGoogleClicked() },
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(width = 1.dp, color = Color.LightGray),
         color = MaterialTheme.colorScheme.surface
@@ -192,26 +198,34 @@ fun GoogleSignInButtonUi(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = "Google Logo",
-                tint = Color.Unspecified,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = if (isLoading) loadingText else text)
-
-            if (isLoading) {
-                Spacer(modifier = Modifier.width(16.dp))
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .height(16.dp)
-                        .width(16.dp),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.primary
+            Column (modifier = Modifier.fillMaxWidth() , horizontalAlignment = Alignment.CenterHorizontally){
+                Icon(painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = "Google Logo",
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(18.dp)
                 )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = if (isLoading) loadingText else text)
+
+
+                if (isLoading) {
+                    Spacer(modifier = Modifier.width(16.dp))
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .height(16.dp)
+                            .width(16.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+                Button(onClick = {onSignInSignUp()}) {
+                    Text("Sign in or Sign up")
+                }
             }
+
+
         }
+
     }
 }
 
