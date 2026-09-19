@@ -23,9 +23,16 @@ sealed interface SignInEvent {
  *
  * @property repository The repository interface handling authentication operations. Defaults to [AuthRepositoryImpl].
  */
-class SignInViewModel(private val repository: AuthReposistory = AuthRepositoryImpl()) : ViewModel() {
+class SignInViewModel(private val repository: AuthReposistory) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignInState())
+
+    init {
+        val currentUser = repository.getCurrentUser()
+        if (currentUser != null) {
+            _uiState.update { it.copy(authState = AuthUiState.Success(currentUser)) }
+        }
+    }
 
     /**
      * [StateFlow] representing the current UI state of the sign-in screen.

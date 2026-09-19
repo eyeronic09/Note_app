@@ -1,10 +1,14 @@
 package com.example.noteapp.sign_in.domain.reposistory
 
 import android.content.Context
+import com.example.noteapp.sign_in.domain.model.UserData
 import com.google.firebase.auth.FirebaseUser
 
 interface AuthReposistory {
     fun getCurrentUserId() : String?
+    fun getCurrentUser() : FirebaseUser?
+
+    fun getCurrentUserData() : UserData?
     fun isUserisCurrentlyloggedIN() : Boolean
     suspend fun signInWithGoogle(
         context: Context
