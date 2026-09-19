@@ -40,6 +40,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -77,6 +79,8 @@ object NoteTab : Tab {
 }
 
 class _HomeScreen : Screen {
+    override val key: ScreenKey = uniqueScreenKey
+
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     override fun Content() {

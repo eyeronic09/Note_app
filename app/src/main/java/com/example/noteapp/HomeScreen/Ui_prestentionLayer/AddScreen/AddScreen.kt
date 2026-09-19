@@ -47,6 +47,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
@@ -55,6 +57,8 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewMod
 import org.koin.compose.viewmodel.koinViewModel
 
 class _AddScreen() : Screen {
+    override val key: ScreenKey = uniqueScreenKey
+
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     override fun Content() {

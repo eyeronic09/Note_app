@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
@@ -46,7 +48,7 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OpenThe
 import org.koin.androidx.compose.koinViewModel
 
 class _ViewAndEditScreen(val noteId: Int) : Screen {
-    override val key = "ViewAndEditScreen_$noteId"
+    override val key: ScreenKey = uniqueScreenKey
 
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable

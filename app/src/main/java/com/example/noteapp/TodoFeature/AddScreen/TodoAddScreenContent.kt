@@ -12,11 +12,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import org.koin.androidx.compose.koinViewModel
 
 class _TodoAddScreen(): Screen {
+    override val key: ScreenKey = uniqueScreenKey
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     override fun Content() {

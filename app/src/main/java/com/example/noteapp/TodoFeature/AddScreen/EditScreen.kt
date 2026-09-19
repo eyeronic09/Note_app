@@ -7,12 +7,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.noteapp.TodoFeature.HomeScreen.domain.model.Todo
 import org.koin.compose.viewmodel.koinViewModel
 
 class _EditScreen(val id : Int): Screen {
+    override val key: ScreenKey = uniqueScreenKey
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     override fun Content() {

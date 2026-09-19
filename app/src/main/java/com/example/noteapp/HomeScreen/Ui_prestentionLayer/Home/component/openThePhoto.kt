@@ -12,10 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import coil.compose.AsyncImage
 import androidx.core.net.toUri
 
 class OpenThePhoto(private val ImageToOpen: String) : Screen {
+    override val key: ScreenKey = uniqueScreenKey
 
     @Composable
     override fun Content() {

@@ -18,6 +18,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenContent
@@ -25,6 +27,8 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCar
 import org.koin.compose.viewmodel.koinViewModel
 
 class _ArchiverScreen : Screen {
+    override val key: ScreenKey = uniqueScreenKey
+
     @Composable
     override fun Content() {
         ArchiverScreenRoute()

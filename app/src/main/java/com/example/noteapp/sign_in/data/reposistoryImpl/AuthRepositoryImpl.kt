@@ -7,6 +7,8 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import com.example.noteapp.R
+import com.example.noteapp.sign_in.data.mapper.Authmapper.toUserData
+import com.example.noteapp.sign_in.domain.model.UserData
 import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -23,6 +25,15 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth = FirebaseAuth.getInstan
     override fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
     }
+
+    override fun getCurrentUser(): FirebaseUser? {
+        return auth.currentUser
+    }
+
+    override fun getCurrentUserData(): UserData? {
+        return auth.currentUser?.toUserData()
+    }
+
 
     override fun isUserisCurrentlyloggedIN(): Boolean {
         Log.d("AuthRepositoryImpl", "isUserisCurrentlyloggedIN called  ${user?.uid} ${user?.displayName}  ${user?.email}")
@@ -50,10 +61,10 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth = FirebaseAuth.getInstan
                 context = context
             )
 
-            val resultedcredential = result.credential
+            val `resulted-credential` = result.credential
             
-            if (resultedcredential is CustomCredential && resultedcredential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(resultedcredential.data)
+            if (`resulted-credential` is CustomCredential && `resulted-credential`.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(`resulted-credential`.data)
                 
                 val firebaseCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
                 val authResult = auth.signInWithCredential(firebaseCredential).await()
@@ -66,7 +77,7 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth = FirebaseAuth.getInstan
                     Result.failure(Exception("Firebase user is null after sign in"))
                 }
             } else {
-                Result.failure(Exception("Unexpected credential type: ${resultedcredential.type}"))
+                Result.failure(Exception("Unexpected credential type: ${`resulted-credential`.type}"))
             }
         } catch (e: GetCredentialException) {
             Log.e("AuthRepositoryImpl", "Credential Manager failed: ${e.message}")

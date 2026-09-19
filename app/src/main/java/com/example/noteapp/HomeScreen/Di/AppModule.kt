@@ -42,6 +42,7 @@ import com.example.noteapp.TodoFeature.Todo_Notification.NotificationDataSource.
 import com.example.noteapp.TodoFeature.Todo_Notification.Scheduler.NotificationScheduler
 import com.example.noteapp.sign_in.data.reposistoryImpl.AuthRepositoryImpl
 import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
+import com.example.noteapp.sign_in.presentations.screen.CurrentScreenVM
 import com.example.noteapp.sign_in.presentations.state.SignInViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -208,6 +209,9 @@ class AppModule () : Application() {
 
         viewModel {
             SignInViewModel(get())
+        }
+        viewModel {
+            CurrentScreenVM(get())
         }
     }
 
