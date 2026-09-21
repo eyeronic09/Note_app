@@ -60,6 +60,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("com.google.firebase:firebase-auth")
+    implementation("com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc01")
 
     // Jetpack Credential Manager (Modern replacement for GoogleSignInClient)
     implementation("androidx.credentials:credentials:1.3.0")

@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NavigateBefore
 import androidx.compose.material.icons.automirrored.filled.ReadMore
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,16 +36,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import coil.compose.AsyncImage
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenUIState
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OpenThePhoto
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.RichNoteEditor
 import org.koin.androidx.compose.koinViewModel
 
 class _ViewAndEditScreen(val noteId: Int) : Screen {
@@ -66,130 +68,117 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
     ) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val event = viewModel::onEvent
-        LaunchedEffect(noteId != -1) {
-            event(
-                HomeScreenEvent.OpenToReadAndUpdate(
-                    noteId = noteId
-                )
-            )
+        LaunchedEffect(noteId) {
+            if (noteId != -1) {
+                event(HomeScreenEvent.OpenToReadAndUpdate(noteId = noteId))
+            }
         }
+
         NoteScreen(
-            modifier = Modifier, state = state, onAction = event
+            modifier = Modifier,
+            state = state,
+            onAction = event
         )
-
-
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun NoteScreen(
-        modifier: Modifier, state: HomeScreenUIState, onAction: (HomeScreenEvent) -> Unit
+        modifier: Modifier = Modifier,
+        state: HomeScreenUIState,
+        onAction: (HomeScreenEvent) -> Unit
     ) {
         val navigator = LocalNavigator.current
         Scaffold(
             topBar = {
-                TopAppBar(title = {
-                    when {
-                        state.isWriting -> {
-                            Text(text = "Writing Mode")
+                TopAppBar(
+                    title = {
+                        if (state.noteEditor.isWriting) {
+                            Text(text = "Editing Mode")
+                        } else {
+                            Text(text = "Reading Mode")
                         }
-                        else -> {
-                            Text("Reading Mode")
-                        }
-                    }
-                }, actions = {
-                    when {
-                        state.isWriting -> {
+                    },
+                    actions = {
+                        if (state.noteEditor.isWriting) {
+                            IconButton(
+                                onClick = {
+                                    onAction(HomeScreenEvent.UpdateNote)
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = "Save Note"
+                                )
+                            }
+                        } else {
                             IconButton(
                                 onClick = {
                                     onAction(HomeScreenEvent.SetToEdit)
-                                }) {
+                                }
+                            ) {
                                 Icon(
                                     imageVector = Icons.Default.Edit,
-                                    contentDescription = "editing Mode"
+                                    contentDescription = "Edit Mode"
                                 )
                             }
                         }
-
-                        else -> {
-
-                            IconButton(
-                                onClick = {
-                                    onAction(HomeScreenEvent.SetToEdit)
-                                }) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ReadMore,
-                                    contentDescription = "editing Mode"
-                                )
-                            }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navigator?.pop() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.NavigateBefore,
+                                contentDescription = "Back"
+                            )
                         }
                     }
-
-                }, navigationIcon = {
-                    IconButton(onClick = { 
-                        // If we are on the root navigator, pop from there
-                        // This screen was pushed to root, so navigator is root.
-                        navigator?.pop() 
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.NavigateBefore,
-                            contentDescription = "Back"
-                        )
-                    }
-                })
-            }) { innerPadding ->
+                )
+            }
+        ) { innerPadding ->
             NoteScreenContent(
                 state = state,
                 modifier = modifier.padding(innerPadding),
-                onAction = onAction, navigator = navigator
+                onAction = onAction,
+                navigator = navigator
             )
         }
-
     }
 
     @Composable
     fun NoteScreenContent(
-        state: HomeScreenUIState, modifier: Modifier, onAction: (HomeScreenEvent) -> Unit,
+        state: HomeScreenUIState,
+        modifier: Modifier = Modifier,
+        onAction: (HomeScreenEvent) -> Unit,
         navigator: Navigator?
     ) {
-
         val themePrimaryColor = MaterialTheme.colorScheme.primary
-        val textContestColor = if (isSystemInDarkTheme()) Color.White else Color.Black
+        val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
 
         Column(
             modifier = modifier
                 .fillMaxSize()
-                ,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.Start
         ) {
 
-            if (state.imageUri.isNotEmpty()) {
+            if (state.noteEditor.imageUri.isNotEmpty()) {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
-                        .padding(8.dp),
+                        .height(200.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(state.imageUri) { uri ->
+                    items(state.noteEditor.imageUri) { uri ->
                         AsyncImage(
                             model = uri,
                             contentDescription = null,
                             modifier = Modifier
                                 .height(200.dp)
-                                .clickable(
-                                    onClick = {
-                                        // This screen (_ViewAndEditScreen) is already on the Root Navigator.
-                                        // So 'navigator' here IS the Root Navigator.
-                                        // We just push to it directly.
-                                        navigator?.push(
-                                            item = OpenThePhoto(ImageToOpen = uri.toString())
-                                        )
-                                    }
-                                )
-                                .width(200.dp),
-
+                                .width(200.dp)
+                                .clickable {
+                                    navigator?.push(OpenThePhoto(ImageToOpen = uri.toString()))
+                                },
                             contentScale = ContentScale.Fit
                         )
                     }
@@ -201,37 +190,25 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = themePrimaryColor,
                     disabledBorderColor = themePrimaryColor,
-                    disabledTextColor = textContestColor,
-                    focusedTextColor = textContestColor,
+                    disabledTextColor = textColor,
+                    focusedTextColor = textColor,
                     disabledLabelColor = themePrimaryColor,
                 ),
-                value = state.title,
-                enabled = state.isWriting,
-                onValueChange = { updatedContent ->
-                    onAction(HomeScreenEvent.UpdateTitle(title = updatedContent))
+                value = state.noteEditor.title,
+                enabled = state.noteEditor.isWriting,
+                onValueChange = { updatedTitle ->
+                    onAction(HomeScreenEvent.UpdateTitle(title = updatedTitle))
                 },
                 label = { Text("Title") },
                 singleLine = true
             )
-            OutlinedTextField(
+
+            RichNoteEditor(
+                state = state,
+                onAction = onAction,
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = themePrimaryColor,
-                    disabledBorderColor = themePrimaryColor,
-                    disabledLabelColor = themePrimaryColor,
-                    disabledTextColor = textContestColor,
-                    focusedTextColor = textContestColor,
-                ),
-                value = state.content,
-                enabled = state.isWriting,
-                onValueChange = { updatedTitle ->
-                    onAction(HomeScreenEvent.UpdateContent(content = updatedTitle))
-                },
-                label = { Text("Content") },
-                maxLines = Int.MAX_VALUE,
-
+                    .fillMaxWidth()
             )
         }
     }

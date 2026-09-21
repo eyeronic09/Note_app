@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
+import com.mohamedrejeb.richeditor.model.rememberRichTextState
+import com.mohamedrejeb.richeditor.ui.material3.RichText
 
 @Composable
 fun NoteCard(
@@ -84,7 +87,15 @@ fun NoteCard(
             Text(text = note.title, style = MaterialTheme.typography.titleLarge)
             HorizontalDivider()
             Spacer(modifier = Modifier.padding(4.dp))
-            Text(text = note.content)
+            val richTextState = rememberRichTextState()
+            LaunchedEffect(note.content) {
+                richTextState.setHtml(note.content)
+            }
+            RichText(
+                state = richTextState,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.padding(2.dp))
             Text(text = note.date)
             Text(text = note.isArchived.toString())
         }

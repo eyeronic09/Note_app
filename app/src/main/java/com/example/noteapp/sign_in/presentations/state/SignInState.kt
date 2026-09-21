@@ -7,11 +7,7 @@ data class SignInState(
     val password: String = "",
     val authState: AuthUiState = AuthUiState.Idle
 ) {
-    val isLoggedIn: Boolean
-        get() = authState is AuthUiState.Success
 
-    val currentUser: FirebaseUser?
-        get() = (authState as? AuthUiState.Success)?.user
 }
 
 sealed interface AuthUiState {

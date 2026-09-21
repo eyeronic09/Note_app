@@ -6,14 +6,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,12 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.NoteAdd
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.InsertPhoto
-import androidx.compose.material.icons.filled.Navigation
-import androidx.compose.material.icons.filled.NoteAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,15 +36,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
+import coil.compose.AsyncImage
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenEvent
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenUIState
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.HomeScreenViewModel
+import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.RichNoteEditor
 import org.koin.compose.viewmodel.koinViewModel
 
 class _AddScreen() : Screen {
@@ -76,7 +67,6 @@ class _AddScreen() : Screen {
             onAction = onEvent,
             modifier = Modifier,
         )
-
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -86,12 +76,11 @@ class _AddScreen() : Screen {
         onAction: (HomeScreenEvent) -> Unit,
         modifier: Modifier
     ) {
-
         val context = LocalContext.current
         val pickMultipleMedia = rememberLauncherForActivityResult(
             ActivityResultContracts.PickMultipleVisualMedia()
         ) { uris ->
-            if (uris.isNotEmpty()){
+            if (uris.isNotEmpty()) {
                 uris.forEach { uri ->
                     context.contentResolver.takePersistableUriPermission(
                         uri,
@@ -123,8 +112,12 @@ class _AddScreen() : Screen {
                         Text("Compose Note")
                     },
                     actions = {
+                        val navigator = LocalNavigator.current
                         IconButton(
-                            { onAction(HomeScreenEvent.AddNote) }
+                            onClick = {
+                                onAction(HomeScreenEvent.AddNote)
+                                navigator?.pop()
+                            }
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.NoteAdd,
@@ -134,7 +127,7 @@ class _AddScreen() : Screen {
                         IconButton(
                             onClick = {
                                 pickMultipleMedia.launch(
-                                    input =  PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                 )
                             }
                         ) {
@@ -146,16 +139,14 @@ class _AddScreen() : Screen {
                     }
                 )
             }
-        ) { it: PaddingValues ->
-
+        ) { paddingValues: PaddingValues ->
             AddScreenContent(
                 state = state,
                 onAction = onAction,
-                modifier = modifier.padding(it)
+                modifier = modifier.padding(paddingValues)
             )
         }
     }
-
 
     @Composable
     fun AddScreenContent(
@@ -166,11 +157,11 @@ class _AddScreen() : Screen {
         Column(
             modifier = modifier
                 .fillMaxSize()
-                ,
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            if (state.imageUri.isNotEmpty()) {
+            if (state.noteEditor.imageUri.isNotEmpty()) {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -178,7 +169,7 @@ class _AddScreen() : Screen {
                         .padding(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(state.imageUri) { uri ->
+                    items(state.noteEditor.imageUri) { uri ->
                         AsyncImage(
                             model = uri,
                             contentDescription = null,
@@ -193,7 +184,7 @@ class _AddScreen() : Screen {
 
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = state.title,
+                value = state.noteEditor.title,
                 onValueChange = { newText ->
                     onAction(HomeScreenEvent.UpdateTitle(title = newText))
                 },
@@ -201,18 +192,15 @@ class _AddScreen() : Screen {
                 singleLine = true
             )
 
-            OutlinedTextField(
+            RichNoteEditor(
+                state = state.copy(
+                    noteEditor = state.noteEditor.copy(isWriting = true)
+                ),
+                onAction = onAction,
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
-                value = state.content,
-                onValueChange = { newText ->
-                    onAction(HomeScreenEvent.UpdateContent(content = newText))
-                },
-                label = { Text("Content") },
-                maxLines = Int.MAX_VALUE
+                    .fillMaxWidth()
             )
         }
     }
-
 }

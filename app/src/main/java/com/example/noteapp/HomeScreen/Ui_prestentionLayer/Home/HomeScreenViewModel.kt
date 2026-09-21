@@ -6,55 +6,59 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteOrder
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
+import com.example.noteapp.HomeScreen.domain_layer.Use_Case.OrderType
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
-import androidx.core.net.toUri
-import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteOrder
-import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
-import com.example.noteapp.HomeScreen.domain_layer.Use_Case.OrderType
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import java.util.Locale
 
 data class HomeScreenUIState(
-    val title: String = "",
-    val content: String = "",
     val notes: List<Note> = emptyList(),
-    val imageUri: List<Uri> = emptyList(),
-    val error: String? = null,
+    val noteEditor: NoteEditor = NoteEditor(),
     val currentNoteId: Int? = null,
-    val isLoading: Boolean = false,
-    val isWriting : Boolean = false,
-    val color : Int? = null,
-    var searchedText : String  = "",
-    val isSearching : Boolean = false,
-    val noteOrder : NoteOrder = NoteOrder.Title(
+    val color: Int? = null,
+    val searchedText: String = "",
+    val isSearching: Boolean = false,
+    val noteOrder: NoteOrder = NoteOrder.Title(
         orderType = OrderType.Ascending,
     ),
     val isPin: Boolean = false,
-    val isOrderSectionVisibility : Boolean = false
+    val isOrderSectionVisibility: Boolean = false
 )
 
+data class NoteEditor(
+    val title: String = "",
+    val content: String = "",
+    val imageUri: List<Uri> = emptyList(),
+    val error: String? = null,
+    val isLoading: Boolean = false,
+    val isWriting: Boolean = false,
+)
 
 sealed interface HomeScreenEvent {
     data class ToggleArchiver(val note: Note) : HomeScreenEvent
     data object SetToEdit : HomeScreenEvent
-    data class PinNote(val note : Note) : HomeScreenEvent
+    data class PinNote(val note: Note) : HomeScreenEvent
     object ToggleOrderSection : HomeScreenEvent
-    data class Order(val noteOrder: NoteOrder): HomeScreenEvent
+    data class Order(val noteOrder: NoteOrder) : HomeScreenEvent
 
     data class UpdateTitle(val title: String) : HomeScreenEvent
     data class UpdateContent(val content: String) : HomeScreenEvent
@@ -69,7 +73,6 @@ sealed interface HomeScreenEvent {
     data object CloseSearch : HomeScreenEvent
 
     data class OnImageSelected(val uris: List<Uri>) : HomeScreenEvent
-
 }
 
 @OptIn(FlowPreview::class)
@@ -83,7 +86,7 @@ class HomeScreenViewModel(
     private var getNotesJob: Job? = null
 
     init {
-       getNotes(NoteOrder.Date(OrderType.Descending))
+        getNotes(NoteOrder.Date(OrderType.Descending))
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -93,7 +96,6 @@ class HomeScreenViewModel(
                 viewModelScope.launch {
                     deleteNote(event.note)
                 }
-
             }
 
             is HomeScreenEvent.SetToEdit -> {
@@ -109,13 +111,11 @@ class HomeScreenViewModel(
             }
 
             is HomeScreenEvent.UpdateContent -> {
-                _uiState.update { it.copy(content = event.content) }
+                _uiState.update { it.copy(noteEditor = it.noteEditor.copy(content = event.content)) }
             }
 
             is HomeScreenEvent.UpdateTitle -> {
-                _uiState.update {
-                    it.copy(title = event.title)
-                }
+                _uiState.update { it.copy(noteEditor = it.noteEditor.copy(title = event.title)) }
             }
 
             is HomeScreenEvent.UpdateNote -> {
@@ -127,40 +127,43 @@ class HomeScreenViewModel(
             }
 
             is HomeScreenEvent.LoadNotes -> {
-                print("loaded")
-
+                getNotes(_uiState.value.noteOrder)
             }
 
             is HomeScreenEvent.ShowResult -> {
                 search()
             }
+
             is HomeScreenEvent.TapToSearch -> {
                 _uiState.update { it.copy(isSearching = true) }
             }
 
             is HomeScreenEvent.CloseSearch -> {
                 _uiState.update { it.copy(isSearching = false, searchedText = "") }
+                getNotes(_uiState.value.noteOrder)
             }
 
             is HomeScreenEvent.OnImageSelected -> {
-                _uiState.update { it.copy(imageUri = it.imageUri + event.uris) }
+                _uiState.update {
+                    it.copy(
+                        noteEditor = it.noteEditor.copy(imageUri = it.noteEditor.imageUri + event.uris)
+                    )
+                }
             }
 
             HomeScreenEvent.ToggleOrderSection -> {
-                _uiState.value = uiState.value.copy(
-                    isOrderSectionVisibility = !uiState.value.isOrderSectionVisibility
-                )
+                _uiState.update {
+                    it.copy(isOrderSectionVisibility = !it.isOrderSectionVisibility)
+                }
             }
 
             is HomeScreenEvent.Order -> {
-                if (
-                    _uiState.value.noteOrder == event.noteOrder.orderType &&
-                    _uiState.value.noteOrder.orderType == event.noteOrder.orderType
-                ) {
+                if (_uiState.value.noteOrder == event.noteOrder) {
                     return
                 }
                 getNotes(event.noteOrder)
             }
+
             is HomeScreenEvent.PinNote -> {
                 pinNote(event.note)
             }
@@ -173,34 +176,37 @@ class HomeScreenViewModel(
 
     private fun getNotes(noteOrder: NoteOrder) {
         getNotesJob?.cancel()
-        getNotesJob = noteUseCases.getAllNoteUseCase(noteOrder).onEach { notes ->
-            _uiState.value = uiState.value.copy(
-                notes = notes,
-                noteOrder = noteOrder
-            )
-        }
-            .launchIn(viewModelScope)
+        getNotesJob = noteUseCases.getAllNoteUseCase(noteOrder).onEach { notesList ->
+            Log.d("HomeScreenViewModel", "Fetched notes count: ${notesList.size}")
+            _uiState.update { currentState ->
+                currentState.copy(
+                    notes = notesList,
+                    noteOrder = noteOrder
+                )
+            }
+        }.launchIn(viewModelScope)
     }
-     fun toggleArchiver(note: Note){
-         viewModelScope.launch {
-             noteUseCases.unArchiverUseCases.invoke(note)
-         }
 
+    fun toggleArchiver(note: Note) {
+        viewModelScope.launch {
+            noteUseCases.unArchiverUseCases.invoke(note)
+        }
     }
 
     fun search() {
-        if(_uiState.value.isSearching) {
+        if (_uiState.value.isSearching) {
             viewModelScope.launch {
                 val allNotesFlow = noteUseCases.getAllNoteUseCase()
                 val searchedTextFlow = _uiState.map { it.searchedText }.distinctUntilChanged()
                 allNotesFlow
-                     // This prevents the app from searching on every single keystroke, improving performance.
-                    .combine(searchedTextFlow.debounce(300L)) { notes, text ->
-                        if (text.isBlank())   {
-                            notes
+                    // This prevents the app from searching on every single keystroke, improving performance.
+                    .combine(searchedTextFlow.debounce(300L)) { notesList, text ->
+                        if (text.isBlank()) {
+                            notesList
                         } else {
-                            notes.filter { note ->
-                                note.title.contains(text, ignoreCase = true) ||  note.content.contains(text, ignoreCase = true)
+                            notesList.filter { note ->
+                                note.title.contains(text, ignoreCase = true) ||
+                                        note.content.contains(text, ignoreCase = true)
                             }
                         }
                     }
@@ -208,7 +214,7 @@ class HomeScreenViewModel(
                         _uiState.update {
                             it.copy(
                                 notes = filteredNotes,
-                                isLoading = false
+                                noteEditor = it.noteEditor.copy(isLoading = false)
                             )
                         }
                     }
@@ -219,98 +225,113 @@ class HomeScreenViewModel(
     fun onSearchQueryChange(query: String) {
         _uiState.update {
             it.copy(
-                searchedText =  query,
+                searchedText = query,
                 isSearching = true
             )
         }
         search()
-
     }
 
-    private fun setToEditMode(){
-        _uiState.update {
-            it.copy(
-                isWriting = !_uiState.value.isWriting
-            ).also {
-                Log.d("Current Mode" , _uiState.value.isWriting.toString())
-            }
+    private fun setToEditMode() {
+        _uiState.update { currentState ->
+            val newWritingState = !currentState.noteEditor.isWriting
+            Log.d("Current Mode", newWritingState.toString())
+            currentState.copy(
+                noteEditor = currentState.noteEditor.copy(isWriting = newWritingState)
+            )
         }
     }
+
     private fun randomColor(): Int {
         val colors = listOf(
-            argb(255,246, 114, 128),
-            argb(255,192, 108, 132),
+            argb(255, 246, 114, 128),
+            argb(255, 192, 108, 132),
             argb(255, 108, 91, 123),
             argb(255, 174, 222, 252)
         )
-
         return colors.random()
     }
 
-    private suspend fun deleteNote(note: Note){
+    private suspend fun deleteNote(note: Note) {
         noteUseCases.deleteNoteUseCase(note)
     }
 
-    private fun updateNote(){
-        if (_uiState.value.isWriting){
-            val noteId = _uiState.value.currentNoteId ?: return
+    private fun updateNote() {
+        val editor = _uiState.value.noteEditor
+        val noteId = _uiState.value.currentNoteId ?: return
 
-            viewModelScope.launch {
-                try {
-                    _uiState.update { it.copy(isLoading = true) }
-                    val updatedNote = Note(
-                        id = noteId,
-                        title = _uiState.value.title,
-                        content = _uiState.value.content,
-                        date = "",
-                        color = _uiState.value.color ?: randomColor(),
-                        listOfImageUri = _uiState.value.imageUri.map { it.toString() }
+        viewModelScope.launch {
+            try {
+                _uiState.update {
+                    it.copy(noteEditor = it.noteEditor.copy(isLoading = true))
+                }
+                val existingNote = _uiState.value.notes.find { it.id == noteId }
+                val currentDate = SimpleDateFormat("dd/M/yyyy", Locale.getDefault()).format(Date())
+
+                val updatedNote = Note(
+                    id = noteId,
+                    title = editor.title,
+                    content = editor.content,
+                    date = existingNote?.date?.ifBlank { currentDate } ?: currentDate,
+                    color = _uiState.value.color ?: randomColor(),
+                    listOfImageUri = editor.imageUri.map { it.toString() }
+                )
+
+                noteUseCases.updateNotesUseCase(updatedNote)
+
+                _uiState.update {
+                    it.copy(
+                        noteEditor = it.noteEditor.copy(
+                            isLoading = false,
+                            isWriting = false
+                        )
                     )
-
-                    noteUseCases.updateNotesUseCase(updatedNote)
-
-                    _uiState.update {
-                        it.copy(
-                            title = "",
-                            content = "",
-                            imageUri = emptyList(),
-                            currentNoteId = null,
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        noteEditor = it.noteEditor.copy(
+                            error = "Failed to update note",
                             isLoading = false
                         )
-                    }
-                } catch (e: Exception) {
-                    _uiState.update { it.copy(
-                        error = "Failed to update note",
-                        isLoading = false
-                    )}
+                    )
                 }
             }
         }
     }
+
     private fun loadNoteById(noteId: Int) {
-        viewModelScope.launch{
+        viewModelScope.launch {
             try {
-                _uiState.update { it.copy(isLoading = true) }
+                _uiState.update {
+                    it.copy(noteEditor = it.noteEditor.copy(isLoading = true))
+                }
                 val note = noteUseCases.getNoteByIdUseCase(noteId)
                 _uiState.update { currentState ->
                     currentState.copy(
-                        title = note.title,
-                        content = note.content,
                         currentNoteId = noteId,
-                        isLoading = false,
-                        isWriting = true,
                         color = note.color,
-                        imageUri = note.listOfImageUri?.map { it.toUri() } ?: emptyList()
+                        noteEditor = currentState.noteEditor.copy(
+                            title = note.title,
+                            content = note.content,
+                            isLoading = false,
+                            isWriting = true,
+                            imageUri = note.listOfImageUri?.map { it.toUri() } ?: emptyList()
+                        )
                     )
                 }.also {
-                    Log.d("LoadedNote" , _uiState.value.toString())
+                    Log.d("LoadedNote", _uiState.value.toString())
                 }
 
             } catch (e: Exception) {
-                _uiState.update { it.copy(
-                    error = "Failed to load note",
-                    isLoading = false
-                )}
+                _uiState.update {
+                    it.copy(
+                        noteEditor = it.noteEditor.copy(
+                            error = "Failed to load note",
+                            isLoading = false
+                        )
+                    )
+                }
             }
         }
     }
@@ -320,45 +341,59 @@ class HomeScreenViewModel(
     private fun insertNote() {
         viewModelScope.launch {
             try {
-                val sdf = SimpleDateFormat("dd/M/yyyy")
+                val sdf = SimpleDateFormat("dd/M/yyyy", Locale.getDefault())
                 val currentDate = sdf.format(Date())
 
-                _uiState.update { it.copy(isLoading = true) }
+                _uiState.update {
+                    it.copy(noteEditor = it.noteEditor.copy(isLoading = true))
+                }
 
+                val editor = _uiState.value.noteEditor
                 val note = Note(
-                    title = _uiState.value.title,
-                    content = _uiState.value.content,
+                    title = editor.title,
+                    content = editor.content,
                     date = currentDate,
                     color = randomColor(),
-                    listOfImageUri = _uiState.value.imageUri.map { it.toString() }
+                    listOfImageUri = editor.imageUri.map { it.toString() }
                 )
                 noteUseCases.addNoteUseCase(note).also {
                     Log.d("Add_Note", note.toString())
                 }
-                // Reset state after adding
-                _uiState.update { it.copy(
-                    title = "",
-                    content = "",
-                    isLoading = false
-                ) }
+                // Reset editor fields
+                _uiState.update {
+                    it.copy(
+                        noteEditor = NoteEditor()
+                    )
+                }
             } catch (e: Exception) {
-                _uiState.update { it.copy(
-                    error = "Failed to save note",
-                    isLoading = false
-                )}
+                _uiState.update {
+                    it.copy(
+                        noteEditor = it.noteEditor.copy(
+                            error = "Failed to save note",
+                            isLoading = false
+                        )
+                    )
+                }
             }
         }
     }
-    fun pinNote(note : Note){
+
+    fun pinNote(note: Note) {
         viewModelScope.launch {
             try {
-                _uiState.update { it.copy(isLoading = true) }
+                _uiState.update {
+                    it.copy(noteEditor = it.noteEditor.copy(isLoading = true))
+                }
                 noteUseCases.pinNoteUseCase.invoke(note)
-            }catch (e: Exception){
-                _uiState.update { it.copy(
-                    error = e.toString(),
-                    isLoading = false
-                ) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        noteEditor = it.noteEditor.copy(
+                            error = e.toString(),
+                            isLoading = false
+                        )
+                    )
+                }
             }
         }
     }
