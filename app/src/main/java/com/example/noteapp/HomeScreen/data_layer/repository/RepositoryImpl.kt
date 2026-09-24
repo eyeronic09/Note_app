@@ -46,7 +46,7 @@ class RepositoryImpl(
         )
     }
 
-    override suspend fun getNoteById(noteId: Int): Note {
+    override suspend fun getNoteById(noteId: String): Note {
         return localDatasource
             .getNoteById(noteId)
             .toDomain()
@@ -56,33 +56,28 @@ class RepositoryImpl(
         note: Note,
         hasInternet: Boolean
     ) {
-        try {
-            // Room first
-            localDatasource.addNotes(
-                note.toEntity()
-            )
-            if (hasInternet) firebaseRemoteDataSource.addNote(note.toEntity())
-        } catch (e: Exception) {
-            Log.e(
-                "RepositoryImpl",
-                "Error adding note locally",
-                e
-            )
-        }
-
+        var isSynced = false
         if (hasInternet) {
             try {
-                // Firebase second
-                firebaseRemoteDataSource.addNote(
-                    note.toEntity()
-                )
+                val result = firebaseRemoteDataSource.addNote(note.toEntity())
+                if (result.isSuccess) {
+                    isSynced = true
+                    Log.d("RepositoryImpl", "Note synced to Firebase: ${note.title}")
+                } else {
+                    Log.e("RepositoryImpl", "Error syncing note to Firebase", result.exceptionOrNull())
+                }
             } catch (e: Exception) {
-                Log.e(
-                    "RepositoryImpl",
-                    "Error syncing note to Firebase",
-                    e
-                )
+                Log.e("RepositoryImpl", "Error syncing note to Firebase", e)
             }
+        }
+
+        try {
+            val noteToSave = note.copy(syncedStatus = isSynced)
+            localDatasource.addNotes(noteToSave.toEntity()).also {
+                Log.d("RepositoryImpl", "Note added to local DB with syncedStatus=$isSynced: ${note.title}")
+            }
+        } catch (e: Exception) {
+            Log.e("RepositoryImpl", "Error adding note locally", e)
         }
     }
 
@@ -121,30 +116,28 @@ class RepositoryImpl(
         note: Note,
         hasInternet: Boolean
     ) {
-        try {
-            localDatasource.updateNotes(
-                note.toEntity()
-            )
-        } catch (e: Exception) {
-            Log.e(
-                "RepositoryImpl",
-                "Error updating note locally",
-                e
-            )
-        }
-
+        var isSynced = false
         if (hasInternet) {
             try {
-                firebaseRemoteDataSource.updateNote(
-                    note.toEntity()
-                )
+                val result = firebaseRemoteDataSource.updateNote(note.toEntity())
+                if (result.isSuccess) {
+                    isSynced = true
+                    Log.d("RepositoryImpl", "Note updated on Firebase: ${note.title}")
+                } else {
+                    Log.e("RepositoryImpl", "Error updating note on Firebase", result.exceptionOrNull())
+                }
             } catch (e: Exception) {
-                Log.e(
-                    "RepositoryImpl",
-                    "Error updating note on Firebase",
-                    e
-                )
+                Log.e("RepositoryImpl", "Error updating note on Firebase", e)
             }
+        }
+
+        try {
+            val noteToSave = note.copy(syncedStatus = isSynced)
+            localDatasource.updateNotes(noteToSave.toEntity()).also {
+                Log.d("RepositoryImpl", "Note updated in local DB with syncedStatus=$isSynced: ${note.title}")
+            }
+        } catch (e: Exception) {
+            Log.e("RepositoryImpl", "Error updating note locally", e)
         }
     }
 

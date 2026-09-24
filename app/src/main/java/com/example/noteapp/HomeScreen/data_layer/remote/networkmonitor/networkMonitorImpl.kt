@@ -14,35 +14,52 @@ class networkMonitorImpl(
 ) : networkMonitor {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
     override val isConnected: Flow<Boolean> = callbackFlow {
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                trySend(true)
+                trySend(checkIsConnected())
             }
 
             override fun onLost(network: Network) {
                 trySend(false)
             }
+
+            override fun onCapabilitiesChanged(
+                network: Network,
+                networkCapabilities: NetworkCapabilities
+            ) {
+                trySend(checkIsConnected())
+            }
         }
 
         val request = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
             .build()
 
-        // 1. Register the network callback
-        connectivityManager.registerNetworkCallback(request, callback)
+        trySend(checkIsConnected())
 
-        // 2. Immediately send the current/initial connection status
-        val activeNetwork = connectivityManager.activeNetwork
-        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-        val hasInternet = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-        trySend(hasInternet)
+        try {
+            connectivityManager.registerNetworkCallback(request, callback)
+        } catch (e: Exception) {
+            trySend(false)
+        }
 
-        // 3. CRITICAL: Clean up and unregister when the flow collector cancels
         awaitClose {
-            connectivityManager.unregisterNetworkCallback(callback)
+            try {
+                connectivityManager.unregisterNetworkCallback(callback)
+            } catch (e: Exception) {
+                // ignore
+            }
         }
     }
 
+    private fun checkIsConnected(): Boolean {
+        val activeNetwork = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    }
 }
 

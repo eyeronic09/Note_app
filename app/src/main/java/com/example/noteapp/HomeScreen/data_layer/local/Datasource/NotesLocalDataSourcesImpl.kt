@@ -22,7 +22,7 @@ class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSourc
         }
     }
 
-    override suspend fun getNoteById(noteId: Int): NoteEntity {
+    override suspend fun getNoteById(noteId: String): NoteEntity {
         return dao.getNoteById(noteId = noteId)
     }
 

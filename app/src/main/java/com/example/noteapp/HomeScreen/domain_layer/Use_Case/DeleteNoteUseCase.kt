@@ -10,7 +10,7 @@ class DeleteNoteUseCase(
 ) {
     suspend operator fun invoke(note: Note , hasInternet: Boolean = false) {
         val userId = authRepository.getCurrentUserId() ?: ""
-        val noteWithUser  = note.copy(firebaseNoteId = userId , syncedStatus = hasInternet)
+        val noteWithUser  = note.copy(firebaseUserId = userId)
         repository.deleteNote(noteWithUser, hasInternet)
     }
 }

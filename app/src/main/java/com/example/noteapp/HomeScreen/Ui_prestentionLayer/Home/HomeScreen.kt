@@ -277,14 +277,14 @@ private fun HomeScreenContentPreview() {
             state = HomeScreenUIState(
                 notes = listOf(
                     Note(
-                        id = 1,
+                        id = "1",
                         title = "Kotlin lecture notes",
                         content = "Kotlin is statically type Programming lang with OOPs concepts",
                         date = "1-1-2025",
                         color = 1
                     ),
                     Note(
-                        id = 2,
+                        id = "2",
                         title = "Meeting Notes",
                         content = "Discuss project timeline and upcoming features.",
                         date = "2-1-2025",
@@ -315,14 +315,14 @@ private fun HomeScreenPreview() {
                         state = HomeScreenUIState(
                             notes = listOf(
                                 Note(
-                                    id = 1,
+                                    id = "1",
                                     title = "Kotlin lecture notes",
                                     content = "Kotlin is statically type Programming lang with OOPs concepts",
                                     date = "1-1-2025",
                                     color = 1
                                 ),
                                 Note(
-                                    id = 2,
+                                    id = "2",
                                     title = "Meeting Notes",
                                     content = "Discuss project timeline and upcoming features.",
                                     date = "2-1-2025",

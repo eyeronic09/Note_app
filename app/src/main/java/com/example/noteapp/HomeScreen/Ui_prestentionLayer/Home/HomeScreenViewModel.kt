@@ -14,7 +14,6 @@ import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteOrder
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.OrderType
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
-import com.example.noteapp.sign_in.data.reposistoryImpl.AuthRepositoryImpl
 import com.example.noteapp.sign_in.domain.model.UserData
 import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
 import com.example.noteapp.sign_in.presentations.UiState.CurrentUserUiState
@@ -36,11 +35,12 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.UUID
 
 data class HomeScreenUIState(
     val notes: List<Note> = emptyList(),
     val noteEditor: NoteEditor = NoteEditor(),
-    val currentNoteId: Int? = null,
+    val currentNoteId: String? = null,
     val color: Int? = null,
     val searchedText: String = "",
     val isSearching: Boolean = false,
@@ -73,7 +73,7 @@ sealed interface HomeScreenEvent {
     object AddNote : HomeScreenEvent
     data class DeleteNote(val note: Note) : HomeScreenEvent
     data object UpdateNote : HomeScreenEvent
-    data class OpenToReadAndUpdate(val noteId: Int) : HomeScreenEvent
+    data class OpenToReadAndUpdate(val noteId: String) : HomeScreenEvent
     object LoadNotes : HomeScreenEvent
     data class OnSearchQueryChanged(val query: String) : HomeScreenEvent
     data object ShowResult : HomeScreenEvent
@@ -96,7 +96,7 @@ class HomeScreenViewModel(
     private val isConnected :
             StateFlow<Boolean> = connection.isConnected
                 .stateIn(viewModelScope,
-                    SharingStarted.WhileSubscribed(5000),
+                    SharingStarted.Eagerly,
                     initialValue = false)
 
     private var getNotesJob: Job? = null
@@ -106,6 +106,11 @@ class HomeScreenViewModel(
         val currenloggedIn = authRepository.getCurrentUserData()
         if (currenloggedIn != null){
             _uiState.update { it -> it.copy(getUserUserData =  currenloggedIn)
+            }
+        }
+        viewModelScope.launch {
+            isConnected.collect { connected ->
+                Log.d("isConnected", connected.toString())
             }
         }
     }
@@ -294,6 +299,7 @@ class HomeScreenViewModel(
                     title = editor.title,
                     content = editor.content,
                     date = existingNote?.date?.ifBlank { currentDate } ?: currentDate,
+                    updatedAt = System.currentTimeMillis(),
                     color = _uiState.value.color ?: randomColor(),
                     listOfImageUri = editor.imageUri.map { it.toString() }
                 )
@@ -321,7 +327,7 @@ class HomeScreenViewModel(
         }
     }
 
-    private fun loadNoteById(noteId: Int) {
+    private fun loadNoteById(noteId: String) {
         viewModelScope.launch {
             try {
                 _uiState.update {
@@ -370,10 +376,13 @@ class HomeScreenViewModel(
                 }
 
                 val editor = _uiState.value.noteEditor
+                val currentUserId = authRepository.getCurrentUserId() ?: ""
                 val note = Note(
                     title = editor.title,
                     content = editor.content,
+                    firebaseUserId = currentUserId,
                     date = currentDate,
+                    updatedAt = System.currentTimeMillis(),
                     color = randomColor(),
                     listOfImageUri = editor.imageUri.map { it.toString() }
                 )

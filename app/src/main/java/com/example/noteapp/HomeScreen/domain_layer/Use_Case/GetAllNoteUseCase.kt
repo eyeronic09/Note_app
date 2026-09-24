@@ -8,15 +8,6 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class GetAllNoteUseCase(private val repository: NoteRepository) {
-    private val dateFormat = SimpleDateFormat("dd/M/yyyy", Locale.getDefault())
-
-    private fun parseDate(dateStr: String): Long {
-        return try {
-            if (dateStr.isBlank()) 0L else dateFormat.parse(dateStr)?.time ?: 0L
-        } catch (e: Exception) {
-            0L
-        }
-    }
 
     operator fun invoke(
         noteOrder: NoteOrder = NoteOrder.Title(OrderType.Ascending),
@@ -26,7 +17,7 @@ class GetAllNoteUseCase(private val repository: NoteRepository) {
             when (noteOrder.orderType) {
                 OrderType.Ascending -> {
                     when (noteOrder) {
-                        is NoteOrder.Date -> notes.sortedWith(compareBy<Note> { parseDate(it.date) }.thenBy { it.id })
+                        is NoteOrder.Date -> notes.sortedWith(compareBy<Note> { it.updatedAt }.thenBy { it.id })
                         is NoteOrder.Title -> notes.sortedBy { it.title.lowercase(Locale.getDefault()) }
                         is NoteOrder.Color -> notes.sortedBy { it.color }
                         is NoteOrder.Pin -> notes.sortedByDescending { it.isPin }
@@ -34,7 +25,7 @@ class GetAllNoteUseCase(private val repository: NoteRepository) {
                 }
                 OrderType.Descending -> {
                     when (noteOrder) {
-                        is NoteOrder.Date -> notes.sortedWith(compareByDescending<Note> { parseDate(it.date) }.thenByDescending { it.id })
+                        is NoteOrder.Date -> notes.sortedWith(compareByDescending<Note> { it.updatedAt }.thenByDescending { it.id })
                         is NoteOrder.Title -> notes.sortedByDescending { it.title.lowercase(Locale.getDefault()) }
                         is NoteOrder.Color -> notes.sortedByDescending { it.color }
                         is NoteOrder.Pin -> notes.sortedByDescending { it.isPin }

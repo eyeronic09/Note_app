@@ -9,8 +9,8 @@ fun NoteEntity.toDomain() : Note {
         title = this.title,
         content = this.content,
         firebaseUserId = this.firebaseUserId,
-        firebaseNoteId = this.firebaseNoteId,
         date = this.date,
+        updatedAt = this.updatedAt,
         color = this.color,
         listOfImageUri = this.listOfImageUri,
         isPin = this.isPin,
@@ -26,12 +26,13 @@ fun Note.toEntity() : NoteEntity {
         title = this.title,
         content = this.content,
         date = this.date,
+        updatedAt = this.updatedAt,
         firebaseUserId = this.firebaseUserId,
-        firebaseNoteId = this.firebaseNoteId,
         color = this.color,
         listOfImageUri = this.listOfImageUri,
         category = this.category,
         isPin = this.isPin,
         isArchived = this.isArchived,
+        syncedStatus = this.syncedStatus
     )
 }

@@ -9,13 +9,12 @@ class AddNoteUseCase(
     private val repository: NoteRepository,
     private val authRepository: AuthReposistory
 ) {
-    suspend operator fun invoke(note: Note , hasInternet : Boolean = false) {
+    suspend operator fun invoke(note: Note, hasInternet : Boolean = false) {
         val userId = authRepository.getCurrentUserId() ?: ""
         val noteWithUser = note.copy(
-            firebaseNoteId = userId,
-            syncedStatus = hasInternet
+            firebaseUserId = userId
         )
-        Log.d("AddNoteUseCase", "Adding note with userId: '$userId', title: '${note.title}' firebase:${note.firebaseNoteId} with ${note.syncedStatus}")
+        Log.d("AddNoteUseCase", "Adding note with userId: '$userId', title: '${note.title}'")
         repository.addNote(
             noteWithUser,
             hasInternet = hasInternet
