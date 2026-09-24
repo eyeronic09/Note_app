@@ -277,7 +277,7 @@ class HomeScreenViewModel(
                     listOfImageUri = editor.imageUri.map { it.toString() }
                 )
 
-                noteUseCases.updateNotesUseCase(updatedNote)
+                noteUseCases.updateNotesUseCase(updatedNote,)
 
                 _uiState.update {
                     it.copy(

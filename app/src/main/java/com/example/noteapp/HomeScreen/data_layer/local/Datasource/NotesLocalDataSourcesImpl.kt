@@ -7,13 +7,13 @@ import kotlinx.coroutines.flow.Flow
 
 class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSources {
 
-    override fun getNotesNewestFirst(isArchived: Boolean): Flow<List<NoteEntity>> {
-        return dao.getNotesNewestFirst(isArchived)
+    override fun getNotesNewestFirst(userId: String): Flow<List<NoteEntity>> {
+        return dao.getNotesNewestFirst(userId)
     }
 
     override suspend fun addNotes(noteEntity: NoteEntity): Result<Unit> {
         return try {
-            dao.addNotes(noteEntity)
+            dao.upsertNote(noteEntity)
             Log.d("NotesLocalDataSource", "DAO addNotes succeeded for entity: id=${noteEntity.id}, title='${noteEntity.title}'")
             Result.success(Unit)
         } catch (e: Exception) {
@@ -26,15 +26,15 @@ class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSourc
         return dao.getNoteById(noteId = noteId)
     }
 
-    override suspend fun searchNotes(query: String): List<NoteEntity> {
-        return dao.searchNotes(query)
+    override suspend fun searchNotes(query: String, userId: String): List<NoteEntity> {
+        return dao.searchNotes(query, userId)
     }
 
     override suspend fun deleteNotes(noteEntity: NoteEntity) {
-        return dao.deleteNotes(noteEntity)
+        dao.deleteNote(noteEntity)
     }
 
     override suspend fun updateNotes(noteEntity: NoteEntity) {
-        return dao.updateNotes(noteEntity)
+        dao.updateNote(noteEntity)
     }
 }

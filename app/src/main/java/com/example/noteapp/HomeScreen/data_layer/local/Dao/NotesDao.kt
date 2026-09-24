@@ -10,24 +10,49 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NotesDao {
-    @Query("SELECT * FROM notes WHERE (isArchived = :isArchived OR (:isArchived = 0 AND isArchived IS NULL)) ORDER BY id ASC")
-    fun getNotesOldestFirst(isArchived: Boolean = false): Flow<List<NoteEntity>>
 
-    @Query("SELECT * FROM notes WHERE (isArchived = :isArchived OR (:isArchived = 0 AND isArchived IS NULL)) ORDER BY id DESC")
-    fun getNotesNewestFirst(isArchived: Boolean = false): Flow<List<NoteEntity>>
+    @Query("""
+        SELECT * FROM notes
+        WHERE firebaseUserId = :userId
+        ORDER BY date DESC
+    """)
+    fun getNotesNewestFirst(
+        userId: String
+    ): Flow<List<NoteEntity>>
 
-    @Query("SELECT * FROM notes WHERE id = :noteId")
-    suspend fun getNoteById(noteId: Int): NoteEntity
+    @Query("""
+        SELECT * FROM notes
+        WHERE id = :noteId
+    """)
+    suspend fun getNoteById(
+        noteId: Int
+    ): NoteEntity
 
-    @Query("SELECT * FROM notes WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
-    suspend fun searchNotes(query: String): List<NoteEntity>
+    @Query("""
+        SELECT * FROM notes
+        WHERE firebaseUserId = :userId
+        AND (
+            title LIKE '%' || :query || '%'
+            OR content LIKE '%' || :query || '%'
+        )
+    """)
+    suspend fun searchNotes(
+        query: String,
+        userId: String
+    ): List<NoteEntity>
 
     @Upsert
-    suspend fun addNotes(noteEntity: NoteEntity)
+    suspend fun upsertNote(
+        noteEntity: NoteEntity
+    )
 
     @Delete
-    suspend fun deleteNotes(noteEntity: NoteEntity)
+    suspend fun deleteNote(
+        noteEntity: NoteEntity
+    )
 
     @Update
-    suspend fun updateNotes(noteEntity: NoteEntity)
+    suspend fun updateNote(
+        noteEntity: NoteEntity
+    )
 }

@@ -10,9 +10,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 
 interface NotesFirebaseRemoteDataSource {
-    suspend fun addNote(noteEntity: NoteEntity): Result<String> // Returns generated Firestore Document ID
-    suspend fun updateNote(noteEntity: NoteEntity): Result<Unit>
-    suspend fun deleteNote(noteEntity: NoteEntity): Result<Unit>
-    fun fetchNotes(): Flow<List<NoteEntity>>
-}
 
+    suspend fun addNote(
+        noteEntity: NoteEntity
+    ): Result<String>
+
+    suspend fun updateNote(
+        noteEntity: NoteEntity
+    ): Result<Unit>
+
+    suspend fun deleteNote(
+        noteEntity: NoteEntity
+    ): Result<Unit>
+
+    suspend fun fetchNotes(): List<NoteEntity>
+}

@@ -8,6 +8,6 @@ class GetAllArchiverUseCase(
     private val repository: NoteRepository
 ) {
     operator fun invoke() : Flow<List<Note>> {
-        return repository.getNotesNewestFirst(isArchived = true)
+        return repository.getNotes(hasInternet = true)
     }
 }

@@ -22,7 +22,7 @@ class GetAllNoteUseCase(private val repository: NoteRepository) {
         noteOrder: NoteOrder = NoteOrder.Title(OrderType.Ascending),
         isArchived: Boolean = false
     ): Flow<List<Note>> {
-        return repository.getNotesNewestFirst(isArchived).map { notes ->
+        return repository.getNotes().map { notes ->
             when (noteOrder.orderType) {
                 OrderType.Ascending -> {
                     when (noteOrder) {
