@@ -13,6 +13,8 @@ import com.example.noteapp.HomeScreen.data_layer.local.Datasource.NotesLocalData
 import com.example.noteapp.HomeScreen.data_layer.local.database.NoteRoomDatabase
 import com.example.noteapp.HomeScreen.data_layer.remote.datasource.NotesFirebaseRemoteDataSource
 import com.example.noteapp.HomeScreen.data_layer.remote.datasource.NotesFirebaseRemoteDataSourceImpl
+import com.example.noteapp.HomeScreen.data_layer.remote.networkmonitor.networkMonitor
+import com.example.noteapp.HomeScreen.data_layer.remote.networkmonitor.networkMonitorImpl
 import com.example.noteapp.HomeScreen.data_layer.repository.RepositoryImpl
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.AddNoteUseCase
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.DeleteNoteUseCase
@@ -108,18 +110,23 @@ class AppModule () : Application() {
         
         // Repository
         single<NoteRepository> {
-            RepositoryImpl(get(), get())
+            RepositoryImpl(get(), get(), get())
         }
         single<NotesFirebaseRemoteDataSource> {
             NotesFirebaseRemoteDataSourceImpl(get() , get())
+        }
+
+        // Network Monitor
+        single<networkMonitor> {
+            networkMonitorImpl(androidContext())
         }
 
 
         //UseCase
         factory { GetAllNoteUseCase(get()) }
         factory { AddNoteUseCase(get(), get()) }
-        factory { UpdateNotesUseCase(get()) }
-        factory { DeleteNoteUseCase(get()) }
+        factory { UpdateNotesUseCase(get(), get()) }
+        factory { DeleteNoteUseCase(get(), get()) }
         factory { GetNoteByIdUseCase(get()) }
         factory { PinNoteUseCase(get()) }
         factory { UnArchiverUseCase(get()) }

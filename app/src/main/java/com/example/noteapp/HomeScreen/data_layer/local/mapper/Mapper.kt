@@ -8,12 +8,15 @@ fun NoteEntity.toDomain() : Note {
         id = this.id,
         title = this.title,
         content = this.content,
-        authUserId = this.authUserId,
+        firebaseUserId = this.firebaseUserId,
+        firebaseNoteId = this.firebaseNoteId,
         date = this.date,
         color = this.color,
         listOfImageUri = this.listOfImageUri,
         isPin = this.isPin,
         isArchived = this.isArchived,
+        category = this.category,
+        syncedStatus = this.syncedStatus
     )
 }
 
@@ -22,10 +25,12 @@ fun Note.toEntity() : NoteEntity {
         id = this.id,
         title = this.title,
         content = this.content,
-        authUserId = this.authUserId,
         date = this.date,
+        firebaseUserId = this.firebaseUserId,
+        firebaseNoteId = this.firebaseNoteId,
         color = this.color,
         listOfImageUri = this.listOfImageUri,
+        category = this.category,
         isPin = this.isPin,
         isArchived = this.isArchived,
     )

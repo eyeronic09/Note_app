@@ -5,9 +5,12 @@ import com.example.noteapp.HomeScreen.domain_layer.model.Note
 import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 
 class PinNoteUseCase(private val noteRepository: NoteRepository)  {
-    suspend operator fun invoke(note : Note) {
+    suspend operator fun invoke(note : Note , hasInteret : Boolean = false) {
         val note = note.copy(isPin = !note.isPin)
-        noteRepository.updateNotes(note)
+        noteRepository.updateNote(
+            note,
+            hasInternet = hasInteret
+        )
     }
 }
 
