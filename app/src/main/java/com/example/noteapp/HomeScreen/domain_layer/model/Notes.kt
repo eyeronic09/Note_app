@@ -1,15 +1,14 @@
 package com.example.noteapp.HomeScreen.domain_layer.model
 
-import androidx.compose.ui.graphics.Color
-import androidx.room.PrimaryKey
+import java.util.UUID
 
 data class Note(
-    val id: Int = 0 ,
+    val id: String = UUID.randomUUID().toString(),
     val title: String,
     val content: String,
     val firebaseUserId: String = "",
-    val firebaseNoteId: String? = null,
     val date: String,
+    val updatedAt: Long = System.currentTimeMillis(),
     val color: Int,
     val listOfImageUri: List<String>? = emptyList(),
     val isPin : Boolean = false,

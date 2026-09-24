@@ -14,7 +14,7 @@ interface NotesDao {
     @Query("""
         SELECT * FROM notes
         WHERE firebaseUserId = :userId
-        ORDER BY date DESC
+        ORDER BY updatedAt DESC
     """)
     fun getNotesNewestFirst(
         userId: String
@@ -25,7 +25,7 @@ interface NotesDao {
         WHERE id = :noteId
     """)
     suspend fun getNoteById(
-        noteId: Int
+        noteId: String
     ): NoteEntity
 
     @Query("""

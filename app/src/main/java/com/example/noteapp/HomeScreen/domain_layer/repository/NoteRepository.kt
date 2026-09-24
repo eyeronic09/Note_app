@@ -10,7 +10,7 @@ interface NoteRepository {
     ): Flow<List<Note>>
 
     suspend fun getNoteById(
-        noteId: Int
+        noteId: String
     ): Note
 
     suspend fun addNote(

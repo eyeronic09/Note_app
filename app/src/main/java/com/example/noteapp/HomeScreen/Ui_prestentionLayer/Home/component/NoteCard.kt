@@ -118,11 +118,11 @@ fun NoteCard(
 @Composable
 private fun NoteCardPreview() {
    val note = Note(
-        id = 1,
+        id = "1",
         title = "Kotlin lecture notes",
         content = "Kotlin is statically type Programming lang with OOPs concepts",
         date = "1-1-2025" ,
-       color = 21
+        color = 21
     )
     NoteCard(
         note = note,

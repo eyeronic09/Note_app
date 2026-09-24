@@ -7,7 +7,7 @@ import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
 class UpdateNotesUseCase(private val repository: NoteRepository , private val authRepository: AuthReposistory){
     suspend operator fun invoke(note: Note, hasInternet: Boolean = false) {
         val userId = authRepository.getCurrentUserId()?:""
-        val noteWithUser = note.copy(firebaseNoteId = userId ,  syncedStatus = hasInternet)
+        val noteWithUser = note.copy(firebaseUserId = userId)
         repository.updateNote(noteWithUser, hasInternet)
     }
 }

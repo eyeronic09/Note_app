@@ -7,6 +7,8 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
+
+
 class NotesFirebaseRemoteDataSourceImpl(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore
@@ -27,41 +29,32 @@ class NotesFirebaseRemoteDataSourceImpl(
         noteEntity: NoteEntity
     ): Result<String> = runCatching {
 
-        val documentRef = noteCollection().document()
-
-        val remoteEntity = noteEntity.copy(
-            firebaseNoteId = documentRef.id
-        )
+        val documentRef = noteCollection().document(noteEntity.id)
 
         documentRef
-            .set(remoteEntity)
+            .set(noteEntity)
             .await()
 
         Log.d(
             "NotesFirebaseRemoteDS",
-            "Note added: ${documentRef.id}"
+            "Note added: ${noteEntity.id}"
         )
 
-        documentRef.id
+        noteEntity.id
     }
 
     override suspend fun updateNote(
         noteEntity: NoteEntity
     ): Result<Unit> = runCatching {
 
-        val firebaseNoteId = noteEntity.firebaseNoteId
-            ?: throw IllegalStateException(
-                "Cannot update note: firebaseNoteId is null"
-            )
-
         noteCollection()
-            .document(firebaseNoteId)
+            .document(noteEntity.id)
             .set(noteEntity)
             .await()
 
         Log.d(
             "NotesFirebaseRemoteDS",
-            "Note updated: $firebaseNoteId"
+            "Note updated: ${noteEntity.id}"
         )
     }
 
@@ -69,19 +62,14 @@ class NotesFirebaseRemoteDataSourceImpl(
         noteEntity: NoteEntity
     ): Result<Unit> = runCatching {
 
-        val firebaseNoteId = noteEntity.firebaseNoteId
-            ?: throw IllegalStateException(
-                "Cannot delete note: firebaseNoteId is null"
-            )
-
         noteCollection()
-            .document(firebaseNoteId)
+            .document(noteEntity.id)
             .delete()
             .await()
 
         Log.d(
             "NotesFirebaseRemoteDS",
-            "Note deleted: $firebaseNoteId"
+            "Note deleted: ${noteEntity.id}"
         )
     }
 
@@ -94,12 +82,7 @@ class NotesFirebaseRemoteDataSourceImpl(
                 .await()
 
             snapshot.documents.mapNotNull { document ->
-
-                document
-                    .toObject(NoteEntity::class.java)
-                    ?.copy(
-                        firebaseNoteId = document.id
-                    )
+                document.toObject(NoteEntity::class.java)
             }
 
         } catch (e: Exception) {

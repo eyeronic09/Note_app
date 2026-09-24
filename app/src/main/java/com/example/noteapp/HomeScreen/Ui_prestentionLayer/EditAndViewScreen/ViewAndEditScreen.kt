@@ -49,7 +49,7 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OpenThe
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.RichNoteEditor
 import org.koin.androidx.compose.koinViewModel
 
-class _ViewAndEditScreen(val noteId: Int) : Screen {
+class _ViewAndEditScreen(val noteId: String) : Screen {
     override val key: ScreenKey = uniqueScreenKey
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -63,13 +63,13 @@ class _ViewAndEditScreen(val noteId: Int) : Screen {
     @RequiresApi(Build.VERSION_CODES.O)
     @Composable
     fun ViewAndEditScreenRoute(
-        noteId: Int,
+        noteId: String,
         viewModel: HomeScreenViewModel = koinViewModel(),
     ) {
         val state by viewModel.uiState.collectAsStateWithLifecycle()
         val event = viewModel::onEvent
         LaunchedEffect(noteId) {
-            if (noteId != -1) {
+            if (noteId.isNotBlank()) {
                 event(HomeScreenEvent.OpenToReadAndUpdate(noteId = noteId))
             }
         }

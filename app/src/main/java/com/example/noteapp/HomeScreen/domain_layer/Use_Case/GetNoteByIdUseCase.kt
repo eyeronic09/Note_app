@@ -5,7 +5,7 @@ import com.example.noteapp.HomeScreen.domain_layer.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetNoteByIdUseCase (private val repository: NoteRepository){
-    suspend operator fun invoke(id: Int): Note {
+    suspend operator fun invoke(id: String): Note {
         return repository.getNoteById(id)
     }
 }
