@@ -1,8 +1,6 @@
 package com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component
 
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -22,6 +20,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.noteapp.R
+import com.example.noteapp.sign_in.domain.model.UserData
+import com.example.noteapp.ui.theme.NoteAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,14 +63,16 @@ fun SearchAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DefaultAppBar(
+    userdata: UserData? = null,
     onSearchClicked: () -> Unit,
     onSortClicked: () -> Unit,
-    onSideBar:() -> Unit
+    onSideBar: () -> Unit
 ) {
     TopAppBar(
         windowInsets = WindowInsets(0, 0, 0, 0),
         title = {
-            Text(text = "My Notes")
+            val titleText = if (!userdata?.username.isNullOrBlank()) "${userdata.username} 's  Notes" else "offline notes"
+            Text(text = titleText)
         },
         actions = {
             IconButton(onClick = onSortClicked) {
@@ -95,3 +97,18 @@ fun DefaultAppBar(
         }
     )
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun DefaultAppBarPreview() {
+    NoteAppTheme {
+        DefaultAppBar(
+            userdata = UserData(userId = "1", username = "John"),
+            onSearchClicked = {},
+            onSortClicked = {},
+            onSideBar = {}
+        )
+    }
+}
+
+

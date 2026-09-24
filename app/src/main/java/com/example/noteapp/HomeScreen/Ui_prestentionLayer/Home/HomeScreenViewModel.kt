@@ -9,13 +9,19 @@ import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.noteapp.HomeScreen.data_layer.remote.networkmonitor.networkMonitor
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteOrder
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.NoteUseCases
 import com.example.noteapp.HomeScreen.domain_layer.Use_Case.OrderType
 import com.example.noteapp.HomeScreen.domain_layer.model.Note
+import com.example.noteapp.sign_in.data.reposistoryImpl.AuthRepositoryImpl
+import com.example.noteapp.sign_in.domain.model.UserData
+import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
+import com.example.noteapp.sign_in.presentations.UiState.CurrentUserUiState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -24,6 +30,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -41,7 +48,8 @@ data class HomeScreenUIState(
         orderType = OrderType.Ascending,
     ),
     val isPin: Boolean = false,
-    val isOrderSectionVisibility: Boolean = false
+    val isOrderSectionVisibility: Boolean = false,
+    val getUserUserData : UserData? = null
 )
 
 data class NoteEditor(
@@ -77,16 +85,29 @@ sealed interface HomeScreenEvent {
 
 @OptIn(FlowPreview::class)
 class HomeScreenViewModel(
-    private val noteUseCases: NoteUseCases
+    private val noteUseCases: NoteUseCases ,
+    connection : networkMonitor,
+    private val authRepository : AuthReposistory
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeScreenUIState())
     val uiState: StateFlow<HomeScreenUIState> = _uiState.asStateFlow()
 
+    private val isConnected :
+            StateFlow<Boolean> = connection.isConnected
+                .stateIn(viewModelScope,
+                    SharingStarted.WhileSubscribed(5000),
+                    initialValue = false)
+
     private var getNotesJob: Job? = null
 
     init {
         getNotes(NoteOrder.Date(OrderType.Descending))
+        val currenloggedIn = authRepository.getCurrentUserData()
+        if (currenloggedIn != null){
+            _uiState.update { it -> it.copy(getUserUserData =  currenloggedIn)
+            }
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -189,7 +210,7 @@ class HomeScreenViewModel(
 
     fun toggleArchiver(note: Note) {
         viewModelScope.launch {
-            noteUseCases.unArchiverUseCases.invoke(note)
+            noteUseCases.unArchiverUseCases.invoke(note,isConnected.value)
         }
     }
 
@@ -253,7 +274,7 @@ class HomeScreenViewModel(
     }
 
     private suspend fun deleteNote(note: Note) {
-        noteUseCases.deleteNoteUseCase(note)
+        noteUseCases.deleteNoteUseCase(note , isConnected.value)
     }
 
     private fun updateNote() {
@@ -277,7 +298,7 @@ class HomeScreenViewModel(
                     listOfImageUri = editor.imageUri.map { it.toString() }
                 )
 
-                noteUseCases.updateNotesUseCase(updatedNote,)
+                noteUseCases.updateNotesUseCase(updatedNote,isConnected.value)
 
                 _uiState.update {
                     it.copy(
@@ -356,7 +377,7 @@ class HomeScreenViewModel(
                     color = randomColor(),
                     listOfImageUri = editor.imageUri.map { it.toString() }
                 )
-                noteUseCases.addNoteUseCase(note).also {
+                noteUseCases.addNoteUseCase(note, isConnected.value).also {
                     Log.d("Add_Note", note.toString())
                 }
                 // Reset editor fields
@@ -384,7 +405,7 @@ class HomeScreenViewModel(
                 _uiState.update {
                     it.copy(noteEditor = it.noteEditor.copy(isLoading = true))
                 }
-                noteUseCases.pinNoteUseCase.invoke(note)
+                noteUseCases.pinNoteUseCase.invoke(note, isConnected.value)
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(

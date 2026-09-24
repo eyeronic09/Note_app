@@ -146,7 +146,7 @@ class AppModule () : Application() {
         }
 
         viewModel {
-            HomeScreenViewModel(get())
+            HomeScreenViewModel(get() , get() ,get())
         }
         viewModel {
             ArchiverScreenViewModel(get())

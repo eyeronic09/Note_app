@@ -61,6 +61,7 @@ class RepositoryImpl(
             localDatasource.addNotes(
                 note.toEntity()
             )
+            if (hasInternet) firebaseRemoteDataSource.addNote(note.toEntity())
         } catch (e: Exception) {
             Log.e(
                 "RepositoryImpl",

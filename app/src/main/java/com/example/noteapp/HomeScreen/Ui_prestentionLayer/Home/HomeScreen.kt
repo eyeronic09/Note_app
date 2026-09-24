@@ -37,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
@@ -57,8 +58,10 @@ import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.NoteCar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.OrderSection
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.SearchAppBar
 import com.example.noteapp.HomeScreen.Ui_prestentionLayer.Home.component.emptyNotes
+import com.example.noteapp.HomeScreen.domain_layer.model.Note
 import com.example.noteapp.R
 import com.example.noteapp.sign_in.presentations.screen.SignInScreenRouter
+import com.example.noteapp.ui.theme.NoteAppTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -145,6 +148,7 @@ fun HomeScreen(
                     )
                 } else {
                     DefaultAppBar(
+                        userdata = state.getUserUserData,
                         onSearchClicked = {
                             onAction(HomeScreenEvent.TapToSearch)
                             onAction(HomeScreenEvent.LoadNotes)
@@ -264,3 +268,75 @@ fun HomeScreenContent(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenContentPreview() {
+    NoteAppTheme {
+        HomeScreenContent(
+            state = HomeScreenUIState(
+                notes = listOf(
+                    Note(
+                        id = 1,
+                        title = "Kotlin lecture notes",
+                        content = "Kotlin is statically type Programming lang with OOPs concepts",
+                        date = "1-1-2025",
+                        color = 1
+                    ),
+                    Note(
+                        id = 2,
+                        title = "Meeting Notes",
+                        content = "Discuss project timeline and upcoming features.",
+                        date = "2-1-2025",
+                        color = 2,
+                        isPin = true
+                    )
+                )
+            ),
+            modifier = Modifier.fillMaxSize(),
+            onAction = {},
+            navigator = null,
+            context = LocalContext.current
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenPreview() {
+    NoteAppTheme {
+        Navigator(
+            object : Screen {
+                override val key: ScreenKey = "HomeScreenPreview"
+
+                @Composable
+                override fun Content() {
+                    HomeScreen(
+                        state = HomeScreenUIState(
+                            notes = listOf(
+                                Note(
+                                    id = 1,
+                                    title = "Kotlin lecture notes",
+                                    content = "Kotlin is statically type Programming lang with OOPs concepts",
+                                    date = "1-1-2025",
+                                    color = 1
+                                ),
+                                Note(
+                                    id = 2,
+                                    title = "Meeting Notes",
+                                    content = "Discuss project timeline and upcoming features.",
+                                    date = "2-1-2025",
+                                    color = 2,
+                                    isPin = true
+                                )
+                            )
+                        ),
+                        onAction = {}
+                    )
+                }
+            }
+        )
+    }
+}
+
+
