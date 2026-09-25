@@ -78,8 +78,12 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
     kapt ("androidx.room:room-compiler:$room_version")
 
-    // WorkManager
-    val work_version = "2.9.0"
+    val work_version = "2.12.0"
+
+    // (Java only)
+    implementation("androidx.work:work-runtime:$work_version")
+
+    // Kotlin + coroutines
     implementation("androidx.work:work-runtime-ktx:$work_version")
 
     //Koin

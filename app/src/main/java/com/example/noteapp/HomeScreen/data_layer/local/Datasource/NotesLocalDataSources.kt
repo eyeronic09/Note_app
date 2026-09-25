@@ -1,6 +1,7 @@
 package com.example.noteapp.HomeScreen.data_layer.local.Datasource
 
 import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 interface NotesLocalDataSources {
@@ -12,4 +13,5 @@ interface NotesLocalDataSources {
     suspend fun searchNotes(query: String, userId: String): List<NoteEntity>
     suspend fun deleteNotes(noteEntity: NoteEntity)
     suspend fun updateNotes(noteEntity: NoteEntity)
+    suspend fun getAllUnSyncedNotes(currentUser: FirebaseUser?): List<NoteEntity>
 }

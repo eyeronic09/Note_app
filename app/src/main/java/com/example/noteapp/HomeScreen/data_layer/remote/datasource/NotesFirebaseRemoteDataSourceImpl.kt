@@ -14,7 +14,7 @@ class NotesFirebaseRemoteDataSourceImpl(
     private val firestore: FirebaseFirestore
 ) : NotesFirebaseRemoteDataSource {
 
-    private fun noteCollection(): CollectionReference {
+    fun noteCollection(): CollectionReference {
 
         val userId = auth.currentUser?.uid
             ?: throw IllegalStateException("User is not logged in")

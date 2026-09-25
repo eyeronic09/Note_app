@@ -24,4 +24,5 @@ interface NotesFirebaseRemoteDataSource {
     ): Result<Unit>
 
     suspend fun fetchNotes(): List<NoteEntity>
+
 }

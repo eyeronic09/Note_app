@@ -55,4 +55,13 @@ interface NotesDao {
     suspend fun updateNote(
         noteEntity: NoteEntity
     )
+
+    @Query("""
+        SELECT * FROM notes
+        WHERE firebaseUserId = :userId
+        AND syncedStatus = 0
+    """)
+    suspend fun getAllUnSyncedNotes(
+        userId: String
+    ): List<NoteEntity>
 }
