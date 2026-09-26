@@ -13,5 +13,5 @@ interface NotesLocalDataSources {
     suspend fun searchNotes(query: String, userId: String): List<NoteEntity>
     suspend fun deleteNotes(noteEntity: NoteEntity)
     suspend fun updateNotes(noteEntity: NoteEntity)
-    suspend fun getAllUnSyncedNotes(currentUser: FirebaseUser?): List<NoteEntity>
+    suspend fun getAllUnSyncedNotes(currentUser: String?): List<NoteEntity>
 }
