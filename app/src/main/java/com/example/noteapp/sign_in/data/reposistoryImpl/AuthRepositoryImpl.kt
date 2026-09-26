@@ -35,7 +35,7 @@ class AuthRepositoryImpl(private val auth: FirebaseAuth = FirebaseAuth.getInstan
     }
 
 
-    override fun isUserisCurrentlyloggedIN(): Boolean {
+    override fun `isUserisCurrently-loggedIN`(): Boolean {
         Log.d("AuthRepositoryImpl", "isUserisCurrentlyloggedIN called  ${user?.uid} ${user?.displayName}  ${user?.email}")
         return user != null
     }

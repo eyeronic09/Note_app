@@ -9,7 +9,7 @@ interface AuthReposistory {
     fun getCurrentUser() : FirebaseUser?
 
     fun getCurrentUserData() : UserData?
-    fun isUserisCurrentlyloggedIN() : Boolean
+    fun `isUserisCurrently-loggedIN`() : Boolean
     suspend fun signInWithGoogle(
         context: Context
     ): Result<FirebaseUser>

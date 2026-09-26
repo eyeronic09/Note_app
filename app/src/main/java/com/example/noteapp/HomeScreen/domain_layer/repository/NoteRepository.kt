@@ -31,4 +31,5 @@ interface NoteRepository {
     suspend fun searchNotes(
         query: String
     ): List<NoteEntity>
+    suspend fun syncNote() 
 }
