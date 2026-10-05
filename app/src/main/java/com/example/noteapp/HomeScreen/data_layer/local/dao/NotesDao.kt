@@ -1,4 +1,4 @@
-package com.example.noteapp.HomeScreen.data_layer.local.Dao
+package com.example.noteapp.HomeScreen.data_layer.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete

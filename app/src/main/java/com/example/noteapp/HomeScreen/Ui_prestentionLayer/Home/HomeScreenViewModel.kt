@@ -87,7 +87,8 @@ sealed interface HomeScreenEvent {
 class HomeScreenViewModel(
     private val noteUseCases: NoteUseCases ,
     connection : networkMonitor,
-    private val authRepository : AuthReposistory
+    private val authRepository : AuthReposistory,
+    private val syncScheduler: com.example.noteapp.HomeScreen.data_layer.remote.syncscheduler.NoteSyncScheduler
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeScreenUIState())
@@ -105,12 +106,15 @@ class HomeScreenViewModel(
         getNotes(NoteOrder.Date(OrderType.Descending))
         val currenloggedIn = authRepository.getCurrentUserData()
         if (currenloggedIn != null){
-            _uiState.update { it -> it.copy(getUserUserData =  currenloggedIn)
-            }
+            _uiState.update { it -> it.copy(getUserUserData =  currenloggedIn) }
+            syncScheduler.scheduleSync()
         }
         viewModelScope.launch {
             isConnected.collect { connected ->
                 Log.d("isConnected", connected.toString())
+                if (connected && currenloggedIn != null) {
+                    syncScheduler.scheduleSync()
+                }
             }
         }
     }

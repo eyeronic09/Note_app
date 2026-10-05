@@ -3,7 +3,7 @@ package com.example.noteapp.sign_in.presentations.state
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.noteapp.sign_in.data.reposistoryImpl.AuthRepositoryImpl
+import com.example.noteapp.HomeScreen.data_layer.remote.syncscheduler.NoteSyncScheduler
 import com.example.noteapp.sign_in.domain.reposistory.AuthReposistory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,18 +18,17 @@ sealed interface SignInEvent {
     data class ContinueWithGoogle(val context: Context) : SignInEvent
 }
 
-/**
- * ViewModel responsible for managing the state and actions associated with the sign-in screen.
- *
- * @property repository The repository interface handling authentication operations. Defaults to [AuthRepositoryImpl].
- */
-class SignInViewModel(private val repository: AuthReposistory) : ViewModel() {
+class SignInViewModel(
+    private val repository: AuthReposistory,
+    private val syncScheduler: NoteSyncScheduler
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignInState())
 
     init {
         val currentUser = repository.getCurrentUser()
         if (currentUser != null) {
+            syncScheduler.scheduleSync()
             _uiState.update { it.copy(authState = AuthUiState.Success(currentUser)) }
         }
     }
@@ -70,6 +69,7 @@ class SignInViewModel(private val repository: AuthReposistory) : ViewModel() {
             _uiState.update { it.copy(authState = AuthUiState.Loading) }
             val result = repository.signInOrSignUpEmailAndPassword(email, password)
             result.onSuccess { user ->
+                syncScheduler.scheduleSync()
                 _uiState.update { it.copy(authState = AuthUiState.Success(user)) }
             }.onFailure { exception ->
                 _uiState.update {
@@ -91,6 +91,7 @@ class SignInViewModel(private val repository: AuthReposistory) : ViewModel() {
             _uiState.update { it.copy(authState = AuthUiState.Loading) }
             val result = repository.signInWithGoogle(context)
             result.onSuccess { user ->
+                syncScheduler.scheduleSync()
                 _uiState.update { it.copy(authState = AuthUiState.Success(user)) }
             }.onFailure { exception ->
                 _uiState.update {

@@ -1,9 +1,8 @@
 package com.example.noteapp.HomeScreen.data_layer.local.Datasource
 
 import android.util.Log
-import com.example.noteapp.HomeScreen.data_layer.local.Dao.NotesDao
+import com.example.noteapp.HomeScreen.data_layer.local.dao.NotesDao
 import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSources {
@@ -39,8 +38,7 @@ class NotesLocalDataSourcesImpl(private val dao: NotesDao) : NotesLocalDataSourc
         dao.updateNote(noteEntity)
     }
 
-    override suspend fun getAllUnSyncedNotes(currentUser: FirebaseUser?): List<NoteEntity> {
-        val userId = currentUser?.uid ?: return emptyList()
+    override suspend fun getAllUnSyncedNotes(userId: String): List<NoteEntity> {
         return dao.getAllUnSyncedNotes(userId)
     }
 }

@@ -3,7 +3,7 @@ package com.example.noteapp.HomeScreen.data_layer.local.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.noteapp.HomeScreen.data_layer.local.Dao.NotesDao
+import com.example.noteapp.HomeScreen.data_layer.local.dao.NotesDao
 import com.example.noteapp.HomeScreen.data_layer.local.entity.NoteEntity
 
 @Database(
