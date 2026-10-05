@@ -68,7 +68,8 @@ sealed interface CurrentUiEvent {
 }
 
 class CurrentScreenVM(
-    private val repository: AuthReposistory
+    private val repository: AuthReposistory,
+    private val syncScheduler: com.example.noteapp.HomeScreen.data_layer.remote.syncscheduler.NoteSyncScheduler
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<CurrentUserUiState>(value = CurrentUserUiState.Loading)
     val uiState: StateFlow<CurrentUserUiState> = _uiState.asStateFlow()
@@ -90,6 +91,7 @@ class CurrentScreenVM(
         when (event) {
             is CurrentUiEvent.Logout -> {
                 viewModelScope.launch {
+                    syncScheduler.scheduleSync()
                     repository.signOut()
                     _uiState.value = CurrentUserUiState.LoggedOut
                 }

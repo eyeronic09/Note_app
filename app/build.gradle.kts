@@ -92,6 +92,7 @@ dependencies {
     implementation(platform("io.insert-koin:koin-bom:$koin_version"))
     implementation("io.insert-koin:koin-core:$koin_version")
     implementation("io.insert-koin:koin-androidx-compose:$koin_version")
+    implementation("io.insert-koin:koin-androidx-workmanager:$koin_version")
 
     //Navigation
     val voyagerVersion = "1.1.0-beta02"

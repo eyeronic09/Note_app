@@ -154,8 +154,7 @@ class RepositoryImpl(
 
     override suspend fun syncNote()   {
         val userId = authRepository.getCurrentUserId() ?: return
-        val allUnsyncedNotes = localDatasource.getAllUnSyncedNotes(currentUser = userId)
-
+        val allUnsyncedNotes = localDatasource.getAllUnSyncedNotes(userId)
         if (allUnsyncedNotes.isEmpty()) {
             return
         }

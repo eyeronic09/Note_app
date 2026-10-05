@@ -10,5 +10,6 @@ data class NoteUseCases(
     val updateNotesUseCase: UpdateNotesUseCase,
     val getNoteByIdUseCase: GetNoteByIdUseCase,
     val pinNoteUseCase: PinNoteUseCase,
-    val unArchiverUseCases: UnArchiverUseCase
+    val unArchiverUseCases: UnArchiverUseCase,
+    val syncNotesUseCase: SyncNotesUseCase
 )

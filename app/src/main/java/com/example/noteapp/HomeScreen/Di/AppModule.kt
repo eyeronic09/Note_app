@@ -1,5 +1,7 @@
 package com.example.noteapp.HomeScreen.Di
 
+import org.koin.androidx.workmanager.dsl.worker
+import org.koin.androidx.workmanager.koin.workManagerFactory
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -65,6 +67,7 @@ class AppModule () : Application() {
         startKoin {
             androidLogger()
             androidContext(this@AppModule)
+            workManagerFactory()
             modules(noteModule , todoModule , authModule)
         }
     }
@@ -110,7 +113,7 @@ class AppModule () : Application() {
         
         // Repository
         single<NoteRepository> {
-            RepositoryImpl(get(), get(), get())
+            RepositoryImpl(get(), get(), get(),get())
         }
         single<NotesFirebaseRemoteDataSource> {
             NotesFirebaseRemoteDataSourceImpl(get() , get())
@@ -131,6 +134,7 @@ class AppModule () : Application() {
         factory { PinNoteUseCase(get()) }
         factory { UnArchiverUseCase(get()) }
         factory { GetAllArchiverUseCase(get()) }
+        factory { com.example.noteapp.HomeScreen.domain_layer.Use_Case.SyncNotesUseCase(get()) }
 
         factory {
             NoteUseCases(
@@ -141,12 +145,18 @@ class AppModule () : Application() {
                 updateNotesUseCase = get(),
                 getNoteByIdUseCase = get(),
                 pinNoteUseCase = get(),
-                unArchiverUseCases = get()
+                unArchiverUseCases = get(),
+                syncNotesUseCase = get()
             )
         }
 
+        // WorkManager
+        single { androidx.work.WorkManager.getInstance(androidContext()) }
+        single { com.example.noteapp.HomeScreen.data_layer.remote.syncscheduler.NoteSyncScheduler(get()) }
+        worker { com.example.noteapp.HomeScreen.data_layer.remote.syncscheduler.SyncNotesWorker(get(), get(), get()) }
+
         viewModel {
-            HomeScreenViewModel(get() , get() ,get())
+            HomeScreenViewModel(get() , get() ,get(), get())
         }
         viewModel {
             ArchiverScreenViewModel(get())
@@ -215,10 +225,10 @@ class AppModule () : Application() {
         }
 
         viewModel {
-            SignInViewModel(get())
+            SignInViewModel(get(), get())
         }
         viewModel {
-            CurrentScreenVM(get())
+            CurrentScreenVM(get(), get())
         }
     }
 
