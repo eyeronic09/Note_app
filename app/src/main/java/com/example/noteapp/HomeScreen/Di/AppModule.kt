@@ -228,7 +228,7 @@ class AppModule () : Application() {
             SignInViewModel(get(), get())
         }
         viewModel {
-            CurrentScreenVM(get())
+            CurrentScreenVM(get(), get())
         }
     }
 
